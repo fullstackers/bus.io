@@ -59,18 +59,17 @@ bus.io.on('connection', function (socket) {
 
 ##Passengers on the bus
 
-~~~When a socket.io establishes a connection to a socket. The socket is wrapped up
-as a passenger.  The passenger provides a bridge between the socket and the bus.~~~
+A passenger allows you to write specific handlers for when they receive a message.
 
-~~~
 ```javascript
 
 bus.on('passenger', function (passenger) {
-  passenger.does('say').what('hello').to('you');
+  passenger.on('some message', function (message) {
+    message.consume();
+  });
 });
 
 ```
-~~~
 
 ##Handling messages on the bus
 
