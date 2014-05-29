@@ -179,6 +179,8 @@ bus.on('some message', function (message, bus) {
 
 });
 
+```
+
 # Running Tests
 
 Tests are run using grunt.  You must first globally install the grunt-cli with npm.
