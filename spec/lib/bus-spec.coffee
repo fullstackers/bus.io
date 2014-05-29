@@ -3,14 +3,13 @@ Sio = require 'socket.io'
 
 describe 'bus.io', ->
 
+  Given -> @bus = BusIO()
+
   describe '#', ->
     
-    When -> @res = BusIO()
     Then -> expect(@res instanceof BusIO).toBe true
 
   describe '#listen', ->
-
-    Given -> @bus = BusIO()
 
     context 'with port', ->
 
@@ -25,4 +24,15 @@ describe 'bus.io', ->
       Given -> spyOn(@io,['listen'])
       When -> @bus.listen @io
       Then -> expect(@bus.io).toEqual @io
+
+  describe '#handle',
+
+    Given -> spyOn(@bus.emit).andCallThrough()
+    Given -> @message =
+      actor: 'me'
+      action: 'say'
+      content: 'hello'
+      target: 'you'
+    When ->  @bus.handle @message
+    Then -> expect(@bus.emit).toHaveBeenCalledWith 'say', jasmine.any(Object)
 

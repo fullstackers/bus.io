@@ -21,7 +21,7 @@ Clone this repository
 
 cd into the directory and install the dependencies
 
-    > cd message-exchange
+    > cd bus.io
     > npm install && npm shrinkwrap --dev
 
 # Examples
