@@ -1,50 +1,68 @@
 
 describe 'message builder', ->
 
-  Given -> @Builder = requireSubject 'lib/message-builder', {}
+  Given ->
+    id = 0
+    @Message = class Message
+      constructor: ->
+        if not(@ instanceof Message)
+          return new Message
+        @data =
+          actor: 'me'
+          action: 'say'
+          content: 'hello'
+          target: 'you'
+          created: new Date
+          reference: null
+        @id = ++id
+
+      clone: ->
+        return new Message
+
+  Given -> @Builder = requireSubject 'lib/message-builder', { './message': @Message }
   Given -> @builder = @Builder()
   
   describe '#actor', ->
 
     Given -> @p = 'you'
     When -> @builder.actor @p 
-    Then -> expect(@builder.message.data.actor).toBe @p
+    Then -> expect(@builder.actor()).toBe @p
 
   describe '#target', ->
 
     Given -> @p = 'you'
     When -> @builder.target @p
-    Then -> expect(@builder.message.data.target).toBe @p
+    Then -> expect(@builder.target()).toBe @p
 
   describe '#content', ->
 
     Given -> @p = 'you'
     When -> @builder.content @p
-    Then -> expect(@builder.message.data.content).toBe @p
+    Then -> expect(@builder.content()).toBe @p
 
   describe '#action', ->
 
     Given -> @p = 'you'
-    When -> @builder.content @p
-    Then -> expect(@builder.message.data.action).toBe @p
+    When -> @builder.action @p
+    Then -> expect(@builder.action()).toBe @p
 
   describe '#i', ->
 
     Given -> @p = 'you'
     When -> @builder.i @p
-    Then -> expect(@builder.message.data.actor).toBe @p
+    Then -> expect(@builder.i()).toBe @p
 
   describe '#did', ->
 
     Given -> @p = 'you'
     When -> @builder.did @p
-    Then -> expect(@builder.message.data.action).toBe @p
+    Then -> expect(@builder.did()).toBe @p
 
   describe '#what', ->
 
     Given -> @p = 'you'
     When -> @builder.what @p
-    Then -> expect(@builder.message.data.content).toBe @p
+    Then -> expect(@builder.what()).toBe @p
 
   describe '#to', ->
 
@@ -89,7 +107,7 @@ describe 'message builder', ->
       Given -> spyOn(@builder, ['emit'])
       Given -> @p = 'you'
       Given -> @builder.target @p
-      When -> @builder.deliver
+      When -> @builder.deliver()
       Then -> expect(@builder.message.data.target).toBe @p
       And -> expect(@builder.emit).toHaveBeenCalledWith 'built', @builder.message
 
