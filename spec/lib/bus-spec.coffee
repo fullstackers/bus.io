@@ -2,7 +2,7 @@ EventEmitter = require('events').EventEmitter
 
 describe.only 'bus', ->
 
-  Given -> @date = new Date
+  date = new Date
 
   Given ->
     @Sio = class Sio extends EventEmitter
@@ -21,12 +21,13 @@ describe.only 'bus', ->
         action: 'say'
         content: 'hello'
         target: 'you'
-        created: @created 
+        created: date 
 
 
   Given ->
     @Bus = requireSubject 'lib/bus', {
-      'socket.io': @Sio
+      'socket.io': @Sio,
+      './message-builder': @Builder
     }
 
   Given -> @bus = @Bus()
@@ -59,8 +60,8 @@ describe.only 'bus', ->
         action: 'say'
         content: 'hello'
         target: 'you'
-        created: @date
+        created: date
     When -> @message = @bus.message @params
-    Then -> expect(@message.data()).toBe @params
+    Then -> expect(@message.data()).toEqual @params
     And -> expect(@message.listeners('built').length).toBe 1
     And -> expect(@message.listeners('built')[0]).toEqual @bus.onBuiltMessage
