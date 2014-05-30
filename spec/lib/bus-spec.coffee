@@ -1,13 +1,16 @@
-BusIO = require './../../.'
+Builder = ->
+Bus = requireSubject 'lib/bus', {
+  './message-builder': Builder
+}
 Sio = require 'socket.io'
 
 describe 'bus.io', ->
 
-  Given -> @bus = BusIO()
+  Given -> @bus = Bus()
 
   describe '#', ->
     
-    Then -> expect(@res instanceof BusIO).toBe true
+    Then -> expect(@res instanceof Bus).toBe true
 
   describe '#listen', ->
 
@@ -25,14 +28,24 @@ describe 'bus.io', ->
       When -> @bus.listen @io
       Then -> expect(@bus.io).toEqual @io
 
-  describe '#handle',
+  describe '#message', ->
 
-    Given -> spyOn(@bus.emit).andCallThrough()
-    Given -> @message =
-      actor: 'me'
-      action: 'say'
-      content: 'hello'
-      target: 'you'
-    When ->  @bus.handle @message
-    Then -> expect(@bus.emit).toHaveBeenCalledWith 'say', jasmine.any(Object)
+    context 'no args', ->
 
+      When -> @message = @bus.message()
+      Then -> expect(@message instanceof Builder).toBe true
+
+    context 'args', ->
+
+      Given ->
+        @params =
+          actor: 'me'
+          action: 'say'
+          content: 'hello'
+          target: 'you'
+          creatd: new Date
+      When -> @message = @bus.message @params
+      Then -> expect(@message instanceof Builder).toBe true
+      And -> expect(@message.data()).toBe @params
+      And -> expect(@message.listeners('built').length).toBe 1
+      And -> expect(@message.listeners('built')[0]).toEqual @bus.onBuiltMessage

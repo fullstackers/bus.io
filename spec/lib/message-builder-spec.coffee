@@ -28,31 +28,42 @@ describe 'message builder', ->
     When -> @builder.content @p
     Then -> expect(@builder.message.data.action).toBe @p
 
-  dsecribe '#i', ->
+  describe '#i', ->
 
     Given -> @p = 'you'
     When -> @builder.i @p
     Then -> expect(@builder.message.data.actor).toBe @p
 
-  dsecribe '#did', ->
+  describe '#did', ->
 
     Given -> @p = 'you'
     When -> @builder.did @p
     Then -> expect(@builder.message.data.action).toBe @p
 
-  dsecribe '#what', ->
+  describe '#what', ->
 
     Given -> @p = 'you'
     When -> @builder.what @p
     Then -> expect(@builder.message.data.content).toBe @p
 
-  dsecribe '#to', ->
+  describe '#to', ->
 
     Given -> spyOn(@builder, ['emit'])
     Given -> @p = 'you'
     When -> @builder.to @p
     Then -> expect(@builder.message.data.target).toBe @p
     And -> expect(@builder.emit).toHaveBeenCalledWith 'built', @builder.message
+
+  describe '#data', ->
+    Given ->
+      @params =
+        actor: 'me'
+        action: 'say'
+        content: 'hello'
+        target: 'you'
+        creatd: new Date
+    When -> @builder.data @params
+    Then -> expect(@builder.data()).toEqual @params
 
   describe '#deliver', ->
 

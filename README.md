@@ -57,18 +57,6 @@ bus.io.on('connection', function (socket) {
 
 ```
 
-##Passengers on the bus
-
-A passenger allows you to write specific handlers for when they receive a message.
-
-```javascript
-
-bus.on('passenger', function (passenger) {
-  passenger.on('some message', function (message) {
-    message.consume();
-  });
-});
-
 ```
 
 ##Handling messages on the bus
@@ -83,6 +71,7 @@ message will continue to propagate.
 
 bus.on('some message', function (message) {
   console.log(message);
+  message.deliver();
 }).
 
 ```
@@ -196,3 +185,18 @@ To run the tests, just run grunt
 # TODO
 
 Implementation
+
+# Ideas
+
+##Passengers on the bus
+
+A passenger allows you to write specific handlers for when they receive a message.
+
+```javascript
+
+bus.on('passenger', function (passenger) {
+  passenger.on('some message', function (message) {
+    message.consume();
+  });
+});
+
