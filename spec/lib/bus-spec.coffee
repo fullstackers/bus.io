@@ -1,6 +1,6 @@
 EventEmitter = require('events').EventEmitter
 
-describe.only 'bus', ->
+describe 'bus', ->
 
   date = new Date
 
