@@ -1,6 +1,6 @@
 EventEmitter = require('events').EventEmitter
 
-xdescribe 'message handler', ->
+describe 'message handler', ->
 
   Given -> @Handler = requireSubject 'lib/message-handler', {}
 

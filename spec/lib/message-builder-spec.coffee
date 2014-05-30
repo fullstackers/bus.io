@@ -1,5 +1,5 @@
 
-xdescribe 'message builder', ->
+describe 'message builder', ->
 
   Given -> @Builder = requireSubject 'lib/message-builder', {}
   Given -> @builder = @Builder()

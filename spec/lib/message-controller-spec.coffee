@@ -1,5 +1,5 @@
 
-xdescribe 'message controller', ->
+describe 'message controller', ->
 
   Given -> @Controller = requireSubject 'lib/message-controller', {}
 
