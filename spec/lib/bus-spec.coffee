@@ -1,6 +1,8 @@
 EventEmitter = require('events').EventEmitter
 
-describe 'bus.io', ->
+describe.only 'bus', ->
+
+  Given -> @date = new Date
 
   Given ->
     @Sio = class Sio extends EventEmitter
@@ -8,6 +10,19 @@ describe 'bus.io', ->
         if not (@ instanceof Sio)
           return new Sio
       listen: ->
+
+  Given ->
+    @Builder = class Builder extends EventEmitter
+      constructor: ->
+        if not (@ instanceof Builder)
+          return new Builder
+      data: ->
+        actor: 'me'
+        action: 'say'
+        content: 'hello'
+        target: 'you'
+        created: @created 
+
 
   Given ->
     @Bus = requireSubject 'lib/bus', {
@@ -44,7 +59,7 @@ describe 'bus.io', ->
         action: 'say'
         content: 'hello'
         target: 'you'
-        creatd: new Date
+        created: @date
     When -> @message = @bus.message @params
     Then -> expect(@message.data()).toBe @params
     And -> expect(@message.listeners('built').length).toBe 1
