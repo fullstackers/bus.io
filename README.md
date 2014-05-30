@@ -128,7 +128,7 @@ bus.on('some message', function (message) {
 
 ```
 
-You can respond to messages to.
+You can respond to messages too.
 
 ```javascript
 
@@ -151,7 +151,7 @@ bus.on('some message', function (message, bus) {
     action:'say',
     content:'hello'
     target:'you',
-  });
+  }).deliver();
 
 });
 

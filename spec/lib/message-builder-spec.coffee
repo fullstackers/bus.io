@@ -64,6 +64,15 @@ describe 'message builder', ->
       Then -> expect(@builder.message.data.target).toBe @p
       And -> expect(@builder.emit).toHaveBeenCalledWith 'built', @builder.message
 
+      # NOTE need to update this test
+    context 'with multiple params', ->
+
+      Given -> spyOn(@builder, ['emit'])
+      Given -> @p = 'you'
+      When -> @builder.deliver @p
+      Then -> expect(@builder.message.data.target).toBe @p
+      And -> expect(@builder.emit).toHaveBeenCalledWith 'built', @builder.message
+
     context 'with no params', ->
 
       Given -> spyOn(@builder, ['emit'])
