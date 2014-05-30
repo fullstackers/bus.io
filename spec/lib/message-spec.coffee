@@ -1,4 +1,4 @@
-describe.only 'message', ->
+describe 'message', ->
 
   Given -> @Message = requireSubject 'lib/message', {}
 
@@ -9,6 +9,7 @@ describe.only 'message', ->
     content: 'what'
     target: 'you'
     created: @date
+    reference: null
 
   describe '#', ->
 
@@ -22,8 +23,8 @@ describe.only 'message', ->
       Then -> expect(@message.data).toEqual @params
 
     context 'params', ->
-      When -> @message = @Message 'me', 'say', 'what', 'you', @date
-      Then -> expect(@message.data).toEqual actor:'me', action:'say', content:'what', target:'you', created: @date
+      When -> @message = @Message 'me', 'say', 'what', 'you', @date, 'id', null
+      Then -> expect(@message.data).toEqual @params
 
   describe '#clone', ->
     Given -> @message = @Message @params
