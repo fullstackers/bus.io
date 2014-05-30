@@ -51,6 +51,8 @@ describe 'bus', ->
       constructor: ->
       attach: ->
       dettach: ->
+      action: ->
+      exchange: ->
     @SocketMessages.make = ->
       return new SocketMessages
 
@@ -58,6 +60,7 @@ describe 'bus', ->
     @MessageExchange = class MessageExchange extends EventEmitter
       constructor: ->
       publish: ->
+      handler: new EventEmitter
     @MessageExchange.make = ->
       return new MessageExchange
 
@@ -116,8 +119,10 @@ describe 'bus', ->
   describe '#socketMessages', ->
 
     Given -> @socketMessages = new @SocketMessages
+    Given -> spyOn(@socketMessages,['exchange']).andCallThrough()
     When -> @res = @bus.socketMessages(@socketMessages).socketMessages()
     Then -> expect(@res).toEqual @socketMessages
+    And -> expect(@socketMessages.exchange).toHaveBeenCalledWith(@bus.messageExchange())
 
   describe '#io', ->
 
@@ -129,11 +134,13 @@ describe 'bus', ->
 
   describe '#on', ->
     Given -> @fn = ->
-    Given -> spyOn(@bus.messageExchange(),['on']).andCallThrough()
+    Given -> spyOn(@bus.messageExchange().handler,['on']).andCallThrough()
+    Given -> spyOn(@bus.socketMessages(),['action']).andCallThrough()
     When -> @bus.on 'name', @fn
-    Then -> expect(@bus.messageExchange().on).toHaveBeenCalled()
-    And -> expect(@bus.messageExchange().on.mostRecentCall.args[0]).toBe 'name'
-    And -> expect(typeof @bus.messageExchange().on.mostRecentCall.args[1]).toBe 'function'
+    Then -> expect(@bus.messageExchange().handler.on).toHaveBeenCalled()
+    And -> expect(@bus.messageExchange().handler.on.mostRecentCall.args[0]).toBe 'name'
+    And -> expect(typeof @bus.messageExchange().handler.on.mostRecentCall.args[1]).toBe 'function'
+    And -> expect(@bus.socketMessages().action).toHaveBeenCalledWith 'name'
 
   describe '#onPublish', ->
 
