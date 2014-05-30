@@ -133,9 +133,9 @@ Or even create new messages.
 
 ```javascript
 
-bus.on('some message', function (message, bus) {
+bus.on('some message', function (message) {
   
-  bus.message({
+  this.message({
     actor:'I',
     action:'say',
     content:'hello'
@@ -150,9 +150,9 @@ A chainable approach.
 
 ```javascript
 
-bus.on('some message', function (message, bus) {
+bus.on('some message', function (message) {
   
-  bus.message().actor('me').action('say').content('hello').target('you').deliver();
+  this.message().actor('me').action('say').content('hello').target('you').deliver();
 
 });
 
@@ -162,9 +162,9 @@ Or simply
 
 ```javascript
 
-bus.on('some message', function (message, bus) {
+bus.on('some message', function (message) {
   
-  bus.message().i('me').did('say').what('hello').to('you');
+  this.message().i('me').did('say').what('hello').to('you');
 
 });
 
@@ -184,7 +184,8 @@ To run the tests, just run grunt
 
 # TODO
 
-Implementation
+* Hook up the Handler to MessageExchange
+* Hook up the SocketMessages to Socket.IO
 
 # Ideas
 
