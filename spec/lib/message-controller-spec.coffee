@@ -1,6 +1,7 @@
-Controller = require './../../lib/message-controller'
 
-describe 'message controller', ->
+xdescribe 'message controller', ->
+
+  Given -> @Controller = requireSubject 'lib/message-controller', {}
 
   Given ->
     @message =
@@ -12,8 +13,8 @@ describe 'message controller', ->
         created: new Date
 
 
-  When -> @controller  = Controller @message
-  Then -> expect(@controller instanceof Controller).toBe true
+  When -> @controller  = @Controller @message
+  Then -> expect(@controller instanceof @Controller).toBe true
   And -> expect(@controller.message).toEqual @message
 
   describe '#consume', ->

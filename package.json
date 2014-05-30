@@ -41,6 +41,6 @@
     "grunt-cli": "^0.1.13",
     "grunt": "^0.4.5",
     "grunt-jasmine-bundle": "~0.2.0",
-    "sandboxed-module": "^0.3.0"
+    "sandboxed-module": "~0.3.0"
   }
 }

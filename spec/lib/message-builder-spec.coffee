@@ -1,8 +1,8 @@
-Builder = require './../../lib/message-builder'
 
-describe 'message builder', ->
+xdescribe 'message builder', ->
 
-  Given -> @builder = Builder()
+  Given -> @Builder = requireSubject 'lib/message-builder', {}
+  Given -> @builder = @Builder()
   
   describe '#actor', ->
 
