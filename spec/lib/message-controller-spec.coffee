@@ -1,5 +1,5 @@
 
-describe.only 'message controller', ->
+describe 'message controller', ->
 
   Given ->
     id = 0

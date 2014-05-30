@@ -29,4 +29,4 @@ describe 'message', ->
   describe '#clone', ->
     Given -> @message = @Message @params
     When -> @res = @message.clone()
-    Then -> expect(@res).toEqual @message
+    Then -> expect(@res.data).toEqual @message.data
