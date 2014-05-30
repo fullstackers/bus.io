@@ -9,7 +9,9 @@ describe 'message', ->
     content: 'what'
     target: 'you'
     created: @date
-    reference: null
+    reference: 1
+    published: undefined
+    id: 2
 
   describe '#', ->
 
@@ -23,7 +25,7 @@ describe 'message', ->
       Then -> expect(@message.data).toEqual @params
 
     context 'params', ->
-      When -> @message = @Message 'me', 'say', 'what', 'you', @date, 'id', null
+      When -> @message = @Message 'me', 'say', 'what', 'you', @date, 2, 1
       Then -> expect(@message.data).toEqual @params
 
   describe '#clone', ->
