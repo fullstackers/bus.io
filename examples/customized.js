@@ -11,6 +11,7 @@ bus.actor(function (socket, cb) {
 /*
  * set a method to extract the target from the request
  */
+
 bus.target(function (socket, params, cb) {
   // use the last argument in the emit from the client
   cb(null, params.pop());
