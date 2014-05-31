@@ -50,6 +50,7 @@ describe 'bus', ->
     @SocketMessages = class SocketMessages extends EventEmitter
       constructor: ->
       attach: ->
+      actor: (a, b) -> b null, a.id
       dettach: ->
       action: ->
       exchange: ->
@@ -61,6 +62,8 @@ describe 'bus', ->
       constructor: ->
       publish: ->
       handler: new EventEmitter
+      channel: -> @ee
+      ee: new EventEmitter
     @MessageExchange.make = ->
       return new MessageExchange
 
@@ -159,5 +162,20 @@ describe 'bus', ->
       Given -> spyOn(@bus.messageExchange(),['publish']).andCallThrough()
       When -> @bus.onPublish @message
       Then -> expect(@bus.messageExchange().publish).toHaveBeenCalledWith @message.data
+
+  describe '#onConnection', ->
+
+    Given ->
+      @socket = new EventEmitter
+      @socket.id = 'me'
+    Given -> spyOn(@bus.socketMessages(),['actor']).andCallThrough()
+    Given -> spyOn(@bus.messageExchange(),['channel']).andCallThrough()
+    Given -> spyOn(@bus.messageExchange().channel('me'),['on']).andCallThrough()
+    Given -> spyOn(@socket,['on']).andCallThrough()
+    When -> @bus.onConnection @socket
+    Then -> expect(@bus.socketMessages().actor).toHaveBeenCalledWith @socket, jasmine.any(Function)
+    And -> expect(@bus.messageExchange().channel).toHaveBeenCalledWith 'me'
+    And -> expect(@bus.messageExchange().channel('me').on).toHaveBeenCalledWith 'message', jasmine.any(Function)
+    And -> expect(@socket.on).toHaveBeenCalledWith 'disconnect', jasmine.any(Function)
 
 

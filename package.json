@@ -1,6 +1,6 @@
 {
   "name": "bus.io",
-  "version": "0.0.1",
+  "version": "0.0.1-beta",
   "description": "A message bus",
   "main": "index.js",
   "scripts": {
@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "socket.io": "^1.0.2",
-    "socket.io-client": "^1.0.2",
+    "socket.io-client": "~1.0.2",
     "coffee-script": "^1.7.1",
     "grunt-cli": "^0.1.13",
     "grunt": "^0.4.5",

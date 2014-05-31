@@ -11,9 +11,7 @@ scale. Bus.io is built on top of socket.io.
 
 Install node.js (See download and install instructions here: http://nodejs.org/).
 
-Install coffee-script
-
-    > npm install coffee-script -g
+Install redis (See download and install instructions http://redis.io/topics/quickstart)
 
 Clone this repository
 
@@ -26,8 +24,9 @@ cd into the directory and install the dependencies
 
 # Examples
 
-##Getting a bus is simple.
+I will continue to add examples in the example directory.
 
+##Getting a bus is simple.
 
 ```javascript
 
@@ -54,8 +53,6 @@ You have the ability to control the underlying socket.io instance
 bus.io.on('connection', function (socket) {
   socket.emit('hello');
 });
-
-```
 
 ```
 
@@ -172,6 +169,10 @@ bus.on('some message', function (message) {
 
 # Running Tests
 
+Install coffee-script
+
+    > npm install coffee-script -g
+
 Tests are run using grunt.  You must first globally install the grunt-cli with npm.
 
     > sudo npm install -g grunt-cli
@@ -184,8 +185,18 @@ To run the tests, just run grunt
 
 # TODO
 
-* Hook up the Handler to MessageExchange
-* Hook up the SocketMessages to Socket.IO
+* ~~~ Hook up the Handler to MessageExchange
+* ~~~ Hook up the SocketMessages to Socket.IO
+* Take advantage of rooms
+* Simplify modifiy the actor population
+* More examples
+* Work without redis
+
+# Working Examples and Demos
+
+You will need a redis server up and running to run the demos at this time
+
+    > node examples/hello.js
 
 # Ideas
 
@@ -201,3 +212,4 @@ bus.on('passenger', function (passenger) {
   });
 });
 
+```
