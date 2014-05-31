@@ -21,7 +21,9 @@
     "consumer",
     "queue",
     "exchange",
-    "network"
+    "network",
+    "socket.io",
+    "redis"
   ],
   "author": "Nathan G. Romano <nathan.g.romano@gmail.com>",
   "license": "ISC",
