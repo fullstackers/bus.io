@@ -1,6 +1,6 @@
 {
   "name": "bus.io",
-  "version": "0.0.2-beta",
+  "version": "0.0.3-beta",
   "description": "A message bus",
   "main": "index.js",
   "scripts": {
@@ -35,7 +35,8 @@
     "socket-messages": "0.0.1",
     "socket.io": "^1.0.2",
     "message-exchange": "0.0.2",
-    "node-uuid": "~1.4.1"
+    "node-uuid": "~1.4.1",
+    "extend": "~1.2.1"
   },
   "devDependencies": {
     "socket.io": "^1.0.2",

@@ -22,6 +22,20 @@ cd into the directory and install the dependencies
     > cd bus.io
     > npm install && npm shrinkwrap --dev
 
+## Simple Server# 
+
+This is a simple server that will process a message and deliver it to the target.
+
+```javascript
+
+var bus = require('bus.io')().listen(3000);
+bus.on('echo', function (message) {
+  message.deliver(); 
+});
+
+
+```
+
 # Examples
 
 I will continue to add examples in the example directory.
@@ -50,7 +64,7 @@ You have the ability to control the underlying socket.io instance
 
 ```javascript
 
-bus.io.on('connection', function (socket) {
+bus.io().on('connection', function (socket) {
   socket.emit('hello');
 });
 
@@ -185,13 +199,7 @@ To run the tests, just run grunt
 
 # TODO
 
-* ~~~ Hook up the Handler to MessageExchange
-* ~~~ Hook up the SocketMessages to Socket.IO
-* ~~~ Listen to message event from socektMessages and publish it
-* Take advantage of rooms
-* Simplify modifiy the actor population
-* More examples
-* Work without redis
+* Lots
 
 # Working Examples and Demos
 
