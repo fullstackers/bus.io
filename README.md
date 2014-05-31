@@ -22,7 +22,7 @@ cd into the directory and install the dependencies
     > cd bus.io
     > npm install && npm shrinkwrap --dev
 
-## Simple Server# 
+## Simple Server
 
 This is a simple server that will process a message and deliver it to the target.
 
@@ -70,10 +70,13 @@ bus.io().on('connection', function (socket) {
 
 ```
 
+## Configuration
+
+
+
 ##Handling messages on the bus
 
-All messages received by clients are propogated to their targets.  You can control
-how messages are handled and propagated.
+Messages received can be propagated to their target by calling *deliver*.
 
 Here we are writing out the message contents.  After this handler is executed the 
 message will continue to propagate.
@@ -84,16 +87,6 @@ bus.on('some message', function (message) {
   console.log(message);
   message.deliver();
 }).
-
-```
-
-In order to control propagation you can consume the message.
-
-```javascript
-
-bus.on('some message', function (message) {
-  message.consume();
-});
 
 ```
 
@@ -222,3 +215,32 @@ bus.on('passenger', function (passenger) {
 });
 
 ```
+
+## Use socket.io rooms
+
+Each actor has their own channel currently.  It maybe nice to utilize that functionality.
+One can broadcast their message to a number of targets
+
+```javascript
+
+bus.on('some event', function (message) {
+
+  message.deliver('a','b','c','d','e');
+
+});
+
+
+```
+
+## Message consumption
+
+In order to control propagation you can consume the message.
+
+```javascript
+
+bus.on('some message', function (message) {
+  message.consume();
+});
+
+```
+
