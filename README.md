@@ -72,6 +72,44 @@ bus.io().on('connection', function (socket) {
 
 ## Configuration
 
+The **actor** is the entitty assocaited with a socket.  Actors each have their
+own channel.  Actors send messages to other actors.  By default an **actor**
+is represented by the socket identifier.  You can customize this behavior. 
+Here we are using a username from a session.
+
+```javascript
+
+bus.actor(function (socket, cb) {
+  cb(null, socket.handshake.data.session.user);
+});
+
+
+```
+
+The **target** also is an actor.  The target can be pulled from the socket or
+the parameters from a message received on a socket.  By default the target
+is socket identifier.
+
+```javascript
+
+bus.target(funciton (socket, params, cb) {
+  cb(null, params.pop());
+});
+
+```
+
+If the client had done this:
+
+The **target** will be "you"
+
+```javascript
+
+socket.emit('say', 'hello', 'you');
+
+```
+
+The **bus** instance has it's *on* method overriden.  You can still add listeners by
+calling addListener.
 
 
 ##Handling messages on the bus
