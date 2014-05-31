@@ -4,24 +4,24 @@ var bus = require('./..')();
  * set a method to extrac the actor id from the socket
  */
 
-bus.socketMessages().actor(function (socket, cb) {
+bus.actor(function (socket, cb) {
   cb(null, 'Nathan');
 });
 
 /*
  * set a method to extract the target from the request
  */
-bus.socketMessages().target(function (socket, params, cb) {
+bus.target(function (socket, params, cb) {
   // use the last argument in the emit from the client
   cb(null, params.pop());
 });
 
 /*
- * Lets handle the echo event
+ * Lets handle the event
  */
 
 bus.on('say', function (message) {
-  message.respond('hi').deliver();
+  message.respond('hi');
 });
 
 /*
