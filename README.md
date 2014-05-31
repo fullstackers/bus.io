@@ -187,7 +187,7 @@ To run the tests, just run grunt
 
 * ~~~ Hook up the Handler to MessageExchange
 * ~~~ Hook up the SocketMessages to Socket.IO
-* Listen to message event from socektMessages and publish it
+* ~~~ Listen to message event from socektMessages and publish it
 * Take advantage of rooms
 * Simplify modifiy the actor population
 * More examples

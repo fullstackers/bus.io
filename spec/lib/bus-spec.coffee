@@ -37,6 +37,7 @@ describe 'bus', ->
         content: 'hello'
         target: 'you'
         created: date
+      deliver: ->
 
   Given ->
     @Handler = class Handler extends EventEmitter
@@ -53,7 +54,8 @@ describe 'bus', ->
       actor: (a, b) -> b null, a.id
       dettach: ->
       action: ->
-      exchange: ->
+      exchange: -> @ee
+      ee: new EventEmitter
     @SocketMessages.make = ->
       return new SocketMessages
 
@@ -122,10 +124,10 @@ describe 'bus', ->
   describe '#socketMessages', ->
 
     Given -> @socketMessages = new @SocketMessages
-    Given -> spyOn(@socketMessages,['exchange']).andCallThrough()
+    Given -> spyOn(@socketMessages.exchange(),['on']).andCallThrough()
     When -> @res = @bus.socketMessages(@socketMessages).socketMessages()
     Then -> expect(@res).toEqual @socketMessages
-    And -> expect(@socketMessages.exchange).toHaveBeenCalledWith(@bus.messageExchange())
+    And -> expect(@socketMessages.exchange().on).toHaveBeenCalledWith 'message', @bus.onMessage
 
   describe '#io', ->
 
@@ -178,4 +180,12 @@ describe 'bus', ->
     And -> expect(@bus.messageExchange().channel('me').on).toHaveBeenCalledWith 'message', jasmine.any(Function)
     And -> expect(@socket.on).toHaveBeenCalledWith 'disconnect', jasmine.any(Function)
 
+  describe '#onMessage', ->
 
+    Given -> @message = actor: 'me', action: 'say', content: 'hello', target: 'you'
+    Given -> @builder = new @Builder
+    Given -> spyOn(@builder,['deliver']).andCallThrough()
+    Given -> spyOn(@bus,['message']).andCallThrough().andReturn(@builder)
+    When -> @bus.onMessage @message
+    Then -> expect(@bus.message).toHaveBeenCalled()
+    And -> expect(@builder.deliver).toHaveBeenCalled()
