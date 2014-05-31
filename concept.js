@@ -15,12 +15,10 @@ socketMessages.exchange(messageExchange).action('say').attach(io);
 
 io.on('connection', function (socket) {
   function handle (message) {
-    console.log('handle message', message);
     socket.emit.apply(socket, [message.action, message.actor].concat(message.content));
   }
   messageExchange.channel(socket.id).on('message', handle);
   socket.on('disconnect', function () {
-    console.log('on disconnect');
     messageExchange.channel(socket.id).removeListener('message', handle);
   });
 });

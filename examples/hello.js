@@ -7,12 +7,10 @@ bus.on('say', function (message) {
 setTimeout(function () {
   var client = require('socket.io-client')('http://localhost:8080');
   client.on('connect', function () {
-    client.emit('say','Hello');
+    client.once('say', function (who, what) {
+      console.log(who + ' said ' + what);
+      process.exit();
+    });
+    client.emit('say','hello');
   });
-  client.on('say', function (message) {
-    console.log(message);
-    process.exit();
-  });
-
-
 },1000);
