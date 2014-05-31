@@ -1,4 +1,6 @@
-var bus = require('./..')().listen(8080).on('say', function (message) {
+var bus = require('./..')();
+bus.listen(8080);
+bus.on('say', function (message) {
   message.deliver() 
 });
 
