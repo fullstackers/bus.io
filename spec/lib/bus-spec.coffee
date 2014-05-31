@@ -52,6 +52,7 @@ describe 'bus', ->
       constructor: ->
       attach: ->
       actor: (a, b) -> b null, a.id
+      target: (a,b,c) -> c null, b
       dettach: ->
       action: ->
       exchange: -> @ee
@@ -189,3 +190,16 @@ describe 'bus', ->
     When -> @bus.onMessage @message
     Then -> expect(@bus.message).toHaveBeenCalled()
     And -> expect(@builder.deliver).toHaveBeenCalled()
+
+  describe '#actor', ->
+
+    Given -> spyOn(@bus.socketMessages(),['actor'])
+    When -> @bus.actor()
+    Then -> expect(@bus.socketMessages().actor).toHaveBeenCalled()
+
+  describe '#target', ->
+
+    Given -> spyOn(@bus.socketMessages(),['target'])
+    When -> @bus.target()
+    Then -> expect(@bus.socketMessages().target).toHaveBeenCalled()
+

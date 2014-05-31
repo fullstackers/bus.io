@@ -1,6 +1,9 @@
 describe 'message', ->
 
-  Given -> @Message = requireSubject 'lib/message', {}
+  Given -> @Message = requireSubject 'lib/message', {
+    'node-uuid':
+      v1: -> 2
+  }
 
   Given -> @date = new Date
   Given -> @params =
