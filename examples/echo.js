@@ -1,16 +1,16 @@
 var bus = require('./..')();
 bus.listen(8080);
-bus.on('say', function (message) {
+bus.on('echo', function (message) {
   message.deliver(); 
 });
 
 setTimeout(function () {
   var client = require('socket.io-client')('http://localhost:8080');
   client.on('connect', function () {
-    client.once('say', function (who, what) {
-      console.log(who + ' said ' + what);
+    client.once('echo', function (who, what) {
+      console.log(who + ' echo ' + what);
       process.exit();
     });
-    client.emit('say','hello');
+    client.emit('echo','hello');
   });
 },1000);
