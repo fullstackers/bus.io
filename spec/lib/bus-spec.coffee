@@ -102,6 +102,13 @@ describe 'bus', ->
       When -> @bus.listen @io
       Then -> expect(@bus.io()).toEqual @io
 
+    xcontext 'with server', ->
+
+      Given -> @server = require('http').createServer (req, res) ->
+      Given -> @spyOn(@server,['on'])
+      When -> @bus.listen @server
+      Then -> expect(@server.on).toHaveBeenCalled()
+
   describe '#message', ->
 
     Given ->
