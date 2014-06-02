@@ -72,10 +72,10 @@ describe 'bus', ->
   Given ->
     @MessageExchange = class MessageExchange extends EventEmitter
       constructor: ->
+        @ee = new EventEmitter
       publish: ->
       handler: new EventEmitter
       channel: -> @ee
-      ee: new EventEmitter
     @MessageExchange.make = ->
       return new MessageExchange
 
@@ -284,16 +284,30 @@ describe 'bus', ->
     Given -> @fn = jasmine.createSpy()
     Given -> @bus.socket @fn
     When -> @bus.io().emit 'connection', @socket
-    Then -> expect(@fn).toHaveBeenCalledWith @socket
+    Then -> expect(@fn).toHaveBeenCalledWith @socket, @bus
 
   describe '#alias', ->
 
-    Given -> @message = @Message()
-    Given -> @message.data.target = 'me'
+    Given -> @name = 'me'
     Given -> @socket = new EventEmitter
     Given -> @socket.id = 'you'
-    Given -> spyOn(@socket,['emit']).andCallThrough()
-    Given -> @name = 'me'
-    Given -> @bus.alias @socket, @name
-    When -> @bus.messageExchange().channel(@name).emit 'message', @message
-    Then -> expect(@socket.emit).toHaveBeenCalled()
+    Given -> spyOn(@bus.messageExchange(),['channel']).andCallThrough()
+    Given -> spyOn(@bus.messageExchange().channel(@name),['on']).andCallThrough()
+    Given -> spyOn(@socket,['on']).andCallThrough()
+    When -> @bus.alias @socket, @name
+    Then -> expect(@bus.messageExchange().channel).toHaveBeenCalledWith @name
+    And -> expect(@bus.messageExchange().channel(@name).on).toHaveBeenCalledWith 'message', jasmine.any(Function)
+    And -> expect(@socket.on).toHaveBeenCalledWith 'disconnect', jasmine.any(Function)
+
+    context 'triggering an event', ->
+    
+      Given -> @message = @Message()
+      Given -> @message.data.target = @name
+      Given -> spyOn(@bus,['emit']).andCallThrough()
+      When -> @bus.messageExchange().channel(@name).emit 'message', @message
+      Then -> expect(@bus.emit).toHaveBeenCalledWith 'from exchange', @message, @socket
+
+    context 'soscket disconnect', ->
+
+      When -> @socket.emit 'disconnect'
+      Then -> expect(@bus.messageExchange().channel(@name).listeners('message').length).toBe 0

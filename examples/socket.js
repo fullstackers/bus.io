@@ -9,16 +9,16 @@ bus.target(function (socket, params, cb) {
 });
 
 bus.in(function (message, socket, next) {
-  message.data.content[0] += '!!!';
+  message.data.content += '!!!';
   next();
 });
 
 bus.on('shout', function (message) {
-  message.respond(message.data.content + ' okokok');
+  message.respond(message.data.content[0] + ' okokok');
 });
 
 bus.out(function (message, socket, next) {
-  message.data.content[0].toUpperCase();
+  message.data.content[0] = message.data.content[0].toUpperCase();
   next();
 });
 
