@@ -5,7 +5,7 @@ messages are handled they can then be published to subscribers over a channel.
 Channels are identified by the actors and targets.  Messages are composed of 
 an actor, a target, an action, and the content.  A message describes an action 
 performed by a client toward another client or resource.  With Bus.io we can 
-build application that will scale. Bus.io is built on top of socket.io.
+build applications that will scale.
 
 # How this works
 
