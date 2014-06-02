@@ -125,7 +125,7 @@ is socket identifier.
 
 ```javascript
 
-bus.target(funciton (socket, params, cb) {
+bus.target(function (socket, params, cb) {
   cb(null, params.pop());
 });
 
@@ -325,7 +325,6 @@ require('bus.io')()
   .actor(function () { ... })
   .target(function () { ... })
   .socket(function () { ... })
-  .alias(function () { ... })
   .in(function  () { ... })
   .on('some event', function () { ... })
   .out(function () { ... })
