@@ -241,7 +241,12 @@ A chainable approach.
 
 bus.on('some message', function (message) {
   
-  this.message().actor('me').action('say').content('hello').target('you').deliver();
+  this.message()
+    .actor('me')
+    .action('say')
+    .content('hello')
+    .target('you')
+    .deliver();
 
 });
 
@@ -253,7 +258,11 @@ Or simply
 
 bus.on('some message', function (message) {
   
-  this.message().i('me').did('say').what('hello').to('you');
+  this.message()
+    .i('me')
+    .did('say')
+    .what('hello')
+    .to('you');
 
 });
 
@@ -546,11 +555,12 @@ To run the tests, just run grunt
 
 # TODO
 
-* specify the name of the events to be processed as we receive them from the exchange to the client
-* write another receiver from the client to the exchange
+* specify the name of the events to be processed as we receive them from the 
+  exchange to the client
 * Lots
 * Write e2e tests
 * Code coverage
+* Working with message data is cumbersome.
 
 If you would like to contribute please fork and send me a pull request.
 
