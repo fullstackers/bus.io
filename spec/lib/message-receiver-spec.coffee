@@ -22,15 +22,15 @@ describe 'message receiver', ->
   Given -> @handlers = [
     (message, socket, next) ->
       console.log 'AAA'
-      message.content += 'A'
+      message.data.content += 'A'
       next()
     (message, socket, next) ->
       console.log 'BBB'
-      message.content += 'B'
+      message.data.content += 'B'
       next()
     (message, socket, next) ->
       console.log 'CCC'
-      message.content += 'C'
+      message.data.content += 'C'
       next()
   ]
 
@@ -55,11 +55,9 @@ describe 'message receiver', ->
     Given -> @socket = new EventEmitter
     Given -> spyOn(@socket,['emit']).andCallThrough()
     Given -> @receiver.use @handlers
-    Given -> spyOn(@receiver,['onComplete']).andCallThrough()
     Given -> @message = new @Message
-    Given -> @content = @message.content + 'ABC'
+    Given -> @content = @message.data.content + 'ABC'
     When (done)-> @receiver.onReceive @message, @socket, done
-    Then -> expect(@receiver.onComplete).toHaveBeenCalledWith @message, @socket
-    And -> expect(@socket.emit).toHaveBeenCalledWith @message.action, @message.actor, @content, @message.target, @message.created
+    And -> expect(@socket.emit).toHaveBeenCalledWith @message.data.action, @message.data.actor, @content, @message.data.target, @message.data.created
   
 

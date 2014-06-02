@@ -48,6 +48,15 @@ describe 'bus', ->
       fn: ->
 
   Given ->
+    @Receiver = class Receiver extends EventEmitter
+      constructor: ->
+        if not (@ instanceof Receiver)
+          return new Receiver
+      use: ->
+      onReceive: ->
+
+
+  Given ->
     @SocketMessages = class SocketMessages extends EventEmitter
       constructor: ->
       attach: ->
@@ -76,6 +85,7 @@ describe 'bus', ->
       './message': @Message
       './message-builder': @Builder
       './message-handler': @Handler
+      './message-receiver': @Receiver
       'socket-messages': @SocketMessages
       'message-exchange': @MessageExchange
     }
@@ -213,17 +223,17 @@ describe 'bus', ->
   describe '#in', ->
 
     Given -> spyOn(@bus,['receiver']).andCallThrough()
-    Given -> spyOn(@bus.receiver(),['user']).andCallThrough()
+    Given -> spyOn(@bus.receiver(),['use']).andCallThrough()
     Given -> @fn = (a, b, c) ->
-    When -> @receiver.in @fn
-    Then -> expect(@bus.receiver).toHaveBeenCalled @fn
-    And -> expect(@bus.receiver().use).toHaveBeenCalled @fn
+    When -> @bus.in @fn
+    Then -> expect(@bus.receiver).toHaveBeenCalled()
+    And -> expect(@bus.receiver().use).toHaveBeenCalledWith @fn
 
   describe '#receive', ->
 
     Given -> spyOn(@bus,['receiver']).andCallThrough()
-    Given -> spyOn(@bus.receiver(),['user']).andCallThrough()
+    Given -> spyOn(@bus.receiver(),['use']).andCallThrough()
     Given -> @fn = (a, b, c) ->
-    When -> @receiver.in @fn
-    Then -> expect(@bus.receiver).toHaveBeenCalled @fn
-    And -> expect(@bus.receiver().use).toHaveBeenCalled @fn
+    When -> @bus.in @fn
+    Then -> expect(@bus.receiver).toHaveBeenCalled()
+    And -> expect(@bus.receiver().use).toHaveBeenCalledWith @fn
