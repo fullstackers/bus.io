@@ -7,6 +7,16 @@ an actor, a target, an action, and the content.  A message describes an action
 performed by a client toward another client or resource.  With Bus.io we can 
 build application that will scale. Bus.io is built on top of socket.io.
 
+# How this works
+
+A round trip looks like this.
+
+Socket -> SocketMessages -> Receiver -> MessageExchange -> Handler ->
+MessageExchange -> Receiver -> Socket
+
+Where **Handler** is the code that will handle the message and propagate it
+back out to the Exchange.
+
 # Installation and Environment Setup
 
 Install node.js (See download and install instructions here: http://nodejs.org/).
@@ -214,23 +224,12 @@ bus.on('some message', function (message) {
 
 ## Handling messages received from the Exchange
 
-You can specify middlware function that can manipulate the messages incomming
-from the exchange before being emitted to the client.
+You can specify middlware functions to manipulate the messages incomming from
+the exchange before being emitted to the client.
 
 ```javascript
 
-bus.receiver().use(function (message, socket, next) {
-  message.data.content += '!';
-  next(); // you must call next!
-});
-
-```
-
-Or 
-
-```javascript
-
-bus.receive(function (message, socket, next) {
+bus.exchangeReceiver().use(function (message, socket, next) {
   message.data.content += '!';
   next(); // you must call next!
 });
@@ -245,6 +244,33 @@ bus.in(function (message, socket, next) {
   message.data.content += '!';
   next(); // you must call next!
 });
+
+```
+
+## Handling messages received from the Socket
+
+You can specify middleware functions to manipulate the messages incomming from
+the client before being emitted to the exchange.
+
+```javascript
+
+bus.socketReceiver().use(function (message, socket, next) {
+  message.data.content += '!';
+  next(); // you must call next!
+});
+
+```
+
+Or
+
+```javascript
+
+bus.out(function (message, socket, next) {
+  message.data.content += '!';
+  next(); // you must call next!
+});
+
+```
 
 # Running Tests
 
@@ -267,6 +293,11 @@ To run the tests, just run grunt
 * specify the name of the events to be processed as we receive them from the exchange to the client
 * write another receiver from the client to the exchange
 * Lots
+* Get travis config
+* Write e2e tests
+* Code coverage
+
+If you would like to contribute please fork and send me a pull request.
 
 # Working Examples and Demos
 
