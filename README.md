@@ -309,7 +309,7 @@ bus.out(function (message, socket, next) {
 
 ```
 
-# API
+# API Documentation
 
 ## Bus
 
