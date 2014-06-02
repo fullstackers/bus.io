@@ -2,7 +2,6 @@
 describe 'message controller', ->
 
   Given ->
-    id = 0
     @Message = class Message
       constructor: ->
         @data =
@@ -12,7 +11,7 @@ describe 'message controller', ->
           target: 'you'
           created: new Date
           reference: null
-        @id = ++id
+          id: 1
 
       clone: ->
         return new Message
@@ -44,10 +43,19 @@ describe 'message controller', ->
     And -> expect(@controller.emit.mostRecentCall.args[1].data.content).toBe 'goodbye'
     And -> expect(@controller.emit.mostRecentCall.args[1].data.target).toBe 'me'
     And -> expect(@controller.emit.mostRecentCall.args[1].data.reference).toBe 1
-    And -> expect(@controller.emit.mostRecentCall.args[1].id).toBe 2
     And -> expect(@controller.emit.mostRecentCall.args[1].data.created instanceof Date).toBe true
 
   describe '#deliver', ->
-    When -> @controller.deliver 'people'
-    Then -> expect(@controller.emit).toHaveBeenCalledWith 'deliver', @message
+
+    context 'no args', ->
+
+      When -> @controller.deliver()
+      Then -> expect(@controller.emit).toHaveBeenCalledWith 'deliver', @message
+
+    context 'new target', ->
+      Given ->
+        @m = @message.clone()
+        @m.data.target = 'people'
+      When -> @controller.deliver 'people'
+      Then -> expect(@controller.emit).toHaveBeenCalledWith 'deliver', @m
 
