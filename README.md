@@ -343,7 +343,7 @@ require('bus.io')().actor().target()
 
 ```
 
-### actor
+### #actor
 
 Sets / Gets the function that will grab the actor.  The default implementation 
 will use the `socket.id`.  This method is called when the socket connection is 
@@ -375,7 +375,7 @@ bus.actor(function (socket, cb) {
 
 ```
 
-### target
+### #target
 
 Sets / Gets the function that will grab the target from the request.  The 
 default implemenation will use the `socket.id`.  This method is called for each
@@ -416,7 +416,7 @@ bus.target(function (socket, params, cb) {
 
 You get to decide your own convetion.
 
-### socket
+### #socket
 
 This method will allow you to bind a function to the `connection` event that 
 socket.io supports.
@@ -433,7 +433,7 @@ bus.socket(function (socket, bus) {
 
 ```
 
-### alias
+### #alias
 
 With **alias** your **actor** will receive messages whenever their **alias**
 receives one.  This is useful if you want to associate a socket to a logged in 
@@ -464,7 +464,7 @@ bus.socket(function (socket, bus) {
 
 ```
 
-### in
+### #in
 
 The **in** method will use the passed function(s) when a message is received 
 from the `bus.messageExchange()`.  This allows you to modifiy the message before it
@@ -479,7 +479,7 @@ bus.in(function (message, socket, next) {
 
 ```
 
-### on
+### #on
 
 The **on** method binds a handler to the queue.  The handler will process each
 message and give you the ability to either deliver the messsage or discard it.
@@ -493,7 +493,7 @@ bus.on('some event', function (message) {
 
 ```
 
-### out
+### #out
 
 The **out** method will use the passed function(s) when a message is received
 from the `socket` before it is published to the 
@@ -515,7 +515,7 @@ bus.out(function (message, socket, next) {
 
 ```
 
-### listen
+### #listen
 
 You can either pass a `port`, `server`, or `socket.io` instance.
 
