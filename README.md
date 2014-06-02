@@ -61,8 +61,6 @@ socket.on('echo', function (who, what, target, created) {
 
 # Examples
 
-I will continue to add examples in the example directory.
-
 ##Getting a bus is simple.
 
 ```javascript
