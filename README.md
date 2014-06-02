@@ -95,6 +95,16 @@ bus.io().on('connection', function (socket) {
 
 ## Configuration
 
+You can bind custom **socket.io* handlers to each **socket** when it is connected.
+
+```javascript
+
+bus.socket(function (socket, bus) {
+  socket.emit('hello socket.io', 'from bus.io');
+});
+
+```
+
 The **actor** is the entitty assocaited with a socket.  Actors each have their
 own channel.  Actors send messages to other actors.  By default an **actor**
 is represented by the socket identifier.  You can customize this behavior. 
@@ -128,6 +138,20 @@ The **target** will be "you"
 ```javascript
 
 socket.emit('say', 'hello', 'you');
+
+```
+
+Set up an **alias** for your actor.  When a message is sent to the alias the socket
+will receive the message.
+
+```javascript
+
+bus.socket(function (socket, bus) {
+  socket.get('user', function (err, user) {
+    if (err) return socket.emit('err');
+    bus.alias(socket, user.name);
+  });
+});
 
 ```
 

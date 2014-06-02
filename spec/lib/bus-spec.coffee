@@ -277,3 +277,23 @@ describe 'bus', ->
     When -> @bus.out @fn
     Then -> expect(@bus.socketReceiver).toHaveBeenCalled()
     And -> expect(@bus.socketReceiver().use).toHaveBeenCalledWith @fn
+
+  describe '#socket', ->
+
+    Given -> @socket = new EventEmitter
+    Given -> @fn = jasmine.createSpy()
+    Given -> @bus.socket @fn
+    When -> @bus.io().emit 'connection', @socket
+    Then -> expect(@fn).toHaveBeenCalledWith @socket
+
+  describe '#alias', ->
+
+    Given -> @message = @Message()
+    Given -> @message.data.target = 'me'
+    Given -> @socket = new EventEmitter
+    Given -> @socket.id = 'you'
+    Given -> spyOn(@socket,['emit']).andCallThrough()
+    Given -> @name = 'me'
+    Given -> @bus.alias @socket, @name
+    When -> @bus.messageExchange().channel(@name).emit 'message', @message
+    Then -> expect(@socket.emit).toHaveBeenCalled()
