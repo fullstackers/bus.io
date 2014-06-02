@@ -264,6 +264,8 @@ To run the tests, just run grunt
 
 # TODO
 
+* specify the name of the events to be processed as we receive them from the exchange to the client
+* write another receiver from the client to the exchange
 * Lots
 
 # Working Examples and Demos

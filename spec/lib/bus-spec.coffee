@@ -198,13 +198,33 @@ describe 'bus', ->
     And -> expect(@bus.messageExchange().channel('me').on).toHaveBeenCalledWith 'message', jasmine.any(Function)
     And -> expect(@socket.on).toHaveBeenCalledWith 'disconnect', jasmine.any(Function)
 
+  describe '#onError', ->
+    Given -> spyOn(console,['error'])
+    When -> @bus.onError 'message'
+    Then -> expect(console.error).toHaveBeenCalledWith 'message'
+
   describe '#onMessage', ->
+
+    Given -> @message = actor: 'me', action: 'say', content: 'hello', target: 'you'
+    Given -> @socket = new EventEmitter
+    Given -> spyOn(@bus,['emit']).andCallThrough()
+    When -> @bus.onMessage @message, @socket
+    Then -> expect(@bus.emit).toHaveBeenCalledWith 'from socket', @message, @socket
+
+  describe '#onReceivedExchange', ->
+
+    Given -> @message = new Message
+    Given -> @socket = new EventEmitter
+    When -> @bus.onReceivedExchange @message, @socket
+    And -> expect(@socket.emit).toHaveBeenCalledWith @message.data.action, @message.data.actor, @message.data.content, @message.data.target, @message.data.created
+
+  describe '#onReceivedSocket', ->
 
     Given -> @message = actor: 'me', action: 'say', content: 'hello', target: 'you'
     Given -> @builder = new @Builder
     Given -> spyOn(@builder,['deliver']).andCallThrough()
     Given -> spyOn(@bus,['message']).andCallThrough().andReturn(@builder)
-    When -> @bus.onMessage @message
+    When -> @bus.onReceivedSocket @message
     Then -> expect(@bus.message).toHaveBeenCalled()
     And -> expect(@builder.deliver).toHaveBeenCalled()
 
@@ -220,20 +240,40 @@ describe 'bus', ->
     When -> @bus.target()
     Then -> expect(@bus.socketMessages().target).toHaveBeenCalled()
 
+  describe '#exchangeReceiver', ->
+
+    Given -> spyOn(@bus,['addListener']).andCallThrough()
+    Given -> @receiver = @Receiver()
+    Given -> spyOn(@receiver,['addListener']).andCallThrough()
+    When -> @res = @bus.exchangeReceiver(@receiver).exchangeReceiver()
+    Then -> expect(@res).toEqual @receiver
+    And -> expect(@receiver.addListener).toHaveBeenCalledWith 'error', @bus.onError
+    And -> expect(@bus.addListener).toHaveBeenCalledWith 'from exchange', @receiver.onReceive
+
+  describe '#socketReceiver', ->
+
+    Given -> spyOn(@bus,['addListener']).andCallThrough()
+    Given -> @receiver = @Receiver()
+    Given -> spyOn(@receiver,['addListener']).andCallThrough()
+    When -> @res = @bus.socketReceiver(@receiver).socketReceiver()
+    Then -> expect(@res).toEqual @receiver
+    And -> expect(@receiver.addListener).toHaveBeenCalledWith 'error', @bus.onError
+    And -> expect(@bus.addListener).toHaveBeenCalledWith 'from socket', @receiver.onReceive
+
   describe '#in', ->
 
-    Given -> spyOn(@bus,['receiver']).andCallThrough()
-    Given -> spyOn(@bus.receiver(),['use']).andCallThrough()
+    Given -> spyOn(@bus,['exchangeReceiver']).andCallThrough()
+    Given -> spyOn(@bus.exchangeReceiver(),['use']).andCallThrough()
     Given -> @fn = (a, b, c) ->
     When -> @bus.in @fn
-    Then -> expect(@bus.receiver).toHaveBeenCalled()
-    And -> expect(@bus.receiver().use).toHaveBeenCalledWith @fn
+    Then -> expect(@bus.exchangeReceiver).toHaveBeenCalled()
+    And -> expect(@bus.exchangeReceiver().use).toHaveBeenCalledWith @fn
 
-  describe '#receive', ->
+  describe '#out', ->
 
-    Given -> spyOn(@bus,['receiver']).andCallThrough()
-    Given -> spyOn(@bus.receiver(),['use']).andCallThrough()
+    Given -> spyOn(@bus,['socketReceiver']).andCallThrough()
+    Given -> spyOn(@bus.socketReceiver(),['use']).andCallThrough()
     Given -> @fn = (a, b, c) ->
-    When -> @bus.in @fn
-    Then -> expect(@bus.receiver).toHaveBeenCalled()
-    And -> expect(@bus.receiver().use).toHaveBeenCalledWith @fn
+    When -> @bus.out @fn
+    Then -> expect(@bus.socketReceiver).toHaveBeenCalled()
+    And -> expect(@bus.socketReceiver().use).toHaveBeenCalledWith @fn
