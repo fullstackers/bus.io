@@ -318,16 +318,26 @@ You will need a redis server up and running to run the demos at this time
 
 # Ideas
 
-##Passengers on the bus
+## Receiver Message Routing
 
-A passenger allows you to write specific handlers for when they receive a message.
+Currently all messages are passed through the Receivers
 
 ```javascript
 
-bus.on('passenger', function (passenger) {
-  passenger.on('some message', function (message) {
-    message.consume();
-  });
+bus.in(function (message, socket, next) {
+  //do something!
+  next();
+});
+
+```
+
+It would be nice to handle specific kinds of messages
+
+```javascript
+
+bus.in('echo', function (message, socket, next) {
+    assert.equals(message.data.action, 'echo');
+    next();
 });
 
 ```
