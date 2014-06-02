@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/NathanGRomano/bus.io.svg?branch=master)](https://travis-ci.org/NathanGRomano/bus.io)
+
 Bus.io seamlessly connects clients together over a network using socket.io
 and redis.  Messages are produced by clients which are published to an 
 exchange.  The exchange queues up these messages to be handled.  When these 
@@ -304,7 +306,6 @@ To run the tests, just run grunt
 * specify the name of the events to be processed as we receive them from the exchange to the client
 * write another receiver from the client to the exchange
 * Lots
-* Get travis config
 * Write e2e tests
 * Code coverage
 
