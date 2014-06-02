@@ -38,11 +38,24 @@ This is a simple server that will process a message and deliver it to the target
 
 ```javascript
 
-var bus = require('bus.io')().listen(3000);
+var bus = require('bus.io')(3000);
 bus.on('echo', function (message) {
   message.deliver(); 
 });
 
+```
+
+On the client could do this
+
+```javascript
+
+var socket = require('socket.io-client')('http://localhost:3000');
+socket.on('connect', function () {
+  socket.emit('echo', 'hello');
+});
+socket.on('echo', function (who, what, target, created) {
+  console.log('Socket ' + who + ' said ' + what + ' to ' + target + ' at ' + created);
+});
 
 ```
 

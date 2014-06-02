@@ -1,5 +1,4 @@
-var bus = require('./..')();
-bus.listen(8080);
+var bus = require('./..')(8080);
 bus.on('greet', function (message) {
   message.deliver(); 
   message.respond('I am fine');
