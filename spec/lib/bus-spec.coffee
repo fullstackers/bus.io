@@ -210,3 +210,20 @@ describe 'bus', ->
     When -> @bus.target()
     Then -> expect(@bus.socketMessages().target).toHaveBeenCalled()
 
+  describe '#in', ->
+
+    Given -> spyOn(@bus,['receiver']).andCallThrough()
+    Given -> spyOn(@bus.receiver(),['user']).andCallThrough()
+    Given -> @fn = (a, b, c) ->
+    When -> @receiver.in @fn
+    Then -> expect(@bus.receiver).toHaveBeenCalled @fn
+    And -> expect(@bus.receiver().use).toHaveBeenCalled @fn
+
+  describe '#receive', ->
+
+    Given -> spyOn(@bus,['receiver']).andCallThrough()
+    Given -> spyOn(@bus.receiver(),['user']).andCallThrough()
+    Given -> @fn = (a, b, c) ->
+    When -> @receiver.in @fn
+    Then -> expect(@bus.receiver).toHaveBeenCalled @fn
+    And -> expect(@bus.receiver().use).toHaveBeenCalled @fn

@@ -212,6 +212,40 @@ bus.on('some message', function (message) {
 
 ```
 
+## Handling messages received from the Exchange
+
+You can specify middlware function that can manipulate the messages incomming
+from the exchange before being emitted to the client.
+
+```javascript
+
+bus.receiver().use(function (message, socket, next) {
+  message.data.content += '!';
+  next(); // you must call next!
+});
+
+```
+
+Or 
+
+```javascript
+
+bus.receive(function (message, socket, next) {
+  message.data.content += '!';
+  next(); // you must call next!
+});
+
+```
+
+Or
+
+```javascript
+
+bus.in(function (message, socket, next) {
+  message.data.content += '!';
+  next(); // you must call next!
+});
+
 # Running Tests
 
 Install coffee-script
