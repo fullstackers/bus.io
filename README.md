@@ -212,7 +212,7 @@ You can respond to messages too.
 
 bus.on('some message', function (message) {
 
-  message.respond({some:'additional content'});
+  message.respond({some:'some other content'});
 
 });
 
@@ -292,7 +292,7 @@ the client before being emitted to the exchange.
 ```javascript
 
 bus.socketReceiver().use(function (message, socket, next) {
-  message.data.content += '!';
+  message.data.content[0] += '!';
   next(); // you must call next!
 });
 
@@ -303,7 +303,7 @@ Or
 ```javascript
 
 bus.out(function (message, socket, next) {
-  message.data.content += '!';
+  message.data.content[0] += '!';
   next(); // you must call next!
 });
 
