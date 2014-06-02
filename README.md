@@ -309,6 +309,226 @@ bus.out(function (message, socket, next) {
 
 ```
 
+# API
+
+## Bus
+
+Most methods are chainable.  Excepts for when you are getting an object.
+
+e.g.
+
+**Chaninable**
+
+```javascript
+
+require('bus.io')()
+  .actor(function () { ... })
+  .target(function () { ... })
+  .socket(function () { ... })
+  .alias(function () { ... })
+  .in(function  () { ... })
+  .on('some event', function () { ... })
+  .out(function () { ... })
+  .listen(3000)
+
+```
+
+**Not chainable**
+
+This will produce a runtime error.
+
+```javascript
+
+require('bus.io')().actor().target()
+
+```
+
+### actor
+
+Sets / Gets the function that will grab the actor.  The default implementation 
+will use the `socket.id`.  This method is called when the socket connection is 
+established.
+
+```javascript 
+
+bus.actor(function (socket, cb) {
+  cb(null, socket.id);
+});
+
+```
+
+You may pass an `Error` object for the first argument if you encounter an error
+or would like to trigger one.
+
+
+```javascript
+
+bus.actor(function (socket, cb) {
+  socket.get('user', function (err, user) {
+    if (err)
+      return cb(err);
+    if (!user)
+      return cb(new Error('Need to login'));
+    return cb(null, user.name);
+  });
+});
+
+```
+
+### target
+
+Sets / Gets the function that will grab the target from the request.  The 
+default implemenation will use the `socket.id`.  This method is called for each
+request from the `socket`.
+
+The client would emit this.
+
+```javascript
+
+socket.emit('shout', 'hello', 'You');
+
+```
+
+We would like `"You"` to be the *actor*.
+
+```javascript
+
+bus.target(function (socket, params, cb) {
+  cb(null, params.pop());
+});
+
+```
+
+If you encounter an error you can also pass one along.
+
+```javascript
+
+bus.target(function (socket, params, cb) {
+  if (params.length === 0) {
+    cb(new Error('You are you talking to?!'));
+  }
+  else {
+    cb(null, params.pop());
+  }
+});
+
+```
+
+You get to decide your own convetion.
+
+### socket
+
+This method will allow you to bind a function to the `connection` event that 
+socket.io supports.
+
+e.g.
+
+We would like to tell the client `"Hello"` when they connect.
+
+```javascript
+
+bus.socket(function (socket, bus) {
+  socket.emit('greet', 'Hello');
+});
+
+```
+
+### alias
+
+With **alias** your **actor** will receive messages whenever their **alias**
+receives one.  This is useful if you want to associate a socket to a logged in 
+user.
+
+```javascript
+
+bus.alias(socket, 'nathan');
+
+```
+
+A good place to do this is when the client is connected to the server.
+
+```javascript
+
+bus.socket(function (socket, bus) {
+
+  socket.get('user', function (err, user) {
+
+    if (err) return socket.emit('error', err);
+    if (!user) return socket.emit('login', 'You must login');
+    
+    bus.alias(socket, user.name);
+
+  });
+
+});
+
+```
+
+### in
+
+The **in** method will use the passed function(s) when a message is received 
+from the `bus.messageExchange()`.  This allows you to modifiy the message before it
+is sent to the `socket`.
+
+```javascript
+
+bus.in(function (message, socket, next) {
+  message.data.content[0] = message.data.content[0].toLowerCase();
+  next();
+});
+
+```
+
+### on
+
+The **on** method binds a handler to the queue.  The handler will process each
+message and give you the ability to either deliver the messsage or discard it.
+That is up to your application requirements.
+
+```javascript
+
+bus.on('some event', function (message) {
+  message.deliver();
+});
+
+```
+
+### out
+
+The **out** method will use the passed function(s) when a message is received
+from the `socket` before it is published to the 
+`bus.messageExchange()` instance.
+
+Here you could save the message to a mongo store using mongoose.
+
+```javascript
+
+//assuming you have mongoose and a message model
+var Message = monngose.model('Message');
+
+bus.out(function (message, socket, next) {
+  new Message(message.data).save(function (err) {
+    if (err) return next(err);
+    next();
+  });
+});
+
+```
+
+### listen
+
+You can either pass a `port`, `server`, or `socket.io` instance.
+
+```javascript
+
+bus.listen(3000);
+
+bus.listen(require('http').createServer(function (req, res) { }));
+
+bus.listen(require('socket.io')());
+
+```
+
 # Running Tests
 
 Install coffee-script

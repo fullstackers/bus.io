@@ -1,6 +1,6 @@
 {
   "name": "bus.io",
-  "version": "0.0.13-beta",
+  "version": "0.0.14-beta",
   "description": "A message bus",
   "main": "index.js",
   "scripts": {
@@ -26,7 +26,8 @@
     "redis",
     "receiver",
     "sender",
-    "distributed"
+    "distributed",
+    "service"
   ],
   "author": "Nathan G. Romano <nathan.g.romano@gmail.com>",
   "license": "ISC",
