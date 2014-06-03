@@ -7,8 +7,8 @@ Bus.io seamlessly connects clients and servers together over a network using
 **[socket.io](https://github.com/Automattic/socket.io "socket.io")** and 
 **[redis](https://github.com/antirez/redis "redis")**.  Messages are produced 
 by clients which are published to an exchange.  The exchange queues up these 
-messages to be handled.  Messages are composed of an actor, a target, an 
-action, and the content.  When these messages are handled they can then be 
+messages to be handled.  Messages are composed of an `actor`, a `target`, an 
+`action`, and the `content`.  When these messages are handled they can be 
 published to subscribers over a channel.  Channels are identified by the 
 actors and targets.
 
