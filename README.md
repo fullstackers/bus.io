@@ -16,7 +16,7 @@ clients that are producing messages.  By associating a socket with an actor
 it enables that when the message is delivered to that **actor** it will be 
 delivered to each **socket** associated with it.
 
-# How this works (nuthell)
+# How this works (nutshell)
 
 Each **socket** is assocaited with one ore more **actors**.  When a socket 
 receives data, the data is encapsulated as a **messsage** and written to a 
