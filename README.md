@@ -9,7 +9,7 @@ Bus.io seamlessly connects clients and servers together over a network using
 bus that all app instances communicate on.
 
 Bus.io enables your app instances to all work together by providing a way for all 
-of them to *produce*, *handle*, and *distrubute* messages.  Your app istances 
+of them to *produce*, *handle*, and *distribute* messages.  Your app instances 
 become both a producer and a consumer on the backbone of redis. Bus.io abstracts
 the **socket** away by introducing actors.  Actors are the people, services or
 clients that are producing messages.  By associating a socket with an actor
@@ -131,7 +131,7 @@ bus.io().on('connection', function (socket) {
 
 ## Configuration
 
-You can bind custom **socket.io* handlers to each **socket** when it is connected.
+You can bind custom **socket.io** handlers to each **socket** when it is connected.
 
 ```javascript
 
@@ -141,7 +141,7 @@ bus.socket(function (socket, bus) {
 
 ```
 
-The **actor** is the entitty assocaited with a socket.  Actors each have their
+The **actor** is the entity associated with a socket.  Actors each have their
 own channel.  Actors send messages to other actors.  By default an **actor**
 is represented by the socket identifier.  You can customize this behavior. 
 Here we are using a username from a session.
@@ -157,7 +157,7 @@ bus.actor(function (socket, cb) {
 
 The **target** also is an actor.  The target can be pulled from the socket or
 the parameters from a message received on a socket.  By default the target
-is socket identifier.
+is the socket identifier.
 
 ```javascript
 
@@ -192,8 +192,8 @@ bus.socket(function (socket, bus) {
 
 ```
 
-The **bus** instance has it's *on* method overriden.  You can still add listeners by
-calling addListener.
+The **bus** instance has it's *on* method overridden.  You can still add listeners by
+calling `addListener('event', function() {})`.
 
 
 ##Handling messages on the bus
@@ -232,8 +232,8 @@ bus.on('some message', function (message) {
 
 ```
 
-It is possible to consume a message so it won't be delivered to the original receipent and then deliver it
-to other receipients.
+It is possible to consume a message so it won't be delivered to the original recipient and then deliver it
+to other recipients.
 
 ```javascript
 
@@ -272,7 +272,7 @@ bus.on('some message', function (message) {
 
 ```
 
-A chainable approach.
+A chain-able approach.
 
 ```javascript
 
@@ -307,7 +307,7 @@ bus.on('some message', function (message) {
 
 ## Handling messages received from the Exchange
 
-You can specify middlware functions to manipulate the messages incomming from
+You can specify middleware functions to manipulate the messages incoming from
 the exchange before being emitted to the client.
 
 ```javascript
@@ -332,7 +332,7 @@ bus.in(function (message, socket, next) {
 
 ## Handling messages received from the Socket
 
-You can specify middleware functions to manipulate the messages incomming from
+You can specify middleware functions to manipulate the messages incoming from
 the client before being emitted to the exchange.
 
 ```javascript
@@ -359,11 +359,11 @@ bus.out(function (message, socket, next) {
 
 ## Bus
 
-Most methods are chainable.  Excepts for when you are getting an object.
+Most methods are chain-able.  Excepts for when you are getting an object.
 
 e.g.
 
-**Chaninable**
+**Chanin-able**
 
 ```javascript
 
@@ -378,7 +378,7 @@ require('bus.io')()
 
 ```
 
-**Not chainable**
+**Not chain-able**
 
 This will produce a runtime error.
 
@@ -423,7 +423,7 @@ bus.actor(function (socket, cb) {
 ### #target
 
 Sets / Gets the function that will grab the target from the request.  The 
-default implemenation will use the `socket.id`.  This method is called for each
+default implementation will use the `socket.id`.  This method is called for each
 request from the `socket`.
 
 The client would emit this.
@@ -459,7 +459,7 @@ bus.target(function (socket, params, cb) {
 
 ```
 
-You get to decide your own convetion.
+You get to decide your own convention.
 
 ### #socket
 
@@ -512,7 +512,7 @@ bus.socket(function (socket, bus) {
 ### #in
 
 The **in** method will use the passed function(s) when a message is received 
-from the `bus.messageExchange()`.  This allows you to modifiy the message before it
+from the `bus.messageExchange()`.  This allows you to modify the message before it
 is sent to the `socket`.
 
 ```javascript
@@ -527,7 +527,7 @@ bus.in(function (message, socket, next) {
 ### #on
 
 The **on** method binds a handler to the queue.  The handler will process each
-message and give you the ability to either deliver the messsage or discard it.
+message and give you the ability to either deliver the message or discard it.
 That is up to your application requirements.
 
 ```javascript
@@ -589,7 +589,7 @@ bus.message({
 
 ```
 
-A chainable approach.
+A chain-able approach.
 
 ```javascript
   
@@ -702,10 +702,10 @@ bus.on('some message', function (message) {
 
 ## Message Interface
 
-A better way to interfact with a message than `message.data.FIELD_NAME`.
+A better way to interact with a message than `message.data.FIELD_NAME`.
 
 ## Message Verification
 
-When mesages are published it would be nice if we can validate the message and verify
+When messages are published it would be nice if we can validate the message and verify
 the integrity of the message.
 
