@@ -1,26 +1,31 @@
 [![Build Status](https://travis-ci.org/NathanGRomano/bus.io.svg?branch=master)](https://travis-ci.org/NathanGRomano/bus.io)
 [![NPM version](https://badge.fury.io/js/bus.io.svg)](http://badge.fury.io/js/bus.io)
 
-Easily build robust and scalable applications!
+Easily build distributed applications that scale!
 
 Bus.io seamlessly connects clients and servers together over a network using 
 **[socket.io](https://github.com/Automattic/socket.io "socket.io")** and 
-**[redis](https://github.com/antirez/redis "redis")**.  Messages are produced 
-by clients which are published to an exchange.  The exchange queues up these 
-messages to be handled.  Messages are composed of an `actor`, a `target`, an 
-`action`, and the `content`.  When these messages are handled they can be 
-published to subscribers over a channel.  Channels are identified by the 
-actors and targets.
+**[redis](https://github.com/antirez/redis "redis")**. Providing a message
+bus that all app instances communicate on.
 
-# How this works
+Bus.io makes your app instances all work together by providing a way for all 
+of them to *produce*, *handle*, and *distrubute* messages.  Your app istances 
+become both a producer and a consumer on the backbone of redis. Bus.io abstracts
+the **socket** away by introducing actors.  Actors are the people, services or
+clients that are producing messages.  By associating a socket with an actor
+it enables that when the message is delivered to that **actor** it will be 
+delivered to each **socket** associated with it.
 
-A round trip of a **Message** looks like this.
+# How this works (nuthell)
 
-Socket -> SocketMessages -> Receiver -> MessageExchange -> Handler ->
-MessageExchange -> Receiver -> Socket
-
-Where **Handler** is the code that will handle the message and propagate it
-back out to the Exchange.
+Each **socket** is assocaited with one ore more **actors**.  When a socket 
+receives data, the data is encapsulated as a **messsage** and written to a 
+**queue**.  Since *all* of your app instances are connected to that queue,
+one of them will receive the message for processing.  After the instance
+procsses the message it can be delivered to the **target**. A target is just
+another actor, so if your actor is associated with multiple sockets.  Each
+socket regardless of which app instance it is connected to, itwill receive the 
+data from the message.
 
 # Installation and Environment Setup
 
