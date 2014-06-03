@@ -357,8 +357,6 @@ bus.out(function (message, socket, next) {
 
 # API Documentation
 
-## Bus
-
 Most methods are chain-able.  Excepts for when you are getting an object.
 
 e.g.
@@ -388,9 +386,47 @@ require('bus.io')().actor().target()
 
 ```
 
-### #actor
+## Server
 
-Sets / Gets the function that will grab the actor.  The default implementation 
+The **Server** is exposed by `require('bus.io')`
+
+### Server()
+
+```javascript
+
+var bus = require('bus.io')();
+
+```
+
+### Server(port:Number)
+
+```javascript
+
+var bus = require('bus.io')(3000);
+
+```
+
+### Server(io:socket.io#Server)
+
+```javascript
+
+var io = require('socket.io')();
+var bus = require('bus.io')(io);
+
+```
+
+### Server(server:http#Server)
+
+```javascript
+
+var server = require('http').createServer(function (req, res) {}).listen(function (err) {});
+var bus = require('bus.io')(server)
+
+```
+
+### Server#actor(fn:Function)
+
+Sets the function that will grab the actor.  The default implementation 
 will use the `socket.id`.  This method is called when the socket connection is 
 established.
 
@@ -401,10 +437,10 @@ bus.actor(function (socket, cb) {
 });
 
 ```
+The callback `cb` takes two parameters `err` and `actor`.
 
 You may pass an `Error` object for the first argument if you encounter an error
 or would like to trigger one.
-
 
 ```javascript
 
@@ -420,9 +456,19 @@ bus.actor(function (socket, cb) {
 
 ```
 
-### #target
+### Server#actor()
 
-Sets / Gets the function that will grab the target from the request.  The 
+Gets the function that will grab the actor from a socket.
+
+```javascript
+
+    var actorFn = bus.actor();
+    
+```
+
+### Server#target(fn:Function)
+
+Sets the function that will grab the target from the request.  The 
 default implementation will use the `socket.id`.  This method is called for each
 request from the `socket`.
 
@@ -461,7 +507,17 @@ bus.target(function (socket, params, cb) {
 
 You get to decide your own convention.
 
-### #socket
+### Server#target()
+
+Gets the method that will grab the target from the request.
+
+```javascript
+
+var targetFn = bus.target();
+
+```
+
+### Server#socket(socket:Object)
 
 This method will allow you to bind a function to the `connection` event that 
 socket.io supports.
@@ -478,7 +534,7 @@ bus.socket(function (socket, bus) {
 
 ```
 
-### #alias
+### Server#alias(socket:Object, name:String)
 
 With **alias** your **actor** will receive messages whenever their **alias**
 receives one.  This is useful if you want to associate a socket to a logged in 
@@ -509,7 +565,7 @@ bus.socket(function (socket, bus) {
 
 ```
 
-### #in
+### Server#in(fn#Function,...)
 
 The **in** method will use the passed function(s) when a message is received 
 from the `bus.messageExchange()`.  This allows you to modify the message before it
@@ -524,7 +580,15 @@ bus.in(function (message, socket, next) {
 
 ```
 
-### #on
+You can pass in multiple functions or arrays of functions.
+
+```javascript
+
+bus.in(function (a,b,c) {...}, function (a,b,c) {...}, [function (a,b,c) {...}, function(a,b,c) {...}]);
+
+```
+
+### Server#on(event:String, fn:Function)
 
 The **on** method binds a handler to the queue.  The handler will process each
 message and give you the ability to either deliver the message or discard it.
@@ -538,7 +602,7 @@ bus.on('some event', function (message) {
 
 ```
 
-### #out
+### Server#out(fn:Function,...)
 
 The **out** method will use the passed function(s) when a message is received
 from the `socket` before it is published to the 
@@ -560,7 +624,15 @@ bus.out(function (message, socket, next) {
 
 ```
 
-### #listen
+You can pass in multiple functions or arrays of functions.
+
+```javascript
+
+bus.out(function (a,b,c) {...}, function (a,b,c) {...}, [function (a,b,c) {...}, function(a,b,c) {...}]);
+
+```
+
+### Server#listen(o:Mixed)
 
 You can either pass a `port`, `server`, or `socket.io` instance.
 
@@ -574,9 +646,10 @@ bus.listen(require('socket.io')());
 
 ```
 
-### #message
+### Server#message(data:Mixed)
 
-This will create you an object for building a message that you can deliver.
+This will create you an object for building a message that you can deliver.  The
+`data` can either be an object or an instanceof of `Message`.
 
 ```javascript
   
