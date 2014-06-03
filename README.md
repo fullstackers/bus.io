@@ -540,6 +540,46 @@ bus.listen(require('socket.io')());
 
 ```
 
+### #message
+
+This will create you an object for building a message that you can deliver.
+
+```javascript
+  
+bus.message({
+  actor:'I',
+  action:'say',
+  content:'hello'
+  target:'you',
+}).deliver();
+
+```
+
+A chainable approach.
+
+```javascript
+  
+bus.message()
+  .actor('me')
+  .action('say')
+  .content('hello')
+  .target('you')
+  .deliver();
+
+```
+
+Or simply
+
+```javascript
+
+this.message()
+  .i('me')
+  .did('say')
+  .what('hello')
+  .to('you');
+
+```
+
 # Running Tests
 
 Install coffee-script
