@@ -662,7 +662,7 @@ bus.in(function (message, socket, next) {
 
 ```
 
-It would be nice to handle specific kinds of messages
+It would be nice to handle specific kinds of messages.  Maybe use **[express] (https://www.npmjs.org/package/express "Express")** style routing.
 
 ```javascript
 
