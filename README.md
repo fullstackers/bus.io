@@ -700,3 +700,12 @@ bus.on('some message', function (message) {
 
 ```
 
+## Message Interface
+
+A better way to interfact with a message than `message.data.FIELD_NAME`.
+
+## Message Verification
+
+When mesages are published it would be nice if we can validate the message and verify
+the integrity of the message.
+
