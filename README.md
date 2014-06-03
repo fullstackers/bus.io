@@ -68,6 +68,8 @@ socket.on('echo', function (who, what, target, created) {
 
 ##Getting a bus is simple.
 
+Here we can use an already existing **socket.io** instance.
+
 ```javascript
 
 var io = require('socket.io')();
@@ -83,6 +85,32 @@ Or you can just listen to a port.
 
 var bus = require('bus.io')();
 bus.listen(3000);
+
+```
+
+You can listen to a server with express.
+
+```javascript
+
+var app = require('express')();
+
+var server = require('http').createServer(app).listen(3000, function (err) { console.error(err) });
+
+var bus = require('bus.io')(server);
+
+```
+
+You can even sperate out **express**, **socket.io**, and **bus.io**.
+
+```javascript
+
+var app = require('express')();
+
+var server = require('http').createServer(app).listen(3000, function (err) { console.error(err) });
+
+var io = require('socket.io')(server);
+
+var bus = require('bus.io')(io);
 
 ```
 
