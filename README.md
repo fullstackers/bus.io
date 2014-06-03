@@ -1,17 +1,19 @@
 [![Build Status](https://travis-ci.org/NathanGRomano/bus.io.svg?branch=master)](https://travis-ci.org/NathanGRomano/bus.io)
 
-Bus.io seamlessly connects clients together over a network using socket.io
-and redis.  Messages are produced by clients which are published to an 
-exchange.  The exchange queues up these messages to be handled.  When these 
-messages are handled they can then be published to subscribers over a channel.
-Channels are identified by the actors and targets.  Messages are composed of 
-an actor, a target, an action, and the content.  A message describes an action 
-performed by a client toward another client or resource.  With Bus.io we can 
-build applications that will scale.
+Easily build robust and scalable applications!
+
+Bus.io seamlessly connects clients and servers together over a network using 
+**[socket.io](https://github.com/Automattic/socket.io "socket.io")** and 
+**[redis](https://github.com/antirez/redis "redis")**.  Messages are produced 
+by clients which are published to an exchange.  The exchange queues up these 
+messages to be handled.  Messages are composed of an actor, a target, an 
+action, and the content.  When these messages are handled they can then be 
+published to subscribers over a channel.  Channels are identified by the 
+actors and targets.
 
 # How this works
 
-A round trip looks like this.
+A round trip of a **Message** looks like this.
 
 Socket -> SocketMessages -> Receiver -> MessageExchange -> Handler ->
 MessageExchange -> Receiver -> Socket
@@ -149,6 +151,7 @@ will receive the message.
 bus.socket(function (socket, bus) {
   socket.get('user', function (err, user) {
     if (err) return socket.emit('err');
+    if (!user) return socket.emit('login', 'You must login');
     bus.alias(socket, user.name);
   });
 });
@@ -331,12 +334,12 @@ e.g.
 ```javascript
 
 require('bus.io')()
-  .actor(function () { ... })
-  .target(function () { ... })
-  .socket(function () { ... })
-  .in(function  () { ... })
-  .on('some event', function () { ... })
-  .out(function () { ... })
+  .actor(function (socket, cb) { ... })
+  .target(function (socket, params, cb) { ... })
+  .socket(function (socket, bus) { ... })
+  .in(function (message, socket, next) { ... })
+  .on('some event', function (message) { ... })
+  .out(function (message, socket, next) { ... })
   .listen(3000)
 
 ```
@@ -555,14 +558,14 @@ To run the tests, just run grunt
 
 # TODO
 
-* specify the name of the events to be processed as we receive them from the 
+* Specify the name of the events to be processed as we receive them from the 
   exchange to the client
-* Lots
 * Write e2e tests
 * Code coverage
 * Working with message data is cumbersome.
+* Examples, Examples, Examples
 
-If you would like to contribute please fork and send me a pull request.
+If you would like to contribute please fork and send me a pull request!
 
 # Working Examples and Demos
 
@@ -590,8 +593,8 @@ It would be nice to handle specific kinds of messages
 ```javascript
 
 bus.in('echo', function (message, socket, next) {
-    assert.equals(message.data.action, 'echo');
-    next();
+  assert.equals(message.data.action, 'echo');
+  next();
 });
 
 ```
@@ -604,7 +607,6 @@ One can broadcast their message to a number of targets
 ```javascript
 
 bus.on('some event', function (message) {
-
   message.deliver('a','b','c','d','e');
 
 });
