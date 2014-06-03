@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/NathanGRomano/bus.io.svg?branch=master)](https://travis-ci.org/NathanGRomano/bus.io)
+[![NPM version](https://badge.fury.io/js/bus.io.svg)](http://badge.fury.io/js/bus.io)
 
 Easily build robust and scalable applications!
 
