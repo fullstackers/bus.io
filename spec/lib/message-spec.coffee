@@ -1,4 +1,4 @@
-describe 'message', ->
+describe 'Message', ->
 
   Given -> @Message = requireSubject 'lib/message', {
     'node-uuid':

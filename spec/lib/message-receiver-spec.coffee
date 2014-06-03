@@ -1,6 +1,6 @@
 EventEmitter = require('events').EventEmitter
 
-describe 'message receiver', ->
+describe 'Receiver', ->
 
   Given ->
     @Message = class Message
@@ -34,7 +34,7 @@ describe 'message receiver', ->
       next()
   ]
 
-  Given -> @MessageReceiver = requireSubject 'lib/message-receiver', {
+  Given -> @MessageReceiver = requireSubject 'lib/receiver', {
     './message': @Message
   }
 

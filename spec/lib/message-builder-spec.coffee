@@ -1,5 +1,5 @@
 
-describe 'message builder', ->
+describe 'Builder', ->
 
   Given ->
     id = 0
@@ -19,7 +19,7 @@ describe 'message builder', ->
       clone: ->
         return new Message
 
-  Given -> @Builder = requireSubject 'lib/message-builder', { './message': @Message }
+  Given -> @Builder = requireSubject 'lib/builder', { './message': @Message }
   Given -> @builder = @Builder()
   
   describe '#actor', ->

@@ -1,6 +1,6 @@
 EventEmitter = require('events').EventEmitter
 
-describe 'bus', ->
+describe 'Server', ->
 
   date = new Date
 
@@ -80,21 +80,21 @@ describe 'bus', ->
       return new MessageExchange
 
   Given ->
-    @Bus = requireSubject 'lib/bus', {
+    @Server = requireSubject 'lib/server', {
       'socket.io': @Sio
       './message': @Message
-      './message-builder': @Builder
-      './message-handler': @Handler
-      './message-receiver': @Receiver
+      './builder': @Builder
+      './handler': @Handler
+      './receiver': @Receiver
       'socket-messages': @SocketMessages
       'message-exchange': @MessageExchange
     }
 
-  Given -> @bus = @Bus()
+  Given -> @bus = @Server()
 
   describe '#', ->
     
-    Then -> expect(@bus instanceof @Bus).toBe true
+    Then -> expect(@bus instanceof @Server).toBe true
 
   describe '#listen', ->
 

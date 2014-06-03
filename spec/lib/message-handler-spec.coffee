@@ -1,6 +1,6 @@
 EventEmitter = require('events').EventEmitter
 
-describe 'message handler', ->
+describe 'Handler', ->
 
   date = new Date
 
@@ -41,10 +41,10 @@ describe 'message handler', ->
       consume: ->
         @.emit 'consume', @message
 
-  Given -> @Handler = requireSubject 'lib/message-handler', {
+  Given -> @Handler = requireSubject 'lib/handler', {
     './message': @Message
-    './message-builder': @Builder
-    './message-controller': @Controller
+    './builder': @Builder
+    './controller': @Controller
   }
 
   describe '#onConsume', ->
