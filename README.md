@@ -99,7 +99,7 @@ You can listen to a server with express.
 
 var app = require('express')();
 
-var server = require('http').createServer(app).listen(3000, function (err) { console.error(err) });
+var server = require('http').createServer(app).listen(3000, function (err) { });
 
 var bus = require('bus.io')(server);
 
@@ -111,7 +111,7 @@ You can even sperate out **express**, **socket.io**, and **bus.io**.
 
 var app = require('express')();
 
-var server = require('http').createServer(app).listen(3000, function (err) { console.error(err) });
+var server = require('http').createServer(app).listen(3000, function (err) { });
 
 var io = require('socket.io')(server);
 
