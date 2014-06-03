@@ -8,7 +8,7 @@ Bus.io seamlessly connects clients and servers together over a network using
 **[redis](https://github.com/antirez/redis "redis")**. Providing a message
 bus that all app instances communicate on.
 
-Bus.io makes your app instances all work together by providing a way for all 
+Bus.io enables your app instances to all work together by providing a way for all 
 of them to *produce*, *handle*, and *distrubute* messages.  Your app istances 
 become both a producer and a consumer on the backbone of redis. Bus.io abstracts
 the **socket** away by introducing actors.  Actors are the people, services or
@@ -18,13 +18,13 @@ delivered to each **socket** associated with it.
 
 # How this works (nutshell)
 
-Each **socket** is assocaited with one ore more **actors**.  When a socket 
+Each **socket** is associated with one ore more **actors**.  When a socket 
 receives data, the data is encapsulated as a **messsage** and written to a 
 **queue**.  Since *all* of your app instances are connected to that queue,
 one of them will receive the message for processing.  After the instance
 procsses the message it can be delivered to the **target**. A target is just
 another actor, so if your actor is associated with multiple sockets.  Each
-socket regardless of which app instance it is connected to, itwill receive the 
+socket regardless of which app instance it is connected to, it will receive the 
 data from the message.
 
 # Installation and Environment Setup
