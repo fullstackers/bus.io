@@ -720,6 +720,11 @@ You will need a redis server up and running to run the demos at this time
 
     > node examples/hello.js
 
+# Demos
+
+Demos are under the `/demo` directory.  There is currently a basic chat program
+I also have some ideas. There.
+
 # Ideas
 
 ## Receiver Message Routing
@@ -775,10 +780,30 @@ bus.on('some message', function (message) {
 
 ## Message Interface
 
-A better way to interact with a message than `message.data.FIELD_NAME`.
+A better way to interact with a message than `message.data.FIELD_NAME`
 
 ## Message Verification
 
 When messages are published it would be nice if we can validate the message and verify
 the integrity of the message.
+
+## Use middleware to populate actor and target
+
+Using middleware would be much nicer IMO.
+
+```javascript
+// set actor
+bus.in(function (message, socket, next) {
+  message.actor(socket.user);
+  next();
+})
+
+// set target
+bus.in(function (message, socket, next) {
+  message.target(message.content().pop());
+  next();
+});
+```
+
+
 
