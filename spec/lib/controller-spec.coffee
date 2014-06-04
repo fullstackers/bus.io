@@ -2,6 +2,13 @@
 describe 'Controller', ->
 
   Given ->
+    setGet = (n) ->
+      (v) ->
+        if typeof v != 'undefined'
+          @data[n] = v
+          return @
+        else
+          return @data[n]
     @Message = class Message
       constructor: ->
         @data =
@@ -12,7 +19,14 @@ describe 'Controller', ->
           created: new Date
           reference: null
           id: 1
-
+      actor: setGet 'actor' 
+      action: setGet 'action'
+      target: setGet 'target'
+      content: setGet 'content'
+      id: setGet 'id'
+      created: setGet 'created'
+      reference: setGet 'reference'
+      published: setGet 'published'
       clone: ->
         return new Message
 
@@ -59,3 +73,45 @@ describe 'Controller', ->
       When -> @controller.deliver 'people'
       Then -> expect(@controller.emit).toHaveBeenCalledWith 'deliver', @m
 
+  describe '#actor', ->
+
+    Given -> @v = 'a'
+    Then -> expect(@controller.actor(@v).actor()).toEqual @v
+  
+  describe '#action', ->
+
+    Given -> @v = 'a'
+    Then -> expect(@controller.action(@v).action()).toEqual @v
+
+  describe '#target', ->
+
+    Given -> @v = 'a'
+    Then -> expect(@controller.target(@v).target()).toEqual @v
+
+  describe '#content', ->
+
+    context 'array', ->
+
+      Given -> @v = ['a']
+      Then -> expect(@controller.content(@v).content()).toEqual @v
+
+    context 'object', ->
+
+      Given -> @v = a: 1
+      Then -> expect(@controller.content(@v).content()).toEqual @v
+
+  describe '#id', ->
+
+    When -> expect(@controller.id()).toEqual @controller.data.id
+
+  describe '#created', ->
+
+    When -> expect(@controller.created()).toEqual @controller.data.created
+
+  describe '#reference', ->
+
+    When -> expect(@controller.reference()).toEqual @controller.data.reference
+
+  describe '#published', ->
+
+    When -> expect(@controller.published()).toEqual @controller.data.published
