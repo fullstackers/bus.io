@@ -2,9 +2,9 @@
 [![NPM version](https://badge.fury.io/js/bus.io.svg)](http://badge.fury.io/js/bus.io)
 [![David DM](https://david-dm.org/nathangromano/bus.io.png)](https://david-dm.org/nathangromano/bus.io.png)
 
-[![Bus.IO](https://raw.github.com/nathangromano/bus.io/master/logo.png)
+![Bus.IO](https://raw.github.com/nathangromano/bus.io/master/logo.png)
 
-Easily build distributed applications that scale!
+**Easily build distributed applications that scale!**
 
 Bus.io seamlessly connects clients and servers together over a network using 
 **[socket.io](https://github.com/Automattic/socket.io "socket.io")** and 
