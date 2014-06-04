@@ -3,6 +3,7 @@
 [![David DM](https://david-dm.org/nathangromano/bus.io.png)](https://david-dm.org/nathangromano/bus.io.png)
 
 [![Bus.IO](https://raw.github.com/nathangromano/bus.io/master/logo.png)
+
 Easily build distributed applications that scale!
 
 Bus.io seamlessly connects clients and servers together over a network using 
