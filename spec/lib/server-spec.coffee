@@ -1,6 +1,6 @@
 EventEmitter = require('events').EventEmitter
 
-describe 'bus', ->
+describe 'Server', ->
 
   date = new Date
 
@@ -48,6 +48,15 @@ describe 'bus', ->
       fn: ->
 
   Given ->
+    @Receiver = class Receiver extends EventEmitter
+      constructor: ->
+        if not (@ instanceof Receiver)
+          return new Receiver
+      use: ->
+      onReceive: ->
+
+
+  Given ->
     @SocketMessages = class SocketMessages extends EventEmitter
       constructor: ->
       attach: ->
@@ -63,28 +72,29 @@ describe 'bus', ->
   Given ->
     @MessageExchange = class MessageExchange extends EventEmitter
       constructor: ->
+        @ee = new EventEmitter
       publish: ->
       handler: new EventEmitter
       channel: -> @ee
-      ee: new EventEmitter
     @MessageExchange.make = ->
       return new MessageExchange
 
   Given ->
-    @Bus = requireSubject 'lib/bus', {
+    @Server = requireSubject 'lib/server', {
       'socket.io': @Sio
       './message': @Message
-      './message-builder': @Builder
-      './message-handler': @Handler
+      './builder': @Builder
+      './handler': @Handler
+      './receiver': @Receiver
       'socket-messages': @SocketMessages
       'message-exchange': @MessageExchange
     }
 
-  Given -> @bus = @Bus()
+  Given -> @bus = @Server()
 
   describe '#', ->
     
-    Then -> expect(@bus instanceof @Bus).toBe true
+    Then -> expect(@bus instanceof @Server).toBe true
 
   describe '#listen', ->
 
@@ -188,13 +198,33 @@ describe 'bus', ->
     And -> expect(@bus.messageExchange().channel('me').on).toHaveBeenCalledWith 'message', jasmine.any(Function)
     And -> expect(@socket.on).toHaveBeenCalledWith 'disconnect', jasmine.any(Function)
 
+  describe '#onError', ->
+    Given -> spyOn(console,['error'])
+    When -> @bus.onError 'message'
+    Then -> expect(console.error).toHaveBeenCalledWith 'message'
+
   describe '#onMessage', ->
+
+    Given -> @message = actor: 'me', action: 'say', content: 'hello', target: 'you'
+    Given -> @socket = new EventEmitter
+    Given -> spyOn(@bus,['emit']).andCallThrough()
+    When -> @bus.onMessage @message, @socket
+    Then -> expect(@bus.emit).toHaveBeenCalledWith 'from socket', @message, @socket
+
+  describe '#onReceivedExchange', ->
+
+    Given -> @message = new Message
+    Given -> @socket = new EventEmitter
+    When -> @bus.onReceivedExchange @message, @socket
+    And -> expect(@socket.emit).toHaveBeenCalledWith @message.data.action, @message.data.actor, @message.data.content, @message.data.target, @message.data.created
+
+  describe '#onReceivedSocket', ->
 
     Given -> @message = actor: 'me', action: 'say', content: 'hello', target: 'you'
     Given -> @builder = new @Builder
     Given -> spyOn(@builder,['deliver']).andCallThrough()
     Given -> spyOn(@bus,['message']).andCallThrough().andReturn(@builder)
-    When -> @bus.onMessage @message
+    When -> @bus.onReceivedSocket @message
     Then -> expect(@bus.message).toHaveBeenCalled()
     And -> expect(@builder.deliver).toHaveBeenCalled()
 
@@ -210,3 +240,74 @@ describe 'bus', ->
     When -> @bus.target()
     Then -> expect(@bus.socketMessages().target).toHaveBeenCalled()
 
+  describe '#exchangeReceiver', ->
+
+    Given -> spyOn(@bus,['addListener']).andCallThrough()
+    Given -> @receiver = @Receiver()
+    Given -> spyOn(@receiver,['addListener']).andCallThrough()
+    When -> @res = @bus.exchangeReceiver(@receiver).exchangeReceiver()
+    Then -> expect(@res).toEqual @receiver
+    And -> expect(@receiver.addListener).toHaveBeenCalledWith 'error', @bus.onError
+    And -> expect(@bus.addListener).toHaveBeenCalledWith 'from exchange', @receiver.onReceive
+
+  describe '#socketReceiver', ->
+
+    Given -> spyOn(@bus,['addListener']).andCallThrough()
+    Given -> @receiver = @Receiver()
+    Given -> spyOn(@receiver,['addListener']).andCallThrough()
+    When -> @res = @bus.socketReceiver(@receiver).socketReceiver()
+    Then -> expect(@res).toEqual @receiver
+    And -> expect(@receiver.addListener).toHaveBeenCalledWith 'error', @bus.onError
+    And -> expect(@bus.addListener).toHaveBeenCalledWith 'from socket', @receiver.onReceive
+
+  describe '#in', ->
+
+    Given -> spyOn(@bus,['exchangeReceiver']).andCallThrough()
+    Given -> spyOn(@bus.exchangeReceiver(),['use']).andCallThrough()
+    Given -> @fn = (a, b, c) ->
+    When -> @bus.in @fn
+    Then -> expect(@bus.exchangeReceiver).toHaveBeenCalled()
+    And -> expect(@bus.exchangeReceiver().use).toHaveBeenCalledWith @fn
+
+  describe '#out', ->
+
+    Given -> spyOn(@bus,['socketReceiver']).andCallThrough()
+    Given -> spyOn(@bus.socketReceiver(),['use']).andCallThrough()
+    Given -> @fn = (a, b, c) ->
+    When -> @bus.out @fn
+    Then -> expect(@bus.socketReceiver).toHaveBeenCalled()
+    And -> expect(@bus.socketReceiver().use).toHaveBeenCalledWith @fn
+
+  describe '#socket', ->
+
+    Given -> @socket = new EventEmitter
+    Given -> @fn = jasmine.createSpy()
+    Given -> @bus.socket @fn
+    When -> @bus.io().emit 'connection', @socket
+    Then -> expect(@fn).toHaveBeenCalledWith @socket, @bus
+
+  describe '#alias', ->
+
+    Given -> @name = 'me'
+    Given -> @socket = new EventEmitter
+    Given -> @socket.id = 'you'
+    Given -> spyOn(@bus.messageExchange(),['channel']).andCallThrough()
+    Given -> spyOn(@bus.messageExchange().channel(@name),['on']).andCallThrough()
+    Given -> spyOn(@socket,['on']).andCallThrough()
+    When -> @bus.alias @socket, @name
+    Then -> expect(@bus.messageExchange().channel).toHaveBeenCalledWith @name
+    And -> expect(@bus.messageExchange().channel(@name).on).toHaveBeenCalledWith 'message', jasmine.any(Function)
+    And -> expect(@socket.on).toHaveBeenCalledWith 'disconnect', jasmine.any(Function)
+
+    context 'triggering an event', ->
+    
+      Given -> @message = @Message()
+      Given -> @message.data.target = @name
+      Given -> spyOn(@bus,['emit']).andCallThrough()
+      When -> @bus.messageExchange().channel(@name).emit 'message', @message
+      Then -> expect(@bus.emit).toHaveBeenCalledWith 'from exchange', @message, @socket
+
+    context 'soscket disconnect', ->
+
+      When -> @socket.emit 'disconnect'
+      Then -> expect(@bus.messageExchange().channel(@name).listeners('message').length).toBe 0

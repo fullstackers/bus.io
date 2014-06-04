@@ -1,5 +1,5 @@
 
-describe 'message controller', ->
+describe 'Controller', ->
 
   Given ->
     @Message = class Message
@@ -16,7 +16,7 @@ describe 'message controller', ->
       clone: ->
         return new Message
 
-  Given -> @Controller = requireSubject 'lib/message-controller', {
+  Given -> @Controller = requireSubject 'lib/controller', {
     './message': @Message
   }
 

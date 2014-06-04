@@ -1,5 +1,4 @@
-var bus = require('./..')();
-bus.listen(8080);
+var bus = require('./..')(8080);
 bus.on('say', function (message) {
   message.consume(); 
   this.message().i('server').did('consumed').what('your message').to(message.data.actor);
