@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/NathanGRomano/bus.io.svg?branch=master)](https://travis-ci.org/NathanGRomano/bus.io)
 [![NPM version](https://badge.fury.io/js/bus.io.svg)](http://badge.fury.io/js/bus.io)
+[![David DM](https://david-dm.org/nathangromano/bus.io.png)](https://david-dm.org/nathangromano/bus.io.png)
 
 Easily build distributed applications that scale!
 
