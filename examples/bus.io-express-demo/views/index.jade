@@ -1,0 +1,17 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to the #{title}
+  p
+    span Here we will demonstrate how 
+    a(href="http://npmjs.org/package/bus.io") bus.io 
+    span works
+  if req.user
+    p Hello, #{req.user.name}
+  else
+    p Please either 
+      a(href="/login") login
+      span  or 
+      a(href="/register") register
+      span  to continue.

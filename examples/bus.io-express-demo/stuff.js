@@ -110,12 +110,15 @@ io.set('authorization', function (data, authorization) {
  */
 
 var bus = require('./..')(io);
+
 bus.actor(function (socket, cb) {
   cb(null, socket.handshake.data.session.user.name);
 });
+
 bus.target(function (socket, params, cb) {
   cb(null, params.pop() || socket.handshake.data.session.user.name);
 });
+
 bus.on('follow', function (message) {
 
   // get both the actor and the tarvet
@@ -145,6 +148,7 @@ bus.on('follow', function (message) {
     });
   });
 });
+
 bus.on('post', function (message) {
   store.get(message.data.actor, function (err, actor) {
     if (err) return message.respond(err);
