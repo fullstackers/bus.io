@@ -806,5 +806,25 @@ bus.in(function (message, socket, next) {
 });
 ```
 
+## Automatic propagation
+
+Instead of having to write a function to deliver a message
+
+```javascript
+
+bus.on('some message', function (message) {
+  message.deliver();
+});
+
+```
+
+It would be nice if we could do something like
+
+```javascript
+
+bus.propagate('some message', 'some other message', 'ok');
+
+```
+
 
 
