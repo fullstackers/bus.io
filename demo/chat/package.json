@@ -1,0 +1,15 @@
+{
+  "name": "bus.io-express-demo",
+  "version": "0.0.0",
+  "description": "Bus.io Express Demo",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.4.1",
+    "bus.io": "0.0.25-beta"
+  }
+}
