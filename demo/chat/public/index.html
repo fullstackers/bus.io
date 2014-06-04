@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Bus.io Express Demo</title>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <style type="text/css">
+      * { color:#777; font-family:"Arial"; padding:5px; }
+      body { background: #EEE; padding: }
+      #login, #update, #target_user, #error { display: none }
+      .disconnected { color: #700; }
+      .connected { color: #070; }
+      .who, .what, .to, .when { font-size:150%;}
+      ul { margin: 0; list-style-type: none; padding: 0; background:#FFF; }
+      li { padding: 1em; border-bottom:thin solid #DDD;}
+      input, textarea, button, select, option { font-size:120%; padding: 1em; margin:0 .25em 0 .25em}
+      #login, #update { padding:1em; background-color:#CCC; }
+      h2 { display:inline-block }
+      #name { display: inline-block }
+    </style>
+  </head>
+  <body>
+    <h1>Bus.io Express Demo (<span id="connection"></span>)</h1>
+    <div id="login">
+      <h2>Your name?</h2>
+      <input type="text" id="name" value="" />
+      <button id="go">Join the Conversation</button>
+    </div>
+    <div id="update">
+      <h2>Status?</h2>
+      <input id="status" />
+      <select id="target">
+        <option value="everyone" selected="selected">Everyone</option>
+        <option value="user">User</option>
+      </select>
+      <input type="text" id="target_user" value="" />
+      <button id="share">Share</button>
+    </div>
+    <ul id="messages"></ul>
+    <script type="text/javascript">
+      $(function () {
+        var me = null;
+        var socket = io.connect(window.location.href);
+      
+        socket.on('connect', function () {
+          $('#connection').removeClass('disconnected').addClass('connected').html('connected').show();
+          $('#update').hide();
+          $('#login').show();
+        });
+
+        socket.on('disconnect', function () {
+          $('#connection').removeClass('connected').addClass('disconnected').html('disconnected').show();
+        });
+
+        socket.on('set user', function (who, what) {
+          me = what;
+          $('#error').hide();
+          $('#login').hide();
+          $('#update').show();
+        });
+
+        socket.on('post', function (who, what, to, when) {
+          if (to === me) {
+            to = 'you';
+          }
+          $('#messages').append(
+            $('<li>')
+              .append($('<span>').addClass('who').append(who))
+              .append(' shared ')
+              .append($('<span>').addClass('what').append(what))
+              .append(' with ')
+              .append($('<span>').addClass('to').append(to))
+              .append(' at ')
+              .append($('<span>').addClass('when').append(when))
+          );
+        });
+
+        $('#go').click(function () {
+          socket.emit('set user', $('#name').val());
+        });
+
+        $('#share').click(function () {
+          var target = $('#target').val();
+          if (target === 'user') {
+            target = $('#target_user').val();
+          }
+          socket.emit('post', $('#status').val(), target);
+          $('#status').val('');
+        });
+
+        $('#target').change(function () {
+          if ($(this).val() === 'user') {
+            $('#target_user').show();
+          }
+          else {
+            $('#target_user').hide();
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
