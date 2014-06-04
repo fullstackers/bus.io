@@ -314,7 +314,7 @@ the exchange before being emitted to the client.
 ```javascript
 
 bus.exchangeReceiver().use(function (message, socket, next) {
-  message.data.content += '!';
+  message.content()[0] += '!';
   next(); // you must call next!
 });
 
@@ -325,7 +325,7 @@ Or
 ```javascript
 
 bus.in(function (message, socket, next) {
-  message.data.content += '!';
+  message.content()[0] += '!';
   next(); // you must call next!
 });
 
@@ -339,7 +339,7 @@ the client before being emitted to the exchange.
 ```javascript
 
 bus.socketReceiver().use(function (message, socket, next) {
-  message.data.content[0] += '!';
+  message.content()[0] += '!';
   next(); // you must call next!
 });
 
@@ -575,7 +575,7 @@ is sent to the `socket`.
 ```javascript
 
 bus.in(function (message, socket, next) {
-  message.data.content[0] = message.data.content[0].toLowerCase();
+  message.content([message.content()[0].toLowerCase()]);
   next();
 });
 
