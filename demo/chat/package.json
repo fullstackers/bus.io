@@ -10,6 +10,6 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.4.1",
-    "bus.io": "0.0.25-beta"
+    "bus.io": "*"
   }
 }
