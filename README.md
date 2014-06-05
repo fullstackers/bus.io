@@ -82,7 +82,7 @@ Here we can use an already existing **socket.io** instance.
 
 var io = require('socket.io')();
 
-var bus = reuqire('bus.io')();
+var bus = require('bus.io')();
 bus.listen(io);
 
 ```
