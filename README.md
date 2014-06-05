@@ -82,7 +82,7 @@ Here we can use an already existing **socket.io** instance.
 
 var io = require('socket.io')();
 
-var bus = reuqire('bus.io')();
+var bus = require('bus.io')();
 bus.listen(io);
 
 ```
@@ -725,8 +725,7 @@ You will need a redis server up and running to run the demos at this time
 
 # Demos
 
-Demos are under the `/demo` directory.  There is currently a basic chat program
-I also have some ideas. There.
+Demos are under the `/demo` directory.  There is currently a basic chat program.
 
 # Ideas
 
@@ -828,5 +827,12 @@ bus.propagate('some message', 'some other message', 'ok');
 
 ```
 
+Or event auto propagate messages that do not have a listener.
+
+```javascript
+
+bus.autoPropagate(true);
+
+```
 
 
