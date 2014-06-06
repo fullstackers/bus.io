@@ -96,6 +96,7 @@ describe 'Server', ->
     }
 
   Given -> @bus = @Server()
+  Then -> expect(@Server.Exchange).toEqual @MessageExchange
 
   describe '#', ->
     
