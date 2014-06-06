@@ -73,8 +73,13 @@ describe 'Server', ->
     @MessageExchange = class MessageExchange extends EventEmitter
       constructor: ->
         @ee = new EventEmitter
+        @h = new EventEmitter
+        @q = new EventEmitter
+        @p = new EventEmitter
       publish: ->
-      handler: new EventEmitter
+      handler: -> @h
+      queue: -> @q
+      pubsub: -> @p
       channel: -> @ee
     @MessageExchange.make = ->
       return new MessageExchange
@@ -157,12 +162,12 @@ describe 'Server', ->
 
   describe '#on', ->
     Given -> @fn = ->
-    Given -> spyOn(@bus.messageExchange().handler,['on']).andCallThrough()
+    Given -> spyOn(@bus.messageExchange().handler(),['on']).andCallThrough()
     Given -> spyOn(@bus.socketMessages(),['action']).andCallThrough()
     When -> @bus.on 'name', @fn
-    Then -> expect(@bus.messageExchange().handler.on).toHaveBeenCalled()
-    And -> expect(@bus.messageExchange().handler.on.mostRecentCall.args[0]).toBe 'name'
-    And -> expect(typeof @bus.messageExchange().handler.on.mostRecentCall.args[1]).toBe 'function'
+    Then -> expect(@bus.messageExchange().handler().on).toHaveBeenCalled()
+    And -> expect(@bus.messageExchange().handler().on.mostRecentCall.args[0]).toBe 'name'
+    And -> expect(typeof @bus.messageExchange().handler().on.mostRecentCall.args[1]).toBe 'function'
     And -> expect(@bus.socketMessages().action).toHaveBeenCalledWith 'name'
 
   describe '#onPublish', ->
