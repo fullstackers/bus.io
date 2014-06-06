@@ -694,7 +694,7 @@ this.message()
 
 Gets the exchange the server uses to publish information.
 
-Checkout 
+*See **[message-exchange](https://github.com/nathangromano/message-exchange "message-exchange")**
 
 ```javascript
 
@@ -706,7 +706,8 @@ var exchange = bus.exchange();
 
 Sets the exchange the server uses to publish information.
 
-See **[message-exchange](https://github.com/nathangromano/message-exchange "message-exchange")**
+*See **[message-exchange](https://github.com/nathangromano/message-exchange "message-exchange")**
+
 for more information.
 
 ```javascript
@@ -731,6 +732,8 @@ var qeueue = exchange.queue();
 
 Sets the `Queue` the `Exchange` uses.
 
+*See **[message-exchange](https://github.com/nathangromano/message-exchange "message-exchange")**
+
 ```javascript
 
 var queue = require('bus.io').Exchange.Queue.make();
@@ -741,6 +744,8 @@ bus.queue(queue);
 ### Server#pubsub()
 
 Gets the `Qeueu` the `Exchange` uses.
+
+*See **[message-exchange](https://github.com/nathangromano/message-exchange "message-exchange")**
 
 ```javascript
 
