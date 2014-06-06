@@ -71,7 +71,9 @@ describe 'Controller', ->
         @m = @message.clone()
         @m.data.target = 'people'
       When -> @controller.deliver 'people'
-      Then -> expect(@controller.emit).toHaveBeenCalledWith 'deliver', @m
+      Then -> expect(@controller.emit).toHaveBeenCalled()
+      And -> expect(@controller.emit.mostRecentCall.args[0]).toBe 'deliver'
+      And -> expect(@controller.emit.mostRecentCall.args[1]).toEqual @m
 
   describe '#actor', ->
 
