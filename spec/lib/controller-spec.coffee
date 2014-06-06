@@ -73,7 +73,12 @@ describe 'Controller', ->
       When -> @controller.deliver 'people'
       Then -> expect(@controller.emit).toHaveBeenCalled()
       And -> expect(@controller.emit.mostRecentCall.args[0]).toBe 'deliver'
-      And -> expect(@controller.emit.mostRecentCall.args[1]).toEqual @m
+      And -> expect(@controller.emit.mostRecentCall.args[1].data.actor).toBe 'me'
+      And -> expect(@controller.emit.mostRecentCall.args[1].data.action).toBe 'say'
+      And -> expect(@controller.emit.mostRecentCall.args[1].data.content).toBe 'hello'
+      And -> expect(@controller.emit.mostRecentCall.args[1].data.target).toBe 'people'
+      And -> expect(@controller.emit.mostRecentCall.args[1].data.reference).toBe null
+      And -> expect(@controller.emit.mostRecentCall.args[1].data.created instanceof Date).toBe true
 
   describe '#actor', ->
 
