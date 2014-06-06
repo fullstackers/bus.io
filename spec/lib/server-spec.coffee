@@ -81,6 +81,8 @@ describe 'Server', ->
       queue: -> @q
       pubsub: -> @p
       channel: -> @ee
+    @MessageExchange.Queue = class Queue extends EventEmitter
+    @MessageExchange.PubSub = class PubSub extends EventEmitter
     @MessageExchange.make = ->
       return new MessageExchange
 
@@ -141,9 +143,15 @@ describe 'Server', ->
 
   describe '#messageExchange', ->
 
-    Given -> @messageExchange = new @MessageExchange
-    When -> @res = @bus.messageExchange(@messageExchange).messageExchange()
-    Then -> expect(@res).toEqual @messageExchange
+    Given -> @exchange = new @MessageExchange
+    When -> @res = @bus.messageExchange(@exchange).messageExchange()
+    Then -> expect(@res).toEqual @exchange
+
+  describe '#exchange', ->
+
+    Given -> @exchange = new @MessageExchange
+    When -> @res = @bus.exchange(@exchange).exchange()
+    Then -> expect(@res).toEqual @exchange
 
   describe '#socketMessages', ->
 
@@ -163,12 +171,12 @@ describe 'Server', ->
 
   describe '#on', ->
     Given -> @fn = ->
-    Given -> spyOn(@bus.messageExchange().handler(),['on']).andCallThrough()
+    Given -> spyOn(@bus.exchange().handler(),['on']).andCallThrough()
     Given -> spyOn(@bus.socketMessages(),['action']).andCallThrough()
     When -> @bus.on 'name', @fn
-    Then -> expect(@bus.messageExchange().handler().on).toHaveBeenCalled()
-    And -> expect(@bus.messageExchange().handler().on.mostRecentCall.args[0]).toBe 'name'
-    And -> expect(typeof @bus.messageExchange().handler().on.mostRecentCall.args[1]).toBe 'function'
+    Then -> expect(@bus.exchange().handler().on).toHaveBeenCalled()
+    And -> expect(@bus.exchange().handler().on.mostRecentCall.args[0]).toBe 'name'
+    And -> expect(typeof @bus.exchange().handler().on.mostRecentCall.args[1]).toBe 'function'
     And -> expect(@bus.socketMessages().action).toHaveBeenCalledWith 'name'
 
   describe '#onPublish', ->
@@ -178,16 +186,16 @@ describe 'Server', ->
       Given ->
         @message = @Message()
         @message.data.published = date
-      Given -> spyOn(@bus.messageExchange(),['publish']).andCallThrough()
+      Given -> spyOn(@bus.exchange(),['publish']).andCallThrough()
       When -> @bus.onPublish @message
-      Then -> expect(@bus.messageExchange().publish).toHaveBeenCalledWith @message.data, @message.data.target
+      Then -> expect(@bus.exchange().publish).toHaveBeenCalledWith @message.data, @message.data.target
 
    context 'unpublished', ->
       
       Given -> @message = @Message()
-      Given -> spyOn(@bus.messageExchange(),['publish']).andCallThrough()
+      Given -> spyOn(@bus.exchange(),['publish']).andCallThrough()
       When -> @bus.onPublish @message
-      Then -> expect(@bus.messageExchange().publish).toHaveBeenCalledWith @message.data
+      Then -> expect(@bus.exchange().publish).toHaveBeenCalledWith @message.data
 
   describe '#onConnection', ->
 
@@ -195,13 +203,13 @@ describe 'Server', ->
       @socket = new EventEmitter
       @socket.id = 'me'
     Given -> spyOn(@bus.socketMessages(),['actor']).andCallThrough()
-    Given -> spyOn(@bus.messageExchange(),['channel']).andCallThrough()
-    Given -> spyOn(@bus.messageExchange().channel('me'),['on']).andCallThrough()
+    Given -> spyOn(@bus.exchange(),['channel']).andCallThrough()
+    Given -> spyOn(@bus.exchange().channel('me'),['on']).andCallThrough()
     Given -> spyOn(@socket,['on']).andCallThrough()
     When -> @bus.onConnection @socket
     Then -> expect(@bus.socketMessages().actor).toHaveBeenCalledWith @socket, jasmine.any(Function)
-    And -> expect(@bus.messageExchange().channel).toHaveBeenCalledWith 'me'
-    And -> expect(@bus.messageExchange().channel('me').on).toHaveBeenCalledWith 'message', jasmine.any(Function)
+    And -> expect(@bus.exchange().channel).toHaveBeenCalledWith 'me'
+    And -> expect(@bus.exchange().channel('me').on).toHaveBeenCalledWith 'message', jasmine.any(Function)
     And -> expect(@socket.on).toHaveBeenCalledWith 'disconnect', jasmine.any(Function)
 
   describe '#onError', ->
@@ -297,12 +305,12 @@ describe 'Server', ->
     Given -> @name = 'me'
     Given -> @socket = new EventEmitter
     Given -> @socket.id = 'you'
-    Given -> spyOn(@bus.messageExchange(),['channel']).andCallThrough()
-    Given -> spyOn(@bus.messageExchange().channel(@name),['on']).andCallThrough()
+    Given -> spyOn(@bus.exchange(),['channel']).andCallThrough()
+    Given -> spyOn(@bus.exchange().channel(@name),['on']).andCallThrough()
     Given -> spyOn(@socket,['on']).andCallThrough()
     When -> @bus.alias @socket, @name
-    Then -> expect(@bus.messageExchange().channel).toHaveBeenCalledWith @name
-    And -> expect(@bus.messageExchange().channel(@name).on).toHaveBeenCalledWith 'message', jasmine.any(Function)
+    Then -> expect(@bus.exchange().channel).toHaveBeenCalledWith @name
+    And -> expect(@bus.exchange().channel(@name).on).toHaveBeenCalledWith 'message', jasmine.any(Function)
     And -> expect(@socket.on).toHaveBeenCalledWith 'disconnect', jasmine.any(Function)
 
     context 'triggering an event', ->
@@ -310,10 +318,24 @@ describe 'Server', ->
       Given -> @message = @Message()
       Given -> @message.data.target = @name
       Given -> spyOn(@bus,['emit']).andCallThrough()
-      When -> @bus.messageExchange().channel(@name).emit 'message', @message
+      When -> @bus.exchange().channel(@name).emit 'message', @message
       Then -> expect(@bus.emit).toHaveBeenCalledWith 'from exchange', @message, @socket
 
     context 'soscket disconnect', ->
 
       When -> @socket.emit 'disconnect'
-      Then -> expect(@bus.messageExchange().channel(@name).listeners('message').length).toBe 0
+      Then -> expect(@bus.exchange().channel(@name).listeners('message').length).toBe 0
+
+  describe '#queue', ->
+
+    Given -> spyOn(@bus.exchange(),['queue']).andCallThrough()
+    When -> @bus.queue()
+    Then -> expect(@bus.exchange().queue).toHaveBeenCalled()
+
+    context 'queue:Queue', ->
+
+      Given -> @q = new @MessageExchange.Queue
+      When -> @bus.queue(@q)
+      Then -> expect(@bus.exchange().queue).toHaveBeenCalledWith @q
+
+  describe '#pubsub', ->
