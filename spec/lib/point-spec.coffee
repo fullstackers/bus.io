@@ -1,4 +1,4 @@
-describe.only 'Point', ->
+describe 'Point', ->
 
   Given -> @Point = requireSubject 'lib/point', {}
 
