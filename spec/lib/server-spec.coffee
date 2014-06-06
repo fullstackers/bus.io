@@ -340,6 +340,12 @@ describe 'Server', ->
 
   describe '#pubsub', ->
 
-      Given -> @p = new @MessageExchange.PubSub
-      When -> @bus.pubsub(@p)
-      Then -> expect(@bus.exchange().pubsub).toHaveBeenCalledWith @p
+    Given -> spyOn(@bus.exchange(),['pubsub']).andCallThrough()
+    When -> @bus.pubsub()
+    Then -> expect(@bus.exchange().pubsub).toHaveBeenCalled()
+
+    context 'pubsub:PubSub', ->
+
+      Given -> @q = new @MessageExchange.PubSub
+      When -> @bus.pubsub(@q)
+      Then -> expect(@bus.exchange().pubsub).toHaveBeenCalledWith @q
