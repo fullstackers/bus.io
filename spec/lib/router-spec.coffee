@@ -13,19 +13,19 @@ describe 'Router', ->
           created: new Date
           reference: null
           id: 1
-        @actor -> @data.actor
-        @target -> @data.target
-        @content -> @data.content
-        @action -> @data.action
+      @actor: -> @data.actor
+      @target: -> @data.target
+      @content: -> @data.content
+      @action: -> @data.action
 
       clone: ->
         return new Message
 
   Given ->
     @Point = class Point
-      constructor: (fn, action, index)
-        if not (@ instanceof Message)
-          return new Point fn, action, index
+      constructor: (index, fn, action) ->
+        if not (@ instanceof Point)
+          return new Point index, fn, action
         @fn = fn
         @action = action
         @index = index
@@ -33,8 +33,8 @@ describe 'Router', ->
   Given ->
     @Route = class Route
       constructor: ->
-        if not (@ instanceof Message)
-          return new Message
+        if not (@ instanceof Route)
+          return new Route
       process: ->
       list: -> []
     
@@ -46,50 +46,77 @@ describe 'Router', ->
   describe '#()', ->
 
     Then -> expect(@Router() instanceof @Router).toBe true
+    And -> expect(@Router() instanceof EventEmitter).toBe true
 
   describe 'prototype', ->
 
     Given -> @instance = @Router()
+
+    describe '#routes()', ->
+
+      Then -> expect(@instance.routes()).toEqual {}
+
+    describe '#routes(action:String)', ->
+
+      Given -> @action = 'say'
+      Then -> expect(@instance.routes(@action)).toEqual null
+
+    describe '#paths()', ->
+
+      Then -> expect(@instance.paths()).toEqual {}
+
+    describe '#paths(action:String="say")', ->
+
+      Given -> @action = 'say'
+      Then -> expect(@instance.paths(@action)).toEqual []
   
-    describe.on '#on', ->
+    describe '#on', ->
       
-      Given -> @fn = jasmine.createSpyObj 'fn'
+      Given -> @fn = jasmine.createSpy 'fn'
+      Given -> @action = 'say'
+      Given -> spyOn(@instance,['emit']).andCallThrough()
 
-      context 'path:Sring="say", fn:Function', ->
+      context.only '(path:Sring="say", fn:Function)', ->
 
-        Given -> @path = 'say'
-        When -> @instance.on @path, @fn
-        Then -> expect(@instance.paths(@path).length).toBe 1
-        And -> expect(@instance.paths(@path)[0] instanceof @Point).toBe true
-        And -> expect(@instance.paths(@path)[0].fn).toEqual @fn
-        And -> expect(@instance.paths(@path)[0].action).toEqual @action
-        And -> expect(@instance.paths(@path)[0].index).toEqual 0
+        When -> @instance.on @action, @fn
+        Then -> expect(@instance.paths(@action).length).toBe 1
+        And -> expect(@instance.paths(@action)[0] instanceof @Point).toBe true
+        And -> expect(@instance.paths(@action)[0].fn).toEqual @fn
+        And -> expect(@instance.paths(@action)[0].action).toEqual @action
+        And -> expect(@instance.paths(@action)[0].index).toEqual 0
+        And -> expect(@instance.emit).toHaveBeenCalledWith 'changed', @action
 
-      context 'path:Sring="*"', ->
+      context '(path:Sring="*")', ->
 
-        Given -> @path = 'say'
-        When -> @instance.on @path, @fn
-        Then -> expect(@instance.paths(@path).length).toBe 1
-        And -> expect(@instance.paths(@path)[0] instanceof @Point).toBe true
-        And -> expect(@instance.paths(@path)[0].fn).toEqual @fn
-        And -> expect(@instance.paths(@path)[0].action).toEqual @action
-        And -> expect(@instance.paths(@path)[0].index).toEqual 0
+        When -> @instance.on @action, @fn
+        Then -> expect(@instance.paths(@action).length).toBe 1
+        And -> expect(@instance.paths(@action)[0] instanceof @Point).toBe true
+        And -> expect(@instance.paths(@action)[0].fn).toEqual @fn
+        And -> expect(@instance.paths(@action)[0].action).toEqual @action
+        And -> expect(@instance.paths(@action)[0].index).toEqual 0
+        And -> expect(@instance.emit).toHaveBeenCalledWith 'changed', @action
 
-    describe '#buildRoute(path:String="say")', ->
+    describe '#getRoute(path:String="say")', ->
 
       Given -> @path = 'say'
-      When -> @route = @instance.buildRoute @path
+      When -> @route = @instance.getRoute @path
       Then -> expect(@route instanceof @Route).toBe true
 
     describe '#route(message:Message, cb:Function)', ->
 
       Given -> @message = @Message()
-      Givne -> @cb = jasmine.createSpyObj 'cb'
+      Given -> @cb = jasmine.createSpy 'cb'
       Given -> @route = @Route()
       Given -> spyOn(@route,['process']).andCallThrough()
-      Given -> spyOn(@instance.buildRoute).andReturn(@route)
+      Given -> spyOn(@instance.getRoute).andReturn(@route)
       When -> @instance.route @message, @cb
       Then -> expect(@route.process).toHaveBeenCalledWith @message
       And -> expect(@instance.buildRoute).toHaveBeenCalledWith @message.action()
       And -> expect(@cb).toHaveBeenCalled()
 
+    describe.only '#onChange(action:String)', ->
+
+      Given -> @action = 'say'
+      Given -> @instance.routes @action, @Route()
+      When -> @instance.onChange @action
+      Then -> expect(@instance.routes(@action)).toBe undefined
