@@ -571,7 +571,7 @@ bus.socket(function (socket, bus) {
 ### Server#in(fn#Function,...)
 
 The **in** method will use the passed function(s) when a message is received 
-from the `bus.messageExchange()`.  This allows you to modify the message before it
+from the `bus.exchange()`.  This allows you to modify the message before it
 is sent to the `socket`.
 
 ```javascript
@@ -609,7 +609,7 @@ bus.on('some event', function (message) {
 
 The **out** method will use the passed function(s) when a message is received
 from the `socket` before it is published to the 
-`bus.messageExchange()` instance.
+`bus.exchange()` instance.
 
 Here you could save the message to a mongo store using mongoose.
 
@@ -687,6 +687,81 @@ this.message()
   .did('say')
   .what('hello')
   .to('you');
+
+```
+
+### Server#exchange()
+
+Gets the exchange the server uses to publish information.
+
+See **[message-exchange](https://github.com/nathangromano/message-exchange "message-exchange")**
+
+```javascript
+
+var exchange = bus.exchange();
+
+```
+
+### Server#exchange(exchange:Server.Exchange)
+
+Sets the exchange the server uses to publish information.
+
+See **[message-exchange](https://github.com/nathangromano/message-exchange "message-exchange")**
+
+for more information.
+
+```javascript
+
+var exchange = require('bus.io').Exchange.make();
+bus.exchange(exchange);
+
+```
+
+### Server#queue()
+
+Gets the `Qeueu` the `Exchange` uses.
+
+```javascript
+
+var qeueue = exchange.queue();
+
+```
+
+
+### Server#queue(queue:Server.Exchange.Queue)
+
+Sets the `Queue` the `Exchange` uses.
+
+See **[message-exchange](https://github.com/nathangromano/message-exchange "message-exchange")**
+
+```javascript
+
+var queue = require('bus.io').Exchange.Queue.make();
+bus.queue(queue);
+
+```
+
+### Server#pubsub()
+
+Gets the `Qeueu` the `Exchange` uses.
+
+See **[message-exchange](https://github.com/nathangromano/message-exchange "message-exchange")**
+
+```javascript
+
+var qeueue = exchange.pubsub();
+
+```
+
+
+### Server#pubsub(pubsub:Server.Exchange.PubSub)
+
+Sets the `PubSub` the `Exchange` uses.
+
+```javascript
+
+var pubsub = require('bus.io').Exchange.PubSub.make();
+bus.pubsub(pubsub);
 
 ```
 
