@@ -719,11 +719,11 @@ bus.exchange(exchange);
 
 ### Server#queue()
 
-Gets the `Qeueu` the `Exchange` uses.
+Gets the `Queue` the `Exchange` uses.
 
 ```javascript
 
-var qeueue = exchange.queue();
+var queue = exchange.queue();
 
 ```
 
@@ -743,13 +743,13 @@ bus.queue(queue);
 
 ### Server#pubsub()
 
-Gets the `Qeueu` the `Exchange` uses.
+Gets the `PubSub` the `Exchange` uses.
 
 See **[message-exchange](https://github.com/nathangromano/message-exchange "message-exchange")**
 
 ```javascript
 
-var qeueue = exchange.pubsub();
+var pubsub = exchange.pubsub();
 
 ```
 
