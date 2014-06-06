@@ -690,6 +690,76 @@ this.message()
 
 ```
 
+### Server#exchange()
+
+Gets the exchange the server uses to publish information.
+
+Checkout 
+
+```javascript
+
+var exchange = bus.exchange();
+
+```
+
+### Server#exchange(exchange:Server.Exchange)
+
+Sets the exchange the server uses to publish information.
+
+See **[message-exchange](https://github.com/nathangromano/message-exchange "message-exchange")**
+for more information.
+
+```javascript
+
+var exchange = require('bus.io').Exchange.make();
+bus.exchange(exchange);
+
+```
+
+### Server#queue()
+
+Gets the `Qeueu` the `Exchange` uses.
+
+```javascript
+
+var qeueue = exchange.queue();
+
+```
+
+
+### Server#queue(queue:Server.Exchange.Queue)
+
+Sets the `Queue` the `Exchange` uses.
+
+```javascript
+
+var queue = require('bus.io').Exchange.Queue.make();
+bus.queue(queue);
+
+```
+
+### Server#pubsub()
+
+Gets the `Qeueu` the `Exchange` uses.
+
+```javascript
+
+var qeueue = exchange.pubsub();
+
+```
+
+
+### Server#pubsub(pubsub:Server.Exchange.PubSub)
+
+Sets the `PubSub` the `Exchange` uses.
+
+```javascript
+
+var pubsub = require('bus.io').Exchange.PubSub.make();
+bus.pubsub(pubsub);
+
+```
+
 # Running Tests
 
 Install coffee-script
