@@ -63,7 +63,7 @@
           if (to === me) {
             to = 'you';
           }
-          $('#messages').append(
+          $('#messages').prepend(
             $('<li>')
               .append($('<span>').addClass('who').append(who))
               .append(' shared ')
