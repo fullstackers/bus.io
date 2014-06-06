@@ -339,3 +339,7 @@ describe 'Server', ->
       Then -> expect(@bus.exchange().queue).toHaveBeenCalledWith @q
 
   describe '#pubsub', ->
+
+      Given -> @p = new @MessageExchange.PubSub
+      When -> @bus.pubsub(@p)
+      Then -> expect(@bus.exchange().pubsub).toHaveBeenCalledWith @p
