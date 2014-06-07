@@ -950,7 +950,7 @@ bus.on('chat', function (message, next) {
   message.deliver();
 });
 
-``
+```
 
 ## Regex support / wild cards for actions
 
