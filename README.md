@@ -198,6 +198,33 @@ bus.socket(function (socket, bus) {
 The **bus** instance has it's *on* method overridden.  You can still add listeners by
 calling `addListener('event', function() {})`.
 
+## Handling messages going into the Bus
+
+You can specify middleware functions to manipulate the messages incoming from
+the socket before going into the bus
+
+```javascript
+
+bus.in(function (message, socket, next) {
+  message.content()[0] += '!';
+  next(); //you must call next or either message.deliver(), message.consume(), message.respond()
+
+});
+
+```
+
+Or
+
+```javascript
+
+bus.in('chat', function (message, socket, next) {
+  message.content()[0] += '!!'; 
+  message.deliver();
+});
+
+```
+
+
 
 ##Handling messages on the bus
 
@@ -308,52 +335,27 @@ bus.on('some message', function (message) {
 
 ```
 
-## Handling messages received from the Exchange
+## Handling messages going out of the Bus 
 
 You can specify middleware functions to manipulate the messages incoming from
-the exchange before being emitted to the client.
-
-```javascript
-
-bus.exchangeReceiver().use(function (message, socket, next) {
-  message.content()[0] += '!';
-  next(); // you must call next!
-});
-
-```
-
-Or
-
-```javascript
-
-bus.in(function (message, socket, next) {
-  message.content()[0] += '!';
-  next(); // you must call next!
-});
-
-```
-
-## Handling messages received from the Socket
-
-You can specify middleware functions to manipulate the messages incoming from
-the client before being emitted to the exchange.
-
-```javascript
-
-bus.socketReceiver().use(function (message, socket, next) {
-  message.content()[0] += '!';
-  next(); // you must call next!
-});
-
-```
-
-Or
+the exchange before going to the socket.
 
 ```javascript
 
 bus.out(function (message, socket, next) {
   message.data.content[0] += '!';
-  next(); // you must call next!
+  next(); //you must call next or either message.deliver(), message.consume(), message.respond()
+});
+
+```
+
+Or
+
+```javascript
+
+bus.out('chat', function (message, socket, next) {
+  message.content()[0] += '!!'; 
+  message.deliver();
 });
 
 ```
@@ -571,8 +573,8 @@ bus.socket(function (socket, bus) {
 ### Server#in(fn#Function,...)
 
 The **in** method will use the passed function(s) when a message is received 
-from the `bus.exchange()`.  This allows you to modify the message before it
-is sent to the `socket`.
+from the `socket`.  This allows you to modify the message before it
+is sent to the `exchange`.
 
 ```javascript
 
@@ -588,6 +590,61 @@ You can pass in multiple functions or arrays of functions.
 ```javascript
 
 bus.in(function (a,b,c) {...}, function (a,b,c) {...}, [function (a,b,c) {...}, function(a,b,c) {...}]);
+
+```
+
+You can set up handlers for specific messages.
+
+```javascript
+
+bus.in('chat', function (message, socket, next) {
+  // do something
+  next();
+});
+
+```
+
+If you bind multiple handlers they will be called in this order
+
+```javascript
+bus.in('chat', function (message, socket, next) {
+  message.content('A');
+  next();
+});
+
+bus.in(function (message, socket, next) {
+  message.content(message.content()+'B');
+});
+
+bus.in('chat', function (message, socket, next) {
+  message.content(message.content()+'C');
+  next();
+});
+
+// The output of message.content() will be 'ABC';
+
+```
+
+You can control propagation with `consume()`, `deliver()`, `respond()` as well.
+
+```javascript
+
+bus.in(function (message, socket, next) {
+  message.deliver();
+});
+
+bus.in(function (message, socket, next) {
+  // will not be called because the message will delivered to the target 
+  // as a result of calling deliver!!
+});
+
+// consume()
+
+bus.in(function (message, socket, next) {
+  message.consume();
+  // the message will just die here
+});
+
 
 ```
 
@@ -608,8 +665,8 @@ bus.on('some event', function (message) {
 ### Server#out(fn:Function,...)
 
 The **out** method will use the passed function(s) when a message is received
-from the `socket` before it is published to the 
-`bus.exchange()` instance.
+from the `exchange`. This allows you to modify the message before it
+is sent to the `socket`. 
 
 Here you could save the message to a mongo store using mongoose.
 
@@ -632,6 +689,61 @@ You can pass in multiple functions or arrays of functions.
 ```javascript
 
 bus.out(function (a,b,c) {...}, function (a,b,c) {...}, [function (a,b,c) {...}, function(a,b,c) {...}]);
+
+```
+
+You can set up handlers for specific messages.
+
+```javascript
+
+bus.out('chat', function (message, socket, next) {
+  // do something
+  next();
+});
+
+```
+
+If you bind multiple handlers they will be called in this order
+
+```javascript
+bus.out('chat', function (message, socket, next) {
+  message.content('A');
+  next();
+});
+
+bus.out(function (message, socket, next) {
+  message.content(message.content()+'B');
+});
+
+bus.out('chat', function (message, socket, next) {
+  message.content(message.content()+'C');
+  next();
+});
+
+// The output of message.content() will be 'ABC';
+
+```
+
+You can control propagation with `consume()`, `deliver()`, `respond()` as well.
+
+```javascript
+
+bus.out(function (message, socket, next) {
+  message.deliver();
+});
+
+bus.out(function (message, socket, next) {
+  // will not be called because the message will delivered to the target 
+  // as a result of calling deliver!!
+});
+
+// consume()
+
+bus.out(function (message, socket, next) {
+  message.consume();
+  // the message will just die here
+});
+
 
 ```
 
@@ -783,14 +895,8 @@ To run the tests, just run grunt
 
 # TODO
 
-* Specify the name of the events to be processed as we receive them from the 
-  exchange to the client
-* Write e2e tests
-* Code coverage
-* Working with message data is cumbersome.
-* Examples, Examples, Examples
-
-If you would like to contribute please fork and send me a pull request!
+There are open issues ff you would like to contribute please fork and send me 
+a pull request!
 
 # Working Examples and Demos
 
@@ -804,30 +910,6 @@ Demos are under the `/demo` directory.  There is currently a basic chat program.
 
 # Ideas
 
-## Receiver Message Routing
-
-Currently all messages are passed through the Receivers
-
-```javascript
-
-bus.in(function (message, socket, next) {
-  //do something!
-  next();
-});
-
-```
-
-It would be nice to handle specific kinds of messages.  Maybe use **[express] (https://www.npmjs.org/package/express "Express")** style routing.
-
-```javascript
-
-bus.in('echo', function (message, socket, next) {
-  assert.equals(message.data.action, 'echo');
-  next();
-});
-
-```
-
 ## Use socket.io rooms
 
 Each actor has their own channel currently.  It maybe nice to utilize that functionality.
@@ -840,24 +922,55 @@ bus.on('some event', function (message) {
 
 });
 
-
 ```
 
-## Message consumption
+## Router support for Messages on the Bus
 
-In order to control propagation you can consume the message.
+Currently messages are handled like this.
 
 ```javascript
 
-bus.on('some message', function (message) {
-  message.consume();
+bus.on('chat', function (message) {
+  message.deliver();
 });
 
 ```
 
-## Message Interface
+Would be nice if we implemented the Router in there just like the `in()` and 
+`out()` methods.
 
-A better way to interact with a message than `message.data.FIELD_NAME`
+```javascript
+
+bus.on(function (message, next) {
+  //persist message to store maybe?!
+  next();
+});
+
+bus.on('chat', function (message, next) {
+  message.deliver();
+});
+
+```
+
+## Regex support / wild cards for actions
+
+Using regex instead of just string literals.
+
+```javascript
+
+bus.in(/\w+/, function (message, socket, next) {
+  next();
+});
+
+// or
+
+bus.in('user does *', function (message, socket, next) {
+  next();
+});
+
+```
+
+
 
 ## Message Verification
 
@@ -909,5 +1022,4 @@ Or event auto propagate messages that do not have a listener.
 bus.autoPropagate(true);
 
 ```
-
 

@@ -3,6 +3,13 @@ EventEmitter = require('events').EventEmitter
 describe 'Receiver', ->
 
   Given ->
+    @Router = class Router extends EventEmitter
+      constructor: ->
+        if not (@ instanceof Router)
+          return new Router
+      route: ->
+
+  Given ->
     @Message = class Message
       constructor: ->
         if not (@ instanceof Message)
@@ -35,29 +42,63 @@ describe 'Receiver', ->
   ]
 
   Given -> @MessageReceiver = requireSubject 'lib/receiver', {
+    './router': @Router
     './message': @Message
   }
 
-  Given -> @receiver = @MessageReceiver()
+  Given -> @instance = @MessageReceiver()
 
-  describe '#fn', ->
+  describe '#use (fns:Array)', ->
 
-    When -> @res = @receiver.fn()
-    Then -> expect(@res.length).toBe 0
+    Given -> spyOn(@instance.router(),['on']).andCallThrough()
+    When -> @instance.use @handlers
+    Then -> expect(@instance.router().on).toHaveBeenCalled()
+    And -> expect(@instance.router().on.argsForCall[0]).toEqual ['*', @handlers[0]]
+    And -> expect(@instance.router().on.argsForCall[1]).toEqual ['*', @handlers[1]]
+    And -> expect(@instance.router().on.argsForCall[2]).toEqual ['*', @handlers[2]]
 
-  describe '#use', ->
-
-    When -> @receiver.use @handlers
-    Then -> expect(@receiver.fn().length).toBe 3
-
-  describe '#onReceive', ->
+  describe '#onReceive (message:Message)', ->
 
     Given -> @socket = new EventEmitter
     Given -> spyOn(@socket,['emit']).andCallThrough()
-    Given -> @receiver.use @handlers
+    Given -> @instance.use @handlers
     Given -> @message = new @Message
     Given -> @content = @message.data.content + 'ABC'
-    When (done)-> @receiver.onReceive @message, @socket, done
+    When (done)-> @instance.onReceive @message, @socket, done
     And -> expect(@socket.emit).toHaveBeenCalledWith @message.data.action, @message.data.actor, @content, @message.data.target, @message.data.created
   
+  describe '#router', ->
 
+    When -> @res = @instance.router()
+    Then -> expect(@res instanceof @Router).toBe true
+    And -> expect(@res.listeners('next')[0]).toBe @instance.onReceived
+    And -> expect(@res.listeners('deliver')[0]).toBe @instance.onReceived
+    And -> expect(@res.listeners('respond')[0]).toBe @instance.onReceived
+    And -> expect(@res.listeners('error')[0]).toBe @instance.onError
+    And -> expect(@res.listeners('consume')[0]).toBe @instance.onConsumed
+
+  describe '#onReceived', ->
+
+    Given -> @message = @Message()
+    Given -> @socket = new EventEmitter
+    Given -> spyOn(@instance,['emit']).andCallThrough()
+    When -> @instance.onReceived @message, @socket
+    Then -> expect(@instance.emit).toHaveBeenCalledWith 'received', @message, @socket
+
+  describe '#onConsumed', ->
+
+    Given -> @message = @Message()
+    Given -> @socket = new EventEmitter
+    Given -> spyOn(@instance,['emit']).andCallThrough()
+    When -> @instance.onConsumed @message, @socket
+    Then -> expect(@instance.emit).toHaveBeenCalledWith 'consumed', @message, @socket
+
+
+  describe '#onError', ->
+
+    Given -> @error = 'test'
+    Given -> spyOn(@instance,['emit'])
+    When -> @instance.onError @error
+    Then -> expect(@instance.emit).toHaveBeenCalledWith 'error','test' 
+
+  

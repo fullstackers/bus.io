@@ -274,21 +274,21 @@ describe 'Server', ->
     And -> expect(@receiver.addListener).toHaveBeenCalledWith 'error', @bus.onError
     And -> expect(@bus.addListener).toHaveBeenCalledWith 'from socket', @receiver.onReceive
 
-  describe '#in', ->
+  describe '#out', ->
 
     Given -> spyOn(@bus,['exchangeReceiver']).andCallThrough()
     Given -> spyOn(@bus.exchangeReceiver(),['use']).andCallThrough()
     Given -> @fn = (a, b, c) ->
-    When -> @bus.in @fn
+    When -> @bus.out @fn
     Then -> expect(@bus.exchangeReceiver).toHaveBeenCalled()
     And -> expect(@bus.exchangeReceiver().use).toHaveBeenCalledWith @fn
 
-  describe '#out', ->
+  describe '#in', ->
 
     Given -> spyOn(@bus,['socketReceiver']).andCallThrough()
     Given -> spyOn(@bus.socketReceiver(),['use']).andCallThrough()
     Given -> @fn = (a, b, c) ->
-    When -> @bus.out @fn
+    When -> @bus.in @fn
     Then -> expect(@bus.socketReceiver).toHaveBeenCalled()
     And -> expect(@bus.socketReceiver().use).toHaveBeenCalledWith @fn
 

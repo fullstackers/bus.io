@@ -48,7 +48,7 @@ describe 'Controller', ->
     And -> expect(@message.consumed instanceof Date).toBe true
 
 
-  describe '#respond', ->
+  describe '#respond (content:Mixed="goodbye")', ->
     When -> @controller.respond 'goodbye'
     Then -> expect(@controller.emit).toHaveBeenCalled()
     And -> expect(@controller.emit.mostRecentCall.args[0]).toBe 'respond'
@@ -58,15 +58,17 @@ describe 'Controller', ->
     And -> expect(@controller.emit.mostRecentCall.args[1].data.target).toBe 'me'
     And -> expect(@controller.emit.mostRecentCall.args[1].data.reference).toBe 1
     And -> expect(@controller.emit.mostRecentCall.args[1].data.created instanceof Date).toBe true
+    And -> expect(@controller.message.responded instanceof Date).toBe true
 
   describe '#deliver', ->
 
-    context 'no args', ->
+    context '()', ->
 
       When -> @controller.deliver()
       Then -> expect(@controller.emit).toHaveBeenCalledWith 'deliver', @message
+      And -> expect(@controller.message.delivered instanceof Date).toBe true
 
-    context 'new target', ->
+    context '(target:String="people")', ->
       Given ->
         @m = @message.clone()
         @m.data.target = 'people'
@@ -79,30 +81,31 @@ describe 'Controller', ->
       And -> expect(@controller.emit.mostRecentCall.args[1].data.target).toBe 'people'
       And -> expect(@controller.emit.mostRecentCall.args[1].data.reference).toBe null
       And -> expect(@controller.emit.mostRecentCall.args[1].data.created instanceof Date).toBe true
+      And -> expect(@controller.message.delivered instanceof Date).toBe true
 
-  describe '#actor', ->
+  describe '#actor (v:String="a")', ->
 
     Given -> @v = 'a'
     Then -> expect(@controller.actor(@v).actor()).toEqual @v
   
-  describe '#action', ->
+  describe '#action (v:String="a")', ->
 
     Given -> @v = 'a'
     Then -> expect(@controller.action(@v).action()).toEqual @v
 
-  describe '#target', ->
+  describe '#target (v:String="a")', ->
 
     Given -> @v = 'a'
     Then -> expect(@controller.target(@v).target()).toEqual @v
 
   describe '#content', ->
 
-    context 'array', ->
+    context '(v:Array=["a"])', ->
 
       Given -> @v = ['a']
       Then -> expect(@controller.content(@v).content()).toEqual @v
 
-    context 'object', ->
+    context '(v:Object={a:1})', ->
 
       Given -> @v = a: 1
       Then -> expect(@controller.content(@v).content()).toEqual @v
