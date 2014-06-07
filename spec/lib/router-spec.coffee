@@ -120,33 +120,33 @@ describe 'Router', ->
 
       Given -> @event = 'deliver'
       Given -> @message = @Message()
-      Given -> spyOn(@instance,['emit']).andCallThrough()
+      Given -> spyOn(EventEmitter.prototype.emit,['apply']).andCallThrough()
       When -> @instance.onDeliver @message
-      Then -> expect(@instance.emit).toHaveBeenCalledWith @event, @message
+      Then -> expect(EventEmitter.prototype.emit.apply).toHaveBeenCalledWith @instance, [@event, @message]
 
     describe '#onRespond(message:Message)', ->
 
       Given -> @event = 'respond'
       Given -> @message = @Message()
-      Given -> spyOn(@instance,['emit']).andCallThrough()
+      Given -> spyOn(EventEmitter.prototype.emit,['apply']).andCallThrough()
       When -> @instance.onRespond @message
-      Then -> expect(@instance.emit).toHaveBeenCalledWith @event, @message
+      Then -> expect(EventEmitter.prototype.emit.apply).toHaveBeenCalledWith @instance, [@event, @message]
 
     describe '#onConsume(message:Message)', ->
 
       Given -> @event = 'consume'
       Given -> @message = @Message()
-      Given -> spyOn(@instance,['emit']).andCallThrough()
+      Given -> spyOn(EventEmitter.prototype.emit,['apply']).andCallThrough()
       When -> @instance.onConsume @message
-      Then -> expect(@instance.emit).toHaveBeenCalledWith @event, @message
+      Then -> expect(EventEmitter.prototype.emit.apply).toHaveBeenCalledWith @instance, [@event, @message]
 
     describe '#onNext(message:Message)', ->
 
       Given -> @event = 'next'
       Given -> @message = @Message()
-      Given -> spyOn(@instance,['emit']).andCallThrough()
+      Given -> spyOn(EventEmitter.prototype.emit,['apply']).andCallThrough()
       When -> @instance.onNext @message
-      Then -> expect(@instance.emit).toHaveBeenCalledWith @event, @message
+      Then -> expect(EventEmitter.prototype.emit.apply).toHaveBeenCalledWith @instance, [@event, @message]
 
 
     describe '#deliver(message:Message)', ->

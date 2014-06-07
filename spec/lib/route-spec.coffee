@@ -110,10 +110,9 @@ describe 'Route', ->
 
       Given -> @message = @Message()
       Given -> @socket = new EventEmitter
-      Given -> @params = [@message, @socket]
       Given -> spyOn(EventEmitter.prototype.emit, ['apply']).andCallThrough()
-      When (done) -> @instance.process @params, done
-      Then -> expect(EventEmitter.prototype.emit.apply).toHaveBeenCalledWith @instance, ['next'].concat(@params)
+      When (done) -> @instance.process [@message, @socket], done
+      Then -> expect(EventEmitter.prototype.emit.apply).toHaveBeenCalledWith @instance, ['next', @message, @socket]
 
     describe '#list ()', ->
 
