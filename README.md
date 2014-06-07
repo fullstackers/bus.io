@@ -308,16 +308,17 @@ bus.on('some message', function (message) {
 
 ```
 
-## Handling messages received from the Exchange
+## Handling messages going into the Bus
 
 You can specify middleware functions to manipulate the messages incoming from
 the exchange before being emitted to the client.
 
 ```javascript
 
-bus.exchangeReceiver().use(function (message, socket, next) {
+bus.in(function (message, socket, next) {
   message.content()[0] += '!';
-  next(); // you must call next!
+  next(); //you must call next or either message.deliver(), message.consume(), message.respond()
+
 });
 
 ```
@@ -326,23 +327,23 @@ Or
 
 ```javascript
 
-bus.in(function (message, socket, next) {
-  message.content()[0] += '!';
-  next(); // you must call next!
+bus.in('chat', function (message, socket, next) {
+  message.content()[0] += '!!'; 
+  message.deliver();
 });
 
 ```
 
-## Handling messages received from the Socket
+## Handling messages going out of the Bus 
 
 You can specify middleware functions to manipulate the messages incoming from
 the client before being emitted to the exchange.
 
 ```javascript
 
-bus.socketReceiver().use(function (message, socket, next) {
-  message.content()[0] += '!';
-  next(); // you must call next!
+bus.out(function (message, socket, next) {
+  message.data.content[0] += '!';
+  next(); //you must call next or either message.deliver(), message.consume(), message.respond()
 });
 
 ```
@@ -351,9 +352,9 @@ Or
 
 ```javascript
 
-bus.out(function (message, socket, next) {
-  message.data.content[0] += '!';
-  next(); // you must call next!
+bus.out('chat', function (message, socket, next) {
+  message.content()[0] += '!!'; 
+  message.deliver();
 });
 
 ```
