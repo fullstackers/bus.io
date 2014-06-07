@@ -1,6 +1,6 @@
 {
   "name": "bus.io",
-  "version": "0.0.43-beta",
+  "version": "0.0.44-beta",
   "description": "A message bus",
   "main": "index.js",
   "scripts": {
