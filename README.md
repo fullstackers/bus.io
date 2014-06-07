@@ -198,6 +198,33 @@ bus.socket(function (socket, bus) {
 The **bus** instance has it's *on* method overridden.  You can still add listeners by
 calling `addListener('event', function() {})`.
 
+## Handling messages going into the Bus
+
+You can specify middleware functions to manipulate the messages incoming from
+the socket before going into the bus
+
+```javascript
+
+bus.in(function (message, socket, next) {
+  message.content()[0] += '!';
+  next(); //you must call next or either message.deliver(), message.consume(), message.respond()
+
+});
+
+```
+
+Or
+
+```javascript
+
+bus.in('chat', function (message, socket, next) {
+  message.content()[0] += '!!'; 
+  message.deliver();
+});
+
+```
+
+
 
 ##Handling messages on the bus
 
@@ -308,36 +335,10 @@ bus.on('some message', function (message) {
 
 ```
 
-## Handling messages going into the Bus
-
-You can specify middleware functions to manipulate the messages incoming from
-the exchange before being emitted to the client.
-
-```javascript
-
-bus.in(function (message, socket, next) {
-  message.content()[0] += '!';
-  next(); //you must call next or either message.deliver(), message.consume(), message.respond()
-
-});
-
-```
-
-Or
-
-```javascript
-
-bus.in('chat', function (message, socket, next) {
-  message.content()[0] += '!!'; 
-  message.deliver();
-});
-
-```
-
 ## Handling messages going out of the Bus 
 
 You can specify middleware functions to manipulate the messages incoming from
-the client before being emitted to the exchange.
+the exchange before going to the socket.
 
 ```javascript
 
