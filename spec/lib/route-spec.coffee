@@ -68,9 +68,11 @@ describe.only 'Route', ->
       context 'deliver', ->
 
         Given -> @message = @Message()
+        Given -> spyOn(EventEmitter.prototype.emit, ['apply']).andCallThrough()
         Given -> spyOn(@instance, ['emit']).andCallThrough()
         When (done) -> @instance.process @message, done
-        Then -> expect(@instance.emit).toHaveBeenCalledWith 'deliver', @message
+        Then -> expect(@instance.emit).toHaveBeenCalledWith 'done', 'deliver', [@message]
+        And -> expect(EventEmitter.prototype.emit.apply).toHaveBeenCalledWith @instance, ['deliver', @message]
 
       context 'respond', ->
 
@@ -78,9 +80,11 @@ describe.only 'Route', ->
         Given -> @fn = (message, next) -> message.respond()
         Given -> @point = @Point 0, @fn, @message.action()
         Given -> @instance.list().push @point
+        Given -> spyOn(EventEmitter.prototype.emit, ['apply']).andCallThrough()
         Given -> spyOn(@instance, ['emit']).andCallThrough()
         When (done) -> @instance.process @message, done
-        Then -> expect(@instance.emit).toHaveBeenCalledWith 'respond', @message
+        Then -> expect(@instance.emit).toHaveBeenCalledWith 'done', 'respond', [@message]
+        And -> expect(EventEmitter.prototype.emit.apply).toHaveBeenCalledWith @instance, ['respond', @message]
 
       context 'consume', ->
 
@@ -89,8 +93,10 @@ describe.only 'Route', ->
         Given -> @fn = (message, next) -> message.consume(); next()
         Given -> @point = @Point 0, @fn, @message.action()
         Given -> @instance.list().push @point
+        Given -> spyOn(EventEmitter.prototype.emit, ['apply']).andCallThrough()
         When (done) -> @instance.process @message, done
-        Then -> expect(@instance.emit).toHaveBeenCalledWith 'consume', @message
+        Then -> expect(@instance.emit).toHaveBeenCalledWith 'done', 'consume', [@message]
+        And -> expect(EventEmitter.prototype.emit.apply).toHaveBeenCalledWith @instance, ['consume', @message]
 
     describe '#process (message:null)', ->
 
@@ -103,8 +109,10 @@ describe.only 'Route', ->
       Given -> @socket = new EventEmitter
       Given -> @params = [@message, @socket]
       Given -> spyOn(@instance, ['emit']).andCallThrough()
+      Given -> spyOn(EventEmitter.prototype.emit, ['apply']).andCallThrough()
       When (done) -> @instance.process @params, done
-      Then -> expect(@instance.emit).toHaveBeenCalledWith 'deliver', @message
+      Then -> expect(@instance.emit).toHaveBeenCalledWith 'done', 'deliver', [@message]
+      And -> expect(EventEmitter.prototype.emit.apply).toHaveBeenCalledWith @instance, ['deliver', @message]
 
     describe '#list ()', ->
 
