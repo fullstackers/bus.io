@@ -573,8 +573,8 @@ bus.socket(function (socket, bus) {
 ### Server#in(fn#Function,...)
 
 The **in** method will use the passed function(s) when a message is received 
-from the `bus.exchange()`.  This allows you to modify the message before it
-is sent to the `socket`.
+from the `socket`.  This allows you to modify the message before it
+is sent to the `exchange`.
 
 ```javascript
 
@@ -665,8 +665,8 @@ bus.on('some event', function (message) {
 ### Server#out(fn:Function,...)
 
 The **out** method will use the passed function(s) when a message is received
-from the `socket` before it is published to the 
-`bus.exchange()` instance.
+from the `exchange`. This allows you to modify the message before it
+is sent to the `socket`. 
 
 Here you could save the message to a mongo store using mongoose.
 
