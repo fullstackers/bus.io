@@ -1,6 +1,6 @@
 EventEmitter = require('events').EventEmitter
 
-describe.only 'Route', ->
+describe 'Route', ->
 
   Given ->
     @Point = class Point
@@ -68,6 +68,9 @@ describe.only 'Route', ->
       context 'deliver', ->
 
         Given -> @message = @Message()
+        Given -> @fn = (message, next) -> message.deliver()
+        Given -> @point = @Point 0, @fn, @message.action()
+        Given -> @instance.list().push @point
         Given -> spyOn(EventEmitter.prototype.emit, ['apply']).andCallThrough()
         Given -> spyOn(@instance, ['emit']).andCallThrough()
         When (done) -> @instance.process @message, done
@@ -108,11 +111,9 @@ describe.only 'Route', ->
       Given -> @message = @Message()
       Given -> @socket = new EventEmitter
       Given -> @params = [@message, @socket]
-      Given -> spyOn(@instance, ['emit']).andCallThrough()
       Given -> spyOn(EventEmitter.prototype.emit, ['apply']).andCallThrough()
       When (done) -> @instance.process @params, done
-      Then -> expect(@instance.emit).toHaveBeenCalledWith 'done', 'deliver', [@message]
-      And -> expect(EventEmitter.prototype.emit.apply).toHaveBeenCalledWith @instance, ['deliver', @message]
+      Then -> expect(EventEmitter.prototype.emit.apply).toHaveBeenCalledWith @instance, ['next'].concat(@params)
 
     describe '#list ()', ->
 

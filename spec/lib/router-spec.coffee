@@ -140,6 +140,15 @@ describe 'Router', ->
       When -> @instance.onConsume @message
       Then -> expect(@instance.emit).toHaveBeenCalledWith @event, @message
 
+    describe '#onNext(message:Message)', ->
+
+      Given -> @event = 'next'
+      Given -> @message = @Message()
+      Given -> spyOn(@instance,['emit']).andCallThrough()
+      When -> @instance.onNext @message
+      Then -> expect(@instance.emit).toHaveBeenCalledWith @event, @message
+
+
     describe '#deliver(message:Message)', ->
 
       Given -> @message = @Message()
