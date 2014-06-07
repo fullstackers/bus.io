@@ -1,9 +1,23 @@
+var cluster = require('cluster');
+
+if (cluster.isMaster) {
+
+  var cpus = require('os').cpus().length || 1;
+  for (var i=0; i<cpus; i++) {
+    cluster.fork();
+  }
+  cluster.on('exit', function () {
+    cluster.fork();
+  });
+  return;
+}
+
 var app = require('express')();
 app.get('/', function (req, res) {
   res.sendfile(__dirname+'/public/index.html');
 });
 
-var server = require('http').Server(app).listen(3000);
+var server = require('http').Server(app).listen(80);
 
 // we want to use the "socket.name" or the "socket.id" as the actor
 var bus = require('bus.io')(server);
