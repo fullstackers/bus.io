@@ -105,9 +105,9 @@ describe 'Router', ->
       Given -> @path = 'say'
       When -> @route = @instance.getRoute @path
       Then -> expect(@route instanceof @Route).toBe true
-      #And -> expect(@route.listeners('consume')[0]).toBe @instance.onConsume
-      #And -> expect(@route.listeners('deliver')[0]).toBe @instance.onDeliver
-      #And -> expect(@route.listeners('respond')[0]).toBe @instance.onRespond
+      And -> expect(@route.listeners('consume')[0]).toBe @instance.onConsume
+      And -> expect(@route.listeners('deliver')[0]).toBe @instance.onDeliver
+      And -> expect(@route.listeners('respond')[0]).toBe @instance.onRespond
 
     describe '#onChange(action:String)', ->
 
