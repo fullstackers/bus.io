@@ -40,7 +40,7 @@
     <script type="text/javascript">
       $(function () {
         var me = null;
-        var socket = io.connect(window.location.href);
+        var socket = io.connect();
       
         socket.on('connect', function () {
           $('#connection').removeClass('disconnected').addClass('connected').html('connected').show();
