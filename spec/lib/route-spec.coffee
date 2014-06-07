@@ -1,6 +1,6 @@
 EventEmitter = require('events').EventEmitter
 
-describe 'Route',
+describe 'Route', ->
 
   Given ->
     @Point = class Point
@@ -39,7 +39,7 @@ describe 'Route',
 
   describe '#()', ->
 
-    Then -> expect(@Route() instanceof @Router).toBe true
+    Then -> expect(@Route() instanceof @Route).toBe true
     And -> expect(@Route() instanceof EventEmitter).toBe true
 
   describe 'prototype', ->
@@ -50,14 +50,13 @@ describe 'Route',
 
       Given -> @message = @Message()
       Given -> spyOn(@instance, ['emit']).andCallThrough()
-      When -> @route.process @message
+      When -> @instance.process @message
       Then -> expect(@instance.emit).toHaveBeenCalledWith 'done', @message
 
     describe '#process (message:null)', ->
 
       Given -> @message = null
-      When -> @test => @route.process @message
-      Then -> expect(@test).toThrow new Error 'message must be a Message'
+      Then -> expect(=> @instance.process @message).toThrow new Error 'message must be a Message'
 
     describe '#list ()', ->
 

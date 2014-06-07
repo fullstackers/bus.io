@@ -1,6 +1,6 @@
 EventEmitter = require('events').EventEmitter
 
-describe.only 'Router', ->
+describe 'Router', ->
 
   Given ->
     @Message = class Message
@@ -15,10 +15,10 @@ describe.only 'Router', ->
           created: new Date
           reference: null
           id: 1
-      @actor: -> @data.actor
-      @target: -> @data.target
-      @content: -> @data.content
-      @action: -> @data.action
+      actor: -> @data.actor
+      target: -> @data.target
+      content: -> @data.content
+      action: -> @data.action
 
       clone: ->
         return new Message
@@ -33,7 +33,7 @@ describe.only 'Router', ->
         @index = index
 
   Given ->
-    @Route = class Route
+    @Route = class Route extends EventEmitter
       constructor: ->
         if not (@ instanceof Route)
           return new Route
@@ -112,15 +112,13 @@ describe.only 'Router', ->
         Given -> @message = @Message()
         Given -> @route = @Route()
         Given -> spyOn(@route,['process']).andCallThrough()
-        Given -> spyOn(@instance.getRoute).andReturn(@route)
+        Given -> spyOn(@instance,['getRoute']).andReturn(@route)
         When -> @instance.route @message
         Then -> expect(@route.process).toHaveBeenCalledWith @message
-        And -> expect(@instance.buildRoute).toHaveBeenCalledWith @message.action()
+        And -> expect(@instance.getRoute).toHaveBeenCalledWith @message.action()
 
       context '(message:null)', ->
-
-        Given -> @test => @instance.route null
-        Then -> expect(@test).toThrow new Error('message must be a Message')
+        Then -> expect(=> @instance.route null).toThrow new Error('message must be a Message')
 
     describe '#onChange(action:String)', ->
 
