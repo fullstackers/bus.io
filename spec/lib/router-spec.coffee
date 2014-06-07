@@ -140,7 +140,7 @@ describe 'Router', ->
       When -> @instance.onConsume @message
       Then -> expect(@instance.emit).toHaveBeenCalledWith @event, @message
 
-    describe '(message:Message)', ->
+    describe '#deliver(message:Message)', ->
 
       Given -> @message = @Message()
     #  Given -> @route = @Route()
@@ -152,6 +152,6 @@ describe 'Router', ->
     #  And -> expect(@route.process).toHaveBeenCalledWith @message
       And -> expect(@instance.emit).toHaveBeenCalledWith 'deliver', @message
 
-    xdescribe '(message:null)', ->
+    describe '#deliver (message:null)', ->
       Then -> expect(=> @instance.route null).toThrow new Error('message must be a Message')
 
