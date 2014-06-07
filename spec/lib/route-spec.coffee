@@ -3,6 +3,15 @@ EventEmitter = require('events').EventEmitter
 describe 'Route',
 
   Given ->
+    @Point = class Point
+      constructor: (index, fn, action) ->
+        if not (@ instanceof Point)
+          return new Point index, fn, action
+        @fn = fn
+        @action = action
+        @index = index
+
+  Given ->
     @Message = class Message
       constructor: ->
         if not (@ instanceof Message)
@@ -23,7 +32,10 @@ describe 'Route',
       clone: ->
         return new Message
 
-  Given -> @Route = require 'lib/route', { }
+  Given -> @Route = requireSubject 'lib/route', {
+    './message': @Message,
+    './point': @Point
+  }
 
   describe '#()', ->
 

@@ -1,4 +1,6 @@
-describe 'Router', ->
+EventEmitter = require('events').EventEmitter
+
+describe.only 'Router', ->
 
   Given ->
     @Message = class Message
@@ -39,6 +41,7 @@ describe 'Router', ->
       list: -> []
     
   Given -> @Router = requireSubject 'lib/router', {
+    './message': @Message,
     './point': @Point,
     './route': @Route
   }
@@ -76,7 +79,7 @@ describe 'Router', ->
       Given -> @action = 'say'
       Given -> spyOn(@instance,['emit']).andCallThrough()
 
-      context.only '(path:Sring="say", fn:Function)', ->
+      context '(path:Sring="say", fn:Function)', ->
 
         When -> @instance.on @action, @fn
         Then -> expect(@instance.paths(@action).length).toBe 1
@@ -102,19 +105,24 @@ describe 'Router', ->
       When -> @route = @instance.getRoute @path
       Then -> expect(@route instanceof @Route).toBe true
 
-    describe '#route(message:Message, cb:Function)', ->
+    describe '#route', ->
 
-      Given -> @message = @Message()
-      Given -> @cb = jasmine.createSpy 'cb'
-      Given -> @route = @Route()
-      Given -> spyOn(@route,['process']).andCallThrough()
-      Given -> spyOn(@instance.getRoute).andReturn(@route)
-      When -> @instance.route @message, @cb
-      Then -> expect(@route.process).toHaveBeenCalledWith @message
-      And -> expect(@instance.buildRoute).toHaveBeenCalledWith @message.action()
-      And -> expect(@cb).toHaveBeenCalled()
+      context '(message:Message)', ->
 
-    describe.only '#onChange(action:String)', ->
+        Given -> @message = @Message()
+        Given -> @route = @Route()
+        Given -> spyOn(@route,['process']).andCallThrough()
+        Given -> spyOn(@instance.getRoute).andReturn(@route)
+        When -> @instance.route @message
+        Then -> expect(@route.process).toHaveBeenCalledWith @message
+        And -> expect(@instance.buildRoute).toHaveBeenCalledWith @message.action()
+
+      context '(message:null)', ->
+
+        Given -> @test => @instance.route null
+        Then -> expect(@test).toThrow new Error('message must be a Message')
+
+    describe '#onChange(action:String)', ->
 
       Given -> @action = 'say'
       Given -> @instance.routes @action, @Route()
