@@ -1,6 +1,6 @@
 EventEmitter = require('events').EventEmitter
 
-describe 'Route', ->
+describe.only 'Route', ->
 
   Given ->
     @Point = class Point
@@ -96,6 +96,15 @@ describe 'Route', ->
 
       Given -> @message = null
       Then -> expect(=> @instance.process @message).toThrow new Error 'message must be a Message'
+
+    describe '#process (message:Array=[Mesage, events.EventEmitter])', ->
+
+      Given -> @message = @Message()
+      Given -> @socket = new EventEmitter
+      Given -> @params = [@message, @socket]
+      Given -> spyOn(@instance, ['emit']).andCallThrough()
+      When (done) -> @instance.process @params, done
+      Then -> expect(@instance.emit).toHaveBeenCalledWith 'deliver', @message
 
     describe '#list ()', ->
 
