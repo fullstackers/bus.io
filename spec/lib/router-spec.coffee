@@ -37,13 +37,14 @@ describe 'Router', ->
       constructor: ->
         if not (@ instanceof Route)
           return new Route
-      process: ->
+      process: (message) ->
+        @emit 'deliver', message
       list: -> []
     
   Given -> @Router = requireSubject 'lib/router', {
-    './message': @Message,
+    './route': @Route,
     './point': @Point,
-    './route': @Route
+    './message': @Message
   }
 
   describe '#()', ->
@@ -104,21 +105,9 @@ describe 'Router', ->
       Given -> @path = 'say'
       When -> @route = @instance.getRoute @path
       Then -> expect(@route instanceof @Route).toBe true
-
-    describe '#route', ->
-
-      context '(message:Message)', ->
-
-        Given -> @message = @Message()
-        Given -> @route = @Route()
-        Given -> spyOn(@route,['process']).andCallThrough()
-        Given -> spyOn(@instance,['getRoute']).andReturn(@route)
-        When -> @instance.route @message
-        Then -> expect(@route.process).toHaveBeenCalledWith @message
-        And -> expect(@instance.getRoute).toHaveBeenCalledWith @message.action()
-
-      context '(message:null)', ->
-        Then -> expect(=> @instance.route null).toThrow new Error('message must be a Message')
+      #And -> expect(@route.listeners('consume')[0]).toBe @instance.onConsume
+      #And -> expect(@route.listeners('deliver')[0]).toBe @instance.onDeliver
+      #And -> expect(@route.listeners('respond')[0]).toBe @instance.onRespond
 
     describe '#onChange(action:String)', ->
 
@@ -126,3 +115,43 @@ describe 'Router', ->
       Given -> @instance.routes @action, @Route()
       When -> @instance.onChange @action
       Then -> expect(@instance.routes(@action)).toBe undefined
+
+    describe '#onDeliver(message:Message)', ->
+
+      Given -> @event = 'deliver'
+      Given -> @message = @Message()
+      Given -> spyOn(@instance,['emit']).andCallThrough()
+      When -> @instance.onDeliver @message
+      Then -> expect(@instance.emit).toHaveBeenCalledWith @event, @message
+
+    describe '#onRespond(message:Message)', ->
+
+      Given -> @event = 'respond'
+      Given -> @message = @Message()
+      Given -> spyOn(@instance,['emit']).andCallThrough()
+      When -> @instance.onRespond @message
+      Then -> expect(@instance.emit).toHaveBeenCalledWith @event, @message
+
+    describe '#onConsume(message:Message)', ->
+
+      Given -> @event = 'consume'
+      Given -> @message = @Message()
+      Given -> spyOn(@instance,['emit']).andCallThrough()
+      When -> @instance.onConsume @message
+      Then -> expect(@instance.emit).toHaveBeenCalledWith @event, @message
+
+    describe '(message:Message)', ->
+
+      Given -> @message = @Message()
+    #  Given -> @route = @Route()
+    #  Given -> spyOn(@route,['process']).andCallThrough()
+    #  Given -> spyOn(@instance,['getRoute']).andReturn(@route)
+      Given -> spyOn(@instance,['emit']).andCallThrough()
+      When -> @instance.route @message
+    #  Then -> expect(@instance.getRoute).toHaveBeenCalledWith @message.action()
+    #  And -> expect(@route.process).toHaveBeenCalledWith @message
+      And -> expect(@instance.emit).toHaveBeenCalledWith 'deliver', @message
+
+    xdescribe '(message:null)', ->
+      Then -> expect(=> @instance.route null).toThrow new Error('message must be a Message')
+
