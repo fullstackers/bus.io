@@ -80,6 +80,10 @@
         });
 
         $('#share').click(function () {
+          //Do not post if status is empty
+          if( $.trim($('#status').val()) === '' ) {
+            return ;
+          }
           var target = $('#target').val();
           if (target === 'user') {
             target = $('#target_user').val();
