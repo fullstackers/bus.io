@@ -1,6 +1,6 @@
 {
   "name": "bus.io",
-  "version": "0.0.55-beta",
+  "version": "0.0.56-beta",
   "description": "A message bus",
   "main": "index.js",
   "scripts": {
@@ -38,7 +38,7 @@
   },
   "homepage": "https://github.com/nathangromano/bus.io",
   "dependencies": {
-    "socket-messages": "0.0.4",
+    "socket-messages": "~0.1.0",
     "socket.io": "^1.0.2",
     "message-exchange": "^0.1.1",
     "node-uuid": "~1.4.1",
