@@ -6,18 +6,15 @@
 
 **Easily build distributed applications that scale!**
 
-# Server
+### Server
 
 ```javascript
-
 var bus = require('bus.io')(process.env.PORT || 3000);
-
 ```
 
-# Client
+### Client
 
 ```javascript
-
 var client = io.connect();
 client.on('connect', function () {
   client.emit('echo', 'Hello, World!');
@@ -25,7 +22,6 @@ client.on('connect', function () {
 client.on('echo', function (who, what) {
   console.log(what);
 });
-
 ```
 
 Bus.io seamlessly connects clients and servers together over a network using 
