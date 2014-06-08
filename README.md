@@ -339,12 +339,14 @@ Or even create new messages.
 
 bus.on('some message', function (message) {
   
-  this.message({
+  bus.message({
     actor:'I',
     action:'say',
     content:'hello'
     target:'you',
   }).deliver();
+
+  message.deliver();
 
 });
 
@@ -356,7 +358,7 @@ A chain-able approach.
 
 bus.on('some message', function (message) {
   
-  this.message()
+  bus.message()
     .actor('me')
     .action('say')
     .content('hello')
@@ -373,12 +375,25 @@ Or simply
 
 bus.on('some message', function (message) {
   
-  this.message()
+  bus.message()
     .i('me')
     .did('say')
     .what('hello')
     .to('you');
 
+});
+
+```
+
+You can write handlers middleware functions too.
+
+This example will uppercase the content for all messages.
+
+```javascript
+
+bus.on(function (message, next) {
+  message.content(message.content().toUpperCase());
+  next();
 });
 
 ```
@@ -710,6 +725,19 @@ bus.on('some event', function (message) {
 
 ```
 
+Or you can use the optional `next` parameter.  You may eiter call `next()` to
+invoke the next handler.  Or you may call `message.deliver()`, `message.respond()`,
+or `message.consumed()` to control the message's propagation.
+
+```javascript
+
+bus.on('some event', function (message, next) {
+  // do something!
+  next();
+});
+
+```
+
 ### Server#out(fn:Function,...)
 
 The **out** method will use the passed function(s) when a message is received
@@ -842,7 +870,7 @@ Or simply
 
 ```javascript
 
-this.message()
+bus.message()
   .i('me')
   .did('say')
   .what('hello')
