@@ -256,43 +256,43 @@ describe 'Server', ->
     When -> @bus.target()
     Then -> expect(@bus.messages().target).toHaveBeenCalled()
 
-  describe '#exchangeReceiver', ->
+  describe '#outgoing', ->
 
     Given -> spyOn(@bus,['addListener']).andCallThrough()
     Given -> @receiver = @Receiver()
     Given -> spyOn(@receiver,['addListener']).andCallThrough()
-    When -> @res = @bus.exchangeReceiver(@receiver).exchangeReceiver()
+    When -> @res = @bus.outgoing(@receiver).outgoing()
     Then -> expect(@res).toEqual @receiver
     And -> expect(@receiver.addListener).toHaveBeenCalledWith 'error', @bus.onError
     And -> expect(@bus.addListener).toHaveBeenCalledWith 'from exchange', @receiver.onReceive
 
-  describe '#socketReceiver', ->
+  describe '#incomming', ->
 
     Given -> spyOn(@bus,['addListener']).andCallThrough()
     Given -> @receiver = @Receiver()
     Given -> spyOn(@receiver,['addListener']).andCallThrough()
-    When -> @res = @bus.socketReceiver(@receiver).socketReceiver()
+    When -> @res = @bus.incomming(@receiver).incomming()
     Then -> expect(@res).toEqual @receiver
     And -> expect(@receiver.addListener).toHaveBeenCalledWith 'error', @bus.onError
     And -> expect(@bus.addListener).toHaveBeenCalledWith 'from socket', @receiver.onReceive
 
   describe '#out', ->
 
-    Given -> spyOn(@bus,['exchangeReceiver']).andCallThrough()
-    Given -> spyOn(@bus.exchangeReceiver(),['use']).andCallThrough()
+    Given -> spyOn(@bus,['outgoing']).andCallThrough()
+    Given -> spyOn(@bus.outgoing(),['use']).andCallThrough()
     Given -> @fn = (a, b, c) ->
     When -> @bus.out @fn
-    Then -> expect(@bus.exchangeReceiver).toHaveBeenCalled()
-    And -> expect(@bus.exchangeReceiver().use).toHaveBeenCalledWith @fn
+    Then -> expect(@bus.outgoing).toHaveBeenCalled()
+    And -> expect(@bus.outgoing().use).toHaveBeenCalledWith @fn
 
   describe '#in', ->
 
-    Given -> spyOn(@bus,['socketReceiver']).andCallThrough()
-    Given -> spyOn(@bus.socketReceiver(),['use']).andCallThrough()
+    Given -> spyOn(@bus,['incomming']).andCallThrough()
+    Given -> spyOn(@bus.incomming(),['use']).andCallThrough()
     Given -> @fn = (a, b, c) ->
     When -> @bus.in @fn
-    Then -> expect(@bus.socketReceiver).toHaveBeenCalled()
-    And -> expect(@bus.socketReceiver().use).toHaveBeenCalledWith @fn
+    Then -> expect(@bus.incomming).toHaveBeenCalled()
+    And -> expect(@bus.incomming().use).toHaveBeenCalledWith @fn
 
   describe '#socket', ->
 
