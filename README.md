@@ -1010,50 +1010,6 @@ Demos are under the `/demo` directory.  There is currently a basic chat program.
 
 # Ideas
 
-## Use socket.io rooms
-
-**This could be implemented using a middleware**
-
-Each actor has their own channel currently.  It maybe nice to utilize that functionality.
-One can broadcast their message to a number of targets
-
-```javascript
-
-bus.on('some event', function (message) {
-  message.deliver('a','b','c','d','e');
-
-});
-
-```
-
-## Router support for Messages on the Bus
-
-Currently messages are handled like this.
-
-```javascript
-
-bus.on('chat', function (message) {
-  message.deliver();
-});
-
-```
-
-Would be nice if we implemented the Router in there just like the `in()` and 
-`out()` methods.
-
-```javascript
-
-bus.on(function (message, next) {
-  //persist message to store maybe?!
-  next();
-});
-
-bus.on('chat', function (message, next) {
-  message.deliver();
-});
-
-```
-
 ## Regex support / wild cards for actions
 
 Using regex instead of just string literals.
@@ -1076,4 +1032,20 @@ bus.in('user does *', function (message, socket, next) {
 
 When messages are published it would be nice if we can validate the message and verify
 the integrity of the message.
+
+## Use socket.io rooms
+
+**This could be implemented using a middleware**
+
+Each actor has their own channel currently.  It maybe nice to utilize that functionality.
+One can broadcast their message to a number of targets
+
+```javascript
+
+bus.on('some event', function (message) {
+  message.deliver('a','b','c','d','e');
+
+});
+
+```
 
