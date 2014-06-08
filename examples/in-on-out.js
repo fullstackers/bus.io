@@ -6,7 +6,7 @@ bus.addListener('from socket', function (message, socket) {
 
 bus.in(function (message, socket, next) {
   console.log('step 1 in(*)');
-  message.content(message.content().shift()+'!!!');
+  message.content(message.content()+'!!!');
   next();
 });
 
@@ -30,8 +30,7 @@ bus.addListener('from exchange', function (message, socket) {
 });
 
 bus.out(function (message, socket, next) {
-  console.log('step 5 out(*)', typeof message, typeof socket, typeof next)
-    message.content(message.content().toUpperCase());
+  message.content(message.content().toUpperCase());
   next();
 });
 

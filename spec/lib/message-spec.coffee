@@ -6,6 +6,7 @@ describe 'Message', ->
   }
 
   Given -> @date = new Date
+
   Given -> @params =
     actor: 'me'
     action: 'say'
@@ -18,74 +19,84 @@ describe 'Message', ->
 
   describe '#', ->
 
-    context 'no params', ->
+    Then -> expect(@Message() instanceof @Message).toBe true
 
-      When -> @message = @Message()
-      Then -> expect(@message instanceof @Message).toBe true
+  describe '# (a:Message)', ->
 
-    context 'with object', ->
-      When -> @message = @Message @params
-      Then -> expect(@message.data).toEqual @params
+    Then -> expect(@Message(@params).data).toEqual @params
 
-    context 'params', ->
-      When -> @message = @Message 'me', 'say', 'what', 'you', @date, 2, 1
-      Then -> expect(@message.data).toEqual @params
+  describe '# (a:String,b:String,c:String,d:String,e:Date,f:Number,g:Number)', ->
 
-  describe '#clone', ->
+    Then -> expect(@Message('me', 'say', 'what', 'you', @date, 2, 1).data).toEqual @params
 
-    Given -> @message = @Message @params
-    When -> @res = @message.clone()
-    Then -> expect(@res.data).toEqual @message.data
-
-
-  describe '#actor', ->
+  describe 'protototype', ->
 
     Given -> @message = @Message()
-    Given -> @v = 'a'
-    Then -> expect(@message.actor(@v).actor()).toEqual @v
-  
-  describe '#action', ->
 
-    Given -> @message = @Message()
-    Given -> @v = 'a'
-    Then -> expect(@message.action(@v).action()).toEqual @v
+    describe '#clone', ->
 
-  describe '#target', ->
+      Given -> @message = @Message @params
+      When -> @res = @message.clone()
+      Then -> expect(@res.data).toEqual @message.data
 
-    Given -> @message = @Message()
-    Given -> @v = 'a'
-    Then -> expect(@message.target(@v).target()).toEqual @v
+    describe '#actor', ->
 
-  describe '#content', ->
-   
-    Given -> @message = @Message()
+      Then -> expect(@message.actor()).toEqual 'unknown'
 
-    context 'array', ->
+    describe '#actor (v:String)', ->
 
-      Given -> @v = ['a']
-      Then -> expect(@message.content(@v).content()).toEqual @v
+      Given -> @v = 'a'
+      Then -> expect(@message.actor(@v).actor()).toEqual @v
+    
+    describe '#action', ->
 
-    context 'object', ->
+      Then -> expect(@message.action()).toEqual 'unknown'
 
-      Given -> @v = a: 1
-      Then -> expect(@message.content(@v).content()).toEqual @v
+    describe '#action (v:String)', ->
 
-  describe '#id', ->
+      Given -> @v = 'a'
+      Then -> expect(@message.action(@v).action()).toEqual @v
 
-    Given -> @message = @Message()
-    When -> expect(@message.id()).toEqual @message.data.id
+    describe '#target', ->
 
-  describe '#created', ->
+      Then -> expect(@message.target()).toEqual 'unknown'
 
-    Given -> @message = @Message()
-    When -> expect(@message.created()).toEqual @message.data.created
+    describe '#target (v:String)', ->
 
-  describe '#reference', ->
+      Given -> @v = 'a'
+      Then -> expect(@message.target(@v).target()).toEqual @v
 
-    Given -> @message = @Message()
-    When -> expect(@message.reference()).toEqual @message.data.reference
+    describe '#content', ->
+     
+      Then -> expect(@message.content()).toEqual []
 
-  describe '#published', ->
+      context '(v:Array=["a"])', ->
 
-    Given -> @message = @Message()
-    When -> expect(@message.published()).toEqual @message.data.published
+        Given -> @v = ['a']
+        Then -> expect(@message.content(@v).content()).toEqual 'a'
+
+      context '(v:Array=["a","b"])', ->
+
+        Given -> @v = ['a','b']
+        Then -> expect(@message.content(@v).content()).toEqual @v
+
+      context '(v:Object)', ->
+
+        Given -> @v = a: 1
+        Then -> expect(@message.content(@v).content()).toEqual @v
+
+    describe '#id', ->
+
+      Then -> expect(@message.id()).toEqual @message.data.id
+
+    describe '#created', ->
+
+      Then -> expect(@message.created()).toEqual @message.data.created
+
+    describe '#reference', ->
+
+      Then -> expect(@message.reference()).toEqual @message.data.reference
+
+    describe '#published', ->
+
+      Then -> expect(@message.published()).toEqual @message.data.published
