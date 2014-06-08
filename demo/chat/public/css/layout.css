@@ -1,0 +1,118 @@
+* { 
+    color:#777;
+    font-family:"Arial";
+    padding:5px; 
+}
+
+body { 
+    background: #EEE; padding: 
+}
+
+input, 
+textarea, 
+button, 
+select, 
+option { 
+    font-size:120%; 
+    padding: 1em; 
+    margin:0 .25em 0 .25em
+}
+
+h2 { 
+    display:inline-block 
+}
+
+ul { 
+    margin: 0; list-style-type: none; padding: 0; background:#FFF; 
+}
+
+li { 
+    padding: 1em; 
+    border-bottom:thin solid #DDD;
+}
+
+#header {
+    margin: 0 0 20px 0;
+}
+
+.bus-io {
+    background: transparent url(/img/logo.png) center center no-repeat;
+    display: inline-block;
+    height: 86px;
+    text-decoration: none;
+    vertical-align: top;
+    width: 200px;
+}
+
+.title {
+    display: inline-block;
+    margin: 20px 0 0 20px;
+}
+
+.disconnected { 
+    color: #700; 
+}
+
+.connected { 
+    color: #070; 
+}
+
+.who, 
+.what, 
+.to, 
+.when { 
+    font-size:150%;
+}
+
+
+#login,
+#update,
+#target_user,
+#error { 
+    display: none 
+}
+
+#login, 
+#update { 
+    padding:1em; 
+    background-color:#CCC; 
+}
+
+#name { 
+    display: inline-block 
+}
+
+input[type=text] {
+  background: -moz-linear-gradient(top, #ccc 0%, #fff 100%);
+  background: -webkit-linear-gradient(top, #ccc 0%, #fff 100%);
+  background: -o-linear-gradient(top, #ccc 0%, #fff 100%);
+  background: -ms-linear-gradient(top, #ccc 0%, #fff 100%);
+  background: linear-gradient(to bottom, #ccc 0%, #fff 100%);
+  border-radius: 3px;
+  border: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.05) inset;
+  -webkit-transition: all 0.2s linear;
+  -moz-transition: all 0.2s linear;
+  -ms-transition: all 0.2s linear;
+  -o-transition: all 0.2s linear;
+  transition: all 0.2s linear;
+  font-family: "Helvetica Neue", sans-serif;
+  font-size: 13px;
+  color: #222222;
+  position: relative;
+  height: 36px;
+  width: 300px;
+  padding-left: 30px;
+}
+
+input[type=text]::-webkit-input-placeholder {
+  color: #999999;
+}
+input[type=text]:-moz-placeholder {
+  color: #999999;
+}
+input[type=text]:focus {
+  box-shadow: 0 1px 0 #2392f3 inset, 0 -1px 0 #2392f3 inset, 1px 0 0 #2392f3 inset, -1px 0 0 #2392f3 inset, 0 0 4px rgba(35, 146, 243, 0.5);
+  outline: none;
+  background: #ffffff;
+}
