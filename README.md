@@ -6,6 +6,24 @@
 
 **Easily build distributed applications that scale!**
 
+### The Server
+
+```javascript
+var bus = require('bus.io')(3000);
+```
+
+### The Client
+
+```javascript
+var client = io.connect();
+client.on('connect', function () {
+  client.emit('echo', 'Hello, World!');
+});
+client.on('echo', function (who, what) {
+  console.log(what);
+});
+```
+
 Bus.io seamlessly connects clients and servers together over a network using 
 **[socket.io](https://github.com/Automattic/socket.io "socket.io")** and 
 **[redis](https://github.com/antirez/redis "redis")**. Providing a message
@@ -134,6 +152,8 @@ bus.io().on('connection', function (socket) {
 
 ## Configuration
 
+### Setting the Actor
+
 You can bind custom **socket.io** handlers to each **socket** when it is connected.
 
 ```javascript
@@ -158,6 +178,20 @@ bus.actor(function (socket, cb) {
 
 ```
 
+You could write a `middleware` function to set the actor on the message too.
+
+```javascript
+
+// set actor
+bus.in(function (message, socket, next) {
+  message.actor(socket.user);
+  next();
+})
+
+```
+
+### Setting the Target
+
 The **target** also is an actor.  The target can be pulled from the socket or
 the parameters from a message received on a socket.  By default the target
 is the socket identifier.
@@ -166,6 +200,18 @@ is the socket identifier.
 
 bus.target(function (socket, params, cb) {
   cb(null, params.pop());
+});
+
+```
+
+You can write a middleware function to set the target too.
+
+```javascript
+
+// set target
+bus.in(function (message, socket, next) {
+  message.target(message.content().pop());
+  next();
 });
 
 ```
@@ -179,6 +225,8 @@ The **target** will be "you"
 socket.emit('say', 'hello', 'you');
 
 ```
+
+### Aliasing a Socket to an Actor
 
 Set up an **alias** for your actor.  When a message is sent to the alias the socket
 will receive the message.
@@ -198,7 +246,9 @@ bus.socket(function (socket, bus) {
 The **bus** instance has it's *on* method overridden.  You can still add listeners by
 calling `addListener('event', function() {})`.
 
-## Handling messages going into the Bus
+## Handling Messages
+
+### Messages from the Socket going into the Bus
 
 You can specify middleware functions to manipulate the messages incoming from
 the socket before going into the bus
@@ -224,9 +274,7 @@ bus.in('chat', function (message, socket, next) {
 
 ```
 
-
-
-##Handling messages on the bus
+### Messages on the Bus
 
 Messages received can be propagated to their target by calling *deliver*.
 
@@ -291,12 +339,14 @@ Or even create new messages.
 
 bus.on('some message', function (message) {
   
-  this.message({
+  bus.message({
     actor:'I',
     action:'say',
     content:'hello'
     target:'you',
   }).deliver();
+
+  message.deliver();
 
 });
 
@@ -308,7 +358,7 @@ A chain-able approach.
 
 bus.on('some message', function (message) {
   
-  this.message()
+  bus.message()
     .actor('me')
     .action('say')
     .content('hello')
@@ -325,7 +375,7 @@ Or simply
 
 bus.on('some message', function (message) {
   
-  this.message()
+  bus.message()
     .i('me')
     .did('say')
     .what('hello')
@@ -335,7 +385,20 @@ bus.on('some message', function (message) {
 
 ```
 
-## Handling messages going out of the Bus 
+You can write handlers middleware functions too.
+
+This example will uppercase the content for all messages.
+
+```javascript
+
+bus.on(function (message, next) {
+  message.content(message.content().toUpperCase());
+  next();
+});
+
+```
+
+### Messages from the Bus going to the Socket
 
 You can specify middleware functions to manipulate the messages incoming from
 the exchange before going to the socket.
@@ -662,6 +725,19 @@ bus.on('some event', function (message) {
 
 ```
 
+Or you can use the optional `next` parameter.  You may eiter call `next()` to
+invoke the next handler.  Or you may call `message.deliver()`, `message.respond()`,
+or `message.consumed()` to control the message's propagation.
+
+```javascript
+
+bus.on('some event', function (message, next) {
+  // do something!
+  next();
+});
+
+```
+
 ### Server#out(fn:Function,...)
 
 The **out** method will use the passed function(s) when a message is received
@@ -794,7 +870,7 @@ Or simply
 
 ```javascript
 
-this.message()
+bus.message()
   .i('me')
   .did('say')
   .what('hello')
@@ -877,6 +953,30 @@ bus.pubsub(pubsub);
 
 ```
 
+### Server#autoPropagation(v:Boolean)
+
+Instead of having to write a function to deliver a message like this.
+
+```javascript
+
+bus.on('some message', function (message) {
+  message.deliver();
+});
+
+```
+
+We could call `autoPropagate(true)` so that any method we have not declared a
+handler for will automatically be propagated.
+
+```javascript
+
+bus.autoPropagate(true);
+
+```
+
+Auto-propagation is **on** by default.  You may turn it off to prevent unwanted
+messages from going into your `bus`.
+
 # Running Tests
 
 Install coffee-script
@@ -911,6 +1011,8 @@ Demos are under the `/demo` directory.  There is currently a basic chat program.
 # Ideas
 
 ## Use socket.io rooms
+
+**This could be implemented using a middleware**
 
 Each actor has their own channel currently.  It maybe nice to utilize that functionality.
 One can broadcast their message to a number of targets
@@ -970,56 +1072,8 @@ bus.in('user does *', function (message, socket, next) {
 
 ```
 
-
-
 ## Message Verification
 
 When messages are published it would be nice if we can validate the message and verify
 the integrity of the message.
-
-## Use middleware to populate actor and target
-
-Using middleware would be much nicer IMO.
-
-```javascript
-// set actor
-bus.in(function (message, socket, next) {
-  message.actor(socket.user);
-  next();
-})
-
-// set target
-bus.in(function (message, socket, next) {
-  message.target(message.content().pop());
-  next();
-});
-```
-
-## Automatic propagation
-
-Instead of having to write a function to deliver a message
-
-```javascript
-
-bus.on('some message', function (message) {
-  message.deliver();
-});
-
-```
-
-It would be nice if we could do something like
-
-```javascript
-
-bus.propagate('some message', 'some other message', 'ok');
-
-```
-
-Or event auto propagate messages that do not have a listener.
-
-```javascript
-
-bus.autoPropagate(true);
-
-```
 

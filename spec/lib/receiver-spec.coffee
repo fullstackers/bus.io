@@ -81,24 +81,26 @@ describe 'Receiver', ->
 
     Given -> @message = @Message()
     Given -> @socket = new EventEmitter
-    Given -> spyOn(@instance,['emit']).andCallThrough()
+    Given -> spyOn(EventEmitter.prototype.emit,['apply']).andCallThrough()
     When -> @instance.onReceived @message, @socket
-    Then -> expect(@instance.emit).toHaveBeenCalledWith 'received', @message, @socket
+    Then -> expect(EventEmitter.prototype.emit.apply).toHaveBeenCalledWith @instance, ['received', @message, @socket]
 
   describe '#onConsumed', ->
 
     Given -> @message = @Message()
     Given -> @socket = new EventEmitter
-    Given -> spyOn(@instance,['emit']).andCallThrough()
+    Given -> spyOn(EventEmitter.prototype.emit,['apply']).andCallThrough()
     When -> @instance.onConsumed @message, @socket
-    Then -> expect(@instance.emit).toHaveBeenCalledWith 'consumed', @message, @socket
+    Then -> expect(EventEmitter.prototype.emit.apply).toHaveBeenCalledWith @instance, ['consumed', @message, @socket]
 
 
   describe '#onError', ->
 
     Given -> @error = 'test'
-    Given -> spyOn(@instance,['emit'])
-    When -> @instance.onError @error
-    Then -> expect(@instance.emit).toHaveBeenCalledWith 'error','test' 
+    Given -> @message = @Message()
+    Given -> @socket = new EventEmitter
+    Given -> spyOn(EventEmitter.prototype.emit,['apply'])
+    When -> @instance.onError @error, @message, @socket
+    Then -> expect(EventEmitter.prototype.emit.apply).toHaveBeenCalledWith @instance, ['error', @error, @message, @socket]
 
   
