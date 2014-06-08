@@ -1,3 +1,5 @@
+var ok = require('assert').equal;
+
 var bus = require('./..')();
 
 /*
@@ -38,6 +40,8 @@ setTimeout(function () {
   client.on('connect', function () {
     client.on('say', function (who, what) {
       console.log(who + ' echo ' + what);
+      ok(who,'Zion');
+      ok(what,'hi');
       process.exit();
     });
     client.emit('say','hello', 'Zion');
