@@ -6,13 +6,13 @@
 
 **Easily build distributed applications that scale!**
 
-### Server
+### The Server
 
 ```javascript
-var bus = require('bus.io')(process.env.PORT || 3000);
+var bus = require('bus.io')(3000);
 ```
 
-### Client
+### The Client
 
 ```javascript
 var client = io.connect();
