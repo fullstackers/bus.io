@@ -6,6 +6,28 @@
 
 **Easily build distributed applications that scale!**
 
+# Server
+
+```javascript
+
+var bus = require('bus.io')(process.env.PORT || 3000);
+
+```
+
+# Client
+
+```javascript
+
+var client = io.connect();
+client.on('connect', function () {
+  client.emit('echo', 'Hello, World!');
+});
+client.on('echo', function (who, what) {
+  console.log(what);
+});
+
+```
+
 Bus.io seamlessly connects clients and servers together over a network using 
 **[socket.io](https://github.com/Automattic/socket.io "socket.io")** and 
 **[redis](https://github.com/antirez/redis "redis")**. Providing a message
