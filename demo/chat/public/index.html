@@ -4,26 +4,16 @@
     <title>Bus.io Express Demo</title>
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script type="text/javascript" src="/socket.io/socket.io.js"></script>
-    <style type="text/css">
-      * { color:#777; font-family:"Arial"; padding:5px; }
-      body { background: #EEE; padding: }
-      #login, #update, #target_user, #error { display: none }
-      .disconnected { color: #700; }
-      .connected { color: #070; }
-      .who, .what, .to, .when { font-size:150%;}
-      ul { margin: 0; list-style-type: none; padding: 0; background:#FFF; }
-      li { padding: 1em; border-bottom:thin solid #DDD;}
-      input, textarea, button, select, option { font-size:120%; padding: 1em; margin:0 .25em 0 .25em}
-      #login, #update { padding:1em; background-color:#CCC; }
-      h2 { display:inline-block }
-      #name { display: inline-block }
-    </style>
+    <link rel="stylesheet" type="text/css" href="/css/layout.css"/>
   </head>
   <body>
-    <h1>Bus.io Express Demo (<span id="connection"></span>)</h1>
+    <div id="header">
+      <a href='https://www.npmjs.org/package/bus.io' class='bus-io'>&nbsp;</a>
+      <h1 class='title'>Express Demo (<span id="connection"></span>)</h1>
+    </div>
     <div id="login">
       <h2>Your name?</h2>
-      <input type="text" id="name" value="" />
+      <input type="text" id="name" value="" autocomplete="off" />
       <button id="go">Join the Conversation</button>
     </div>
     <div id="update">
@@ -36,72 +26,9 @@
       <input type="text" id="target_user" value="" />
       <button id="share">Share</button>
     </div>
+
     <ul id="messages"></ul>
-    <script type="text/javascript">
-      $(function () {
-        var me = null;
-        var socket = io.connect();
-      
-        socket.on('connect', function () {
-          $('#connection').removeClass('disconnected').addClass('connected').html('connected').show();
-          $('#update').hide();
-          $('#login').show();
-        });
 
-        socket.on('disconnect', function () {
-          $('#connection').removeClass('connected').addClass('disconnected').html('disconnected').show();
-        });
-
-        socket.on('set name', function (who, what) {
-          console.log('who', who, 'what', what);
-          me = what;
-          $('#error').hide();
-          $('#login').hide();
-          $('#update').show();
-        });
-
-        socket.on('post', function (who, what, to, when) {
-          if (to === me) {
-            to = 'you';
-          }
-          $('#messages').prepend(
-            $('<li>')
-              .append($('<span>').addClass('who').append(who))
-              .append(' shared ')
-              .append($('<span>').addClass('what').append(what))
-              .append(' with ')
-              .append($('<span>').addClass('to').append(to))
-              .append(' at ')
-              .append($('<span>').addClass('when').append(when))
-          );
-        });
-
-        $('#go').click(function () {
-          socket.emit('set name', $('#name').val());
-        });
-
-        $('#share').click(function () {
-          //Do not post if status is empty
-          if( $.trim($('#status').val()) === '' ) {
-            return ;
-          }
-          var target = $('#target').val();
-          if (target === 'user') {
-            target = $('#target_user').val();
-          }
-          socket.emit('post', $('#status').val(), target);
-          $('#status').val('');
-        });
-
-        $('#target').change(function () {
-          if ($(this).val() === 'user') {
-            $('#target_user').show();
-          }
-          else {
-            $('#target_user').hide();
-          }
-        });
-      });
-    </script>
+    <script type="text/javascript" src="/js/chat.js"></script>
   </body>
 </html>

@@ -23,10 +23,10 @@ if (cluster.isMaster) {
  * Get Express up and running
  */
 
-var app = require('express')();
-app.get('/', function (req, res) {
-  res.sendfile(__dirname+'/public/index.html');
-});
+var express = require('express'),
+    app = express();
+
+app.use(express.static(__dirname + '/public/'));
 
 /*
  * Create a Server to attach our Express app
