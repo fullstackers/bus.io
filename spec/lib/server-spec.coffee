@@ -251,12 +251,19 @@ describe 'Server', ->
     When -> @bus.onMessage @message, @socket
     Then -> expect(@bus.emit).toHaveBeenCalledWith 'from socket', @message, @socket
 
-  describe '#onReceivedExchange', ->
+  describe '#onReceivedPubSub', ->
 
     Given -> @message = new Message
     Given -> @socket = new EventEmitter
-    When -> @bus.onReceivedExchange @message, @socket
+    When -> @bus.onReceivedPubSub @message, @socket
     And -> expect(@socket.emit).toHaveBeenCalledWith @message.data.action, @message.data.actor, @message.data.content, @message.data.target, @message.data.created
+
+  describe '#onReceivedQueue', ->
+
+    Given -> spyOn(@bus,['emit']).andCallThrough()
+    Given -> @message = @Message()
+    When -> @bus.onReceivedQueue @message
+    Then -> expect(@bus.emit).toHaveBeenCalledWith 'from exchange queue', @message.data
 
   describe '#onReceivedSocket', ->
 
@@ -308,7 +315,7 @@ describe 'Server', ->
     Then -> expect(@res).toEqual @receiver
     And -> expect(@receiver.addListener).toHaveBeenCalledWith 'error', @bus.onError
     And -> expect(@receiver.addListener).toHaveBeenCalledWith 'received', @bus.onPublish
-    And -> expect(@bus.addListener).toHaveBeenCalledWith 'process message', @receiver.onReceive
+    And -> expect(@bus.addListener).toHaveBeenCalledWith 'from exchange queue', @receiver.onReceive
 
   describe '#outgoing', ->
 
@@ -318,7 +325,7 @@ describe 'Server', ->
     When -> @res = @bus.outgoing(@receiver).outgoing()
     Then -> expect(@res).toEqual @receiver
     And -> expect(@receiver.addListener).toHaveBeenCalledWith 'error', @bus.onError
-    And -> expect(@bus.addListener).toHaveBeenCalledWith 'from exchange', @receiver.onReceive
+    And -> expect(@bus.addListener).toHaveBeenCalledWith 'from exchange pubsub', @receiver.onReceive
 
   describe '#out', ->
 
@@ -357,7 +364,7 @@ describe 'Server', ->
       Given -> @message.data.target = @name
       Given -> spyOn(@bus,['emit']).andCallThrough()
       When -> @bus.exchange().channel(@name).emit 'message', @message
-      Then -> expect(@bus.emit).toHaveBeenCalledWith 'from exchange', @message, @socket
+      Then -> expect(@bus.emit).toHaveBeenCalledWith 'from exchange pubsub', @message, @socket
 
     context 'soscket disconnect', ->
 
@@ -412,9 +419,3 @@ describe 'Server', ->
       Then -> expect(@res).toBe @bus
       And -> expect(@bus.messages().autoPropagate).toHaveBeenCalledWith false
 
-  describe '#onReceivedQueue', ->
-
-    Given -> spyOn(@bus,['emit']).andCallThrough()
-    Given -> @message = @Message()
-    When -> @bus.onReceivedQueue @message
-    Then -> expect(@bus.emit).toHaveBeenCalledWith 'process message', @message.data
