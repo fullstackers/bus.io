@@ -172,6 +172,28 @@ describe 'Server', ->
     And -> expect(@bus.messages().attach).toHaveBeenCalledWith @io
 
   describe '#on', ->
+
+    context '(0:String="name", 1:Function)', ->
+
+      Given -> spyOn(@bus,['processing']).andCallThrough()
+      Given -> spyOn(@bus.processing(),['use']).andCallThrough()
+      Given -> spyOn(@bus.messages(),['action']).andCallThrough()
+      Given -> @fn = (a, b, c) ->
+      When -> @bus.on 'name', @fn
+      Then -> expect(@bus.processing).toHaveBeenCalled()
+      And -> expect(@bus.messages().action).toHaveBeenCalledWith 'name'
+      And -> expect(@bus.processing().use).toHaveBeenCalledWith 'name', @fn
+
+    context '(0:Function)', ->
+
+      Given -> spyOn(@bus,['processing']).andCallThrough()
+      Given -> spyOn(@bus.processing(),['use']).andCallThrough()
+      Given -> @fn = (a, b, c) ->
+      When -> @bus.on @fn
+      Then -> expect(@bus.processing).toHaveBeenCalled()
+      And -> expect(@bus.processing().use).toHaveBeenCalledWith @fn
+
+    ### 
     Given -> @fn = ->
     Given -> spyOn(@bus.exchange().handler(),['on']).andCallThrough()
     Given -> spyOn(@bus.messages(),['action']).andCallThrough()
@@ -180,6 +202,8 @@ describe 'Server', ->
     And -> expect(@bus.exchange().handler().on.mostRecentCall.args[0]).toBe 'name'
     And -> expect(typeof @bus.exchange().handler().on.mostRecentCall.args[1]).toBe 'function'
     And -> expect(@bus.messages().action).toHaveBeenCalledWith 'name'
+    ###
+
 
   describe '#onPublish', ->
 
@@ -256,16 +280,6 @@ describe 'Server', ->
     When -> @bus.target()
     Then -> expect(@bus.messages().target).toHaveBeenCalled()
 
-  describe '#outgoing', ->
-
-    Given -> spyOn(@bus,['addListener']).andCallThrough()
-    Given -> @receiver = @Receiver()
-    Given -> spyOn(@receiver,['addListener']).andCallThrough()
-    When -> @res = @bus.outgoing(@receiver).outgoing()
-    Then -> expect(@res).toEqual @receiver
-    And -> expect(@receiver.addListener).toHaveBeenCalledWith 'error', @bus.onError
-    And -> expect(@bus.addListener).toHaveBeenCalledWith 'from exchange', @receiver.onReceive
-
   describe '#incomming', ->
 
     Given -> spyOn(@bus,['addListener']).andCallThrough()
@@ -276,6 +290,36 @@ describe 'Server', ->
     And -> expect(@receiver.addListener).toHaveBeenCalledWith 'error', @bus.onError
     And -> expect(@bus.addListener).toHaveBeenCalledWith 'from socket', @receiver.onReceive
 
+  describe '#in', ->
+
+    Given -> spyOn(@bus,['incomming']).andCallThrough()
+    Given -> spyOn(@bus.incomming(),['use']).andCallThrough()
+    Given -> @fn = (a, b, c) ->
+    When -> @bus.in @fn
+    Then -> expect(@bus.incomming).toHaveBeenCalled()
+    And -> expect(@bus.incomming().use).toHaveBeenCalledWith @fn
+
+  describe '#processing', ->
+
+    Given -> spyOn(@bus,['addListener']).andCallThrough()
+    Given -> @receiver = @Receiver()
+    Given -> spyOn(@receiver,['addListener']).andCallThrough()
+    When -> @res = @bus.processing(@receiver).processing()
+    Then -> expect(@res).toEqual @receiver
+    And -> expect(@receiver.addListener).toHaveBeenCalledWith 'error', @bus.onError
+    And -> expect(@receiver.addListener).toHaveBeenCalledWith 'received', @bus.onPublish
+    And -> expect(@bus.addListener).toHaveBeenCalledWith 'process message', @receiver.onReceive
+
+  describe '#outgoing', ->
+
+    Given -> spyOn(@bus,['addListener']).andCallThrough()
+    Given -> @receiver = @Receiver()
+    Given -> spyOn(@receiver,['addListener']).andCallThrough()
+    When -> @res = @bus.outgoing(@receiver).outgoing()
+    Then -> expect(@res).toEqual @receiver
+    And -> expect(@receiver.addListener).toHaveBeenCalledWith 'error', @bus.onError
+    And -> expect(@bus.addListener).toHaveBeenCalledWith 'from exchange', @receiver.onReceive
+
   describe '#out', ->
 
     Given -> spyOn(@bus,['outgoing']).andCallThrough()
@@ -285,14 +329,6 @@ describe 'Server', ->
     Then -> expect(@bus.outgoing).toHaveBeenCalled()
     And -> expect(@bus.outgoing().use).toHaveBeenCalledWith @fn
 
-  describe '#in', ->
-
-    Given -> spyOn(@bus,['incomming']).andCallThrough()
-    Given -> spyOn(@bus.incomming(),['use']).andCallThrough()
-    Given -> @fn = (a, b, c) ->
-    When -> @bus.in @fn
-    Then -> expect(@bus.incomming).toHaveBeenCalled()
-    And -> expect(@bus.incomming().use).toHaveBeenCalledWith @fn
 
   describe '#socket', ->
 
@@ -337,8 +373,13 @@ describe 'Server', ->
     context 'queue:Queue', ->
 
       Given -> @q = new @MessageExchange.Queue
+      Given -> @e = @bus.exchange().queue()
+      Given -> spyOn(@e,['removeListener']).andCallThrough()
+      Given -> spyOn(@q,['addListener']).andCallThrough()
       When -> @bus.queue(@q)
       Then -> expect(@bus.exchange().queue).toHaveBeenCalledWith @q
+      And -> expect(@e.removeListener).toHaveBeenCalledWith 'message', @bus.onReceivedQueue
+      And -> expect(@q.addListener).toHaveBeenCalledWith 'message', @bus.onReceivedQueue
 
   describe '#pubsub', ->
 
@@ -370,3 +411,10 @@ describe 'Server', ->
       When -> @res = @bus.autoPropagate false
       Then -> expect(@res).toBe @bus
       And -> expect(@bus.messages().autoPropagate).toHaveBeenCalledWith false
+
+  describe '#onReceivedQueue', ->
+
+    Given -> spyOn(@bus,['emit']).andCallThrough()
+    Given -> @message = @Message()
+    When -> @bus.onReceivedQueue @message
+    Then -> expect(@bus.emit).toHaveBeenCalledWith 'process message', @message.data
