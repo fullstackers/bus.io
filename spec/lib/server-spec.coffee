@@ -59,6 +59,7 @@ describe 'Server', ->
   Given ->
     @SocketMessages = class SocketMessages extends EventEmitter
       constructor: ->
+        @v = false
       attach: ->
       actor: (a, b) -> b null, a.id
       target: (a,b,c) -> c null, b
@@ -66,6 +67,7 @@ describe 'Server', ->
       action: ->
       exchange: -> @ee
       ee: new EventEmitter
+      autoPropagate: (v) -> if v? then @v = v else @v 
     @SocketMessages.make = ->
       return new SocketMessages
 
@@ -153,31 +155,31 @@ describe 'Server', ->
     When -> @res = @bus.exchange(@exchange).exchange()
     Then -> expect(@res).toEqual @exchange
 
-  describe '#socketMessages', ->
+  describe '#messages', ->
 
-    Given -> @socketMessages = new @SocketMessages
-    Given -> spyOn(@socketMessages.exchange(),['on']).andCallThrough()
-    When -> @res = @bus.socketMessages(@socketMessages).socketMessages()
-    Then -> expect(@res).toEqual @socketMessages
-    And -> expect(@socketMessages.exchange().on).toHaveBeenCalledWith 'message', @bus.onMessage
+    Given -> @messages = new @SocketMessages
+    Given -> spyOn(@messages.exchange(),['on']).andCallThrough()
+    When -> @res = @bus.messages(@messages).messages()
+    Then -> expect(@res).toEqual @messages
+    And -> expect(@messages.exchange().on).toHaveBeenCalledWith 'message', @bus.onMessage
 
   describe '#io', ->
 
-    Given -> spyOn(@bus.socketMessages(),['attach']).andCallThrough()
+    Given -> spyOn(@bus.messages(),['attach']).andCallThrough()
     Given -> @io = @Sio()
     When -> @res = @bus.io(@io).io()
     Then -> expect(@res).toEqual @io
-    And -> expect(@bus.socketMessages().attach).toHaveBeenCalledWith @io
+    And -> expect(@bus.messages().attach).toHaveBeenCalledWith @io
 
   describe '#on', ->
     Given -> @fn = ->
     Given -> spyOn(@bus.exchange().handler(),['on']).andCallThrough()
-    Given -> spyOn(@bus.socketMessages(),['action']).andCallThrough()
+    Given -> spyOn(@bus.messages(),['action']).andCallThrough()
     When -> @bus.on 'name', @fn
     Then -> expect(@bus.exchange().handler().on).toHaveBeenCalled()
     And -> expect(@bus.exchange().handler().on.mostRecentCall.args[0]).toBe 'name'
     And -> expect(typeof @bus.exchange().handler().on.mostRecentCall.args[1]).toBe 'function'
-    And -> expect(@bus.socketMessages().action).toHaveBeenCalledWith 'name'
+    And -> expect(@bus.messages().action).toHaveBeenCalledWith 'name'
 
   describe '#onPublish', ->
 
@@ -202,12 +204,12 @@ describe 'Server', ->
     Given ->
       @socket = new EventEmitter
       @socket.id = 'me'
-    Given -> spyOn(@bus.socketMessages(),['actor']).andCallThrough()
+    Given -> spyOn(@bus.messages(),['actor']).andCallThrough()
     Given -> spyOn(@bus.exchange(),['channel']).andCallThrough()
     Given -> spyOn(@bus.exchange().channel('me'),['on']).andCallThrough()
     Given -> spyOn(@socket,['on']).andCallThrough()
     When -> @bus.onConnection @socket
-    Then -> expect(@bus.socketMessages().actor).toHaveBeenCalledWith @socket, jasmine.any(Function)
+    Then -> expect(@bus.messages().actor).toHaveBeenCalledWith @socket, jasmine.any(Function)
     And -> expect(@bus.exchange().channel).toHaveBeenCalledWith 'me'
     And -> expect(@bus.exchange().channel('me').on).toHaveBeenCalledWith 'message', jasmine.any(Function)
     And -> expect(@socket.on).toHaveBeenCalledWith 'disconnect', jasmine.any(Function)
@@ -244,15 +246,15 @@ describe 'Server', ->
 
   describe '#actor', ->
 
-    Given -> spyOn(@bus.socketMessages(),['actor'])
+    Given -> spyOn(@bus.messages(),['actor'])
     When -> @bus.actor()
-    Then -> expect(@bus.socketMessages().actor).toHaveBeenCalled()
+    Then -> expect(@bus.messages().actor).toHaveBeenCalled()
 
   describe '#target', ->
 
-    Given -> spyOn(@bus.socketMessages(),['target'])
+    Given -> spyOn(@bus.messages(),['target'])
     When -> @bus.target()
-    Then -> expect(@bus.socketMessages().target).toHaveBeenCalled()
+    Then -> expect(@bus.messages().target).toHaveBeenCalled()
 
   describe '#exchangeReceiver', ->
 
@@ -349,3 +351,22 @@ describe 'Server', ->
       Given -> @q = new @MessageExchange.PubSub
       When -> @bus.pubsub(@q)
       Then -> expect(@bus.exchange().pubsub).toHaveBeenCalledWith @q
+
+  describe '#autoPropagate', ->
+
+    Given -> spyOn(@bus.messages(),'autoPropagate').andCallThrough()
+    When -> @res = @bus.autoPropagate()
+    Then -> expect(@res).toBe true
+    And -> expect(@bus.messages().autoPropagate).toHaveBeenCalled()
+
+    context '(v:Boolean=true)', ->
+
+      When -> @res = @bus.autoPropagate true
+      Then -> expect(@res).toBe @bus
+      And -> expect(@bus.messages().autoPropagate).toHaveBeenCalledWith true
+
+    context '(v:Boolean=false)', ->
+
+      When -> @res = @bus.autoPropagate false
+      Then -> expect(@res).toBe @bus
+      And -> expect(@bus.messages().autoPropagate).toHaveBeenCalledWith false
