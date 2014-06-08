@@ -50,7 +50,7 @@ bus.socket(function (socket, bus) {
 
 /*
  * For all messages we will set the message actor to either the socket.name or 
- * socket.id
+ * socket.id. We are handling this message before it gets on the Bus.
  */
 
 bus.in(function (message, socket, next) {
@@ -60,7 +60,8 @@ bus.in(function (message, socket, next) {
 
 /*
  * When we receive a "set name" event from the socket store that on the socket
- * and deliver() the message to the Exchange.
+ * and deliver() the message to the Exchange.  We are handling this message 
+ * before it gets on the Bus.
  */
 
 bus.in('set name', function (message, socket) {
@@ -71,7 +72,7 @@ bus.in('set name', function (message, socket) {
 
 /*
  * When we receive a "post" event from the socket, cap the content length to
- * 128 characters.
+ * 128 characters.  We are handling this message before it gets on the Bus.
  */
 
 bus.in('post', function (message, socket) {
@@ -83,7 +84,8 @@ bus.in('post', function (message, socket) {
 });
 
 /*
- * When the Bus finnaly gets the "post" message just deliver to the target.
+ * When the Bus finnaly gets the "post" message just deliver to the target.  We
+ * are handling this message on the Bus.
  */
 
 bus.on('post', function (message) {
@@ -92,6 +94,7 @@ bus.on('post', function (message) {
 
 /*
  * When the Bus finally gets the "set name" message just deliver to the target.
+ * We are handling this message on the Bus.
  */
 
 bus.on('set name', function (message) {
@@ -100,7 +103,8 @@ bus.on('set name', function (message) {
 
 /*
  * Before we deliver the "set name" event to the socekt,  alias the socket to 
- * the "name".
+ * the "name". We are handling this message after it left the bus and on its
+ * way to the socket.
  */
 
 bus.out('set name', function (message, socket, next) {
