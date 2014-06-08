@@ -52,7 +52,8 @@
           $('#connection').removeClass('connected').addClass('disconnected').html('disconnected').show();
         });
 
-        socket.on('set user', function (who, what) {
+        socket.on('set name', function (who, what) {
+          console.log('who', who, 'what', what);
           me = what;
           $('#error').hide();
           $('#login').hide();
@@ -76,7 +77,7 @@
         });
 
         $('#go').click(function () {
-          socket.emit('set user', $('#name').val());
+          socket.emit('set name', $('#name').val());
         });
 
         $('#share').click(function () {
