@@ -5,7 +5,6 @@
 var cluster = require('cluster'), cpus = require('os').cpus().length;
 
 if (cluster.isMaster) {
-
   for (var i=0; i<cpus; i++) {
     cluster.fork();
   }
@@ -77,27 +76,9 @@ bus.in('set name', function (message, socket) {
 
 bus.in('post', function (message, socket) {
   message.target(message.content().pop());
-  if (message.content().length && message.content()[0].length > 128) {
+  if (message.content().length && message.content().length > 128) {
     message.content(message.content().slice(0,125)+'...');
   }
-  message.deliver();
-});
-
-/*
- * When the Bus finnaly gets the "post" message just deliver to the target.  We
- * are handling this message on the Bus.
- */
-
-bus.on('post', function (message) {
-  message.deliver();
-});
-
-/*
- * When the Bus finally gets the "set name" message just deliver to the target.
- * We are handling this message on the Bus.
- */
-
-bus.on('set name', function (message) {
   message.deliver();
 });
 
