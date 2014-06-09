@@ -1,0 +1,196 @@
+* { 
+    color:#777;
+    font-family:"Arial";
+    padding:5px; 
+}
+
+body { 
+    background: #EEE; padding: 
+}
+
+input, 
+textarea, 
+button, 
+select, 
+option { 
+    font-size:120%; 
+    padding: 1em; 
+    margin:0 .25em 0 .25em
+}
+
+h2 { 
+    display:inline-block 
+}
+
+ul { 
+    margin: 0; list-style-type: none; padding: 0; background:#FFF; 
+}
+
+li {
+    padding: 1em; 
+    border-bottom:thin solid #DDD;
+}
+
+#header {
+    margin: 0 0 20px 0;
+}
+
+.bubble {
+    display: table-cell;
+    position: relative;
+    min-width: 80px;
+    height: 50px;
+    padding: 8px;
+    background: #FFFFFF;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    border: #7F7F7F solid 3px;
+    vertical-align: middle;
+    text-align: center;
+
+    -webkit-box-shadow: 3px 3px 5px 0px rgba(50, 50, 50, 0.75);
+    -moz-box-shadow:    3px 3px 5px 0px rgba(50, 50, 50, 0.75);
+    box-shadow:         3px 3px 5px 0px rgba(50, 50, 50, 0.75);
+}
+
+.bubble:after {
+    content: '';
+    position: absolute;
+    border-style: solid;
+    border-width: 15px 15px 15px 0;
+    border-color: transparent #FFFFFF;
+    display: block;
+    width: 0;
+    z-index: 1;
+    left: -15px;
+    top: 19px;
+}
+
+.bubble:before {
+    content: '';
+    position: absolute;
+    border-style: solid;
+    border-width: 17px 17px 17px 0;
+    border-color: transparent #7F7F7F;
+    display: block;
+    width: 0;
+    z-index: 0;
+    left: -20px;
+    top: 17px;
+}
+
+.bus-io {
+    background: transparent url(/img/logo.png) center center no-repeat;
+    display: inline-block;
+    height: 86px;
+    text-decoration: none;
+    vertical-align: top;
+    width: 200px;
+}
+
+.title {
+    display: inline-block;
+    margin: 20px 0 0 20px;
+}
+
+.disconnected { 
+    color: #700; 
+}
+
+.connected { 
+    color: #070; 
+}
+
+.italic {
+  font-style: italic;
+}
+
+.message-container {
+  display: table-cell;
+  height: 100%;
+  position: relative;
+  padding-left: 20px;
+  vertical-align: top;
+}
+
+.message-container .message-summary {
+  font-size: 11px;
+  margin: 1em 0 0 0;
+}
+
+.message-container li {
+  display: table-row;
+}
+
+.you {
+  color: #070;
+}
+
+.who, 
+.what, 
+.to, 
+.when { 
+    font-size:150%;
+}
+
+.user-box {
+  background: transparent url(/img/logo.png) 0 0 no-repeat;
+  display: table-cell;
+  min-width: 75px;
+  padding-top: 90px;
+  width: 75px;
+  text-align: center;
+}
+
+#login,
+#update,
+#target_user,
+#error { 
+    display: none 
+}
+
+#login, 
+#update { 
+    padding:1em; 
+    background-color:#CCC; 
+}
+
+#name { 
+    display: inline-block 
+}
+
+input[type=text] {
+  background: -moz-linear-gradient(top, #ccc 0%, #fff 100%);
+  background: -webkit-linear-gradient(top, #ccc 0%, #fff 100%);
+  background: -o-linear-gradient(top, #ccc 0%, #fff 100%);
+  background: -ms-linear-gradient(top, #ccc 0%, #fff 100%);
+  background: linear-gradient(to bottom, #ccc 0%, #fff 100%);
+  border-radius: 3px;
+  border: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2) inset, 0 -1px 0 rgba(0, 0, 0, 0.05) inset;
+  -webkit-transition: all 0.2s linear;
+  -moz-transition: all 0.2s linear;
+  -ms-transition: all 0.2s linear;
+  -o-transition: all 0.2s linear;
+  transition: all 0.2s linear;
+  font-family: "Helvetica Neue", sans-serif;
+  font-size: 13px;
+  color: #222222;
+  position: relative;
+  height: 36px;
+  width: 300px;
+  padding-left: 30px;
+}
+
+input[type=text]::-webkit-input-placeholder {
+  color: #999999;
+}
+input[type=text]:-moz-placeholder {
+  color: #999999;
+}
+input[type=text]:focus {
+  box-shadow: 0 1px 0 #2392f3 inset, 0 -1px 0 #2392f3 inset, 1px 0 0 #2392f3 inset, -1px 0 0 #2392f3 inset, 0 0 4px rgba(35, 146, 243, 0.5);
+  outline: none;
+  background: #ffffff;
+}

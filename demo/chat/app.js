@@ -5,7 +5,6 @@
 var cluster = require('cluster'), cpus = require('os').cpus().length;
 
 if (cluster.isMaster) {
-
   for (var i=0; i<cpus; i++) {
     cluster.fork();
   }
@@ -23,10 +22,18 @@ if (cluster.isMaster) {
  * Get Express up and running
  */
 
-var app = require('express')();
-app.get('/', function (req, res) {
-  res.sendfile(__dirname+'/public/index.html');
-});
+var express = require('express');
+var connect = require('connect');
+var session = require('express-session');
+var connectRedis = require('connect-redis')(session);
+var cookieParser = require('cookie-parser');
+var config = { session: { secret:'secret', key: 'bus.io', store: new connectRedis() } };
+
+var app = express();
+
+app.use(cookieParser());
+app.use(session(config.session));
+app.use(express.static(__dirname + '/public/'));
 
 /*
  * Create a Server to attach our Express app
@@ -39,6 +46,33 @@ var server = require('http').Server(app).listen(process.env.PORT || 3000);
  */
 
 var bus = require('bus.io')(server);
+
+bus.addListener('error', function () {
+  console.error(Array.prototype.slice.call(arguments));
+});
+
+/*
+ * Hook up our express session to socket.io
+ */
+
+bus.io().use(function (socket, next) {
+  var handshake = socket.handshake;
+  if (handshake.headers.cookie) {
+    cookieParser()(handshake, {}, function (err) {
+      handshake.sessionID = connect.utils.parseSignedCookie(handshake.cookies[config.session.key], config.session.secret);
+      handshake.sessionStore = config.session.store;
+      handshake.sessionStore.get(handshake.sessionID, function (err, data) {
+        if (err) return next(err);
+        if (!data) return next(new Error('Invalid Session'));
+        handshake.session = new session.Session(handshake, data);
+        next();
+      });
+    });
+  }
+  else {
+    next(new Error('Missing Cookies'));
+  }
+});
 
 /*
  * We want our socket to receive messages when sent to everyone
@@ -54,7 +88,7 @@ bus.socket(function (socket, bus) {
  */
 
 bus.in(function (message, socket, next) {
-  message.actor(socket.name || socket.id);
+  message.actor(socket.handshake.session.name || socket.id);
   next();
 });
 
@@ -65,7 +99,11 @@ bus.in(function (message, socket, next) {
  */
 
 bus.in('set name', function (message, socket) {
-  socket.name = message.content();
+  if (message.content().length && message.content().length > 32) {
+    message.content(message.content().slice(0,32));
+  }
+  socket.handshake.session.name = message.content();
+  socket.handshake.session.save();
   message.deliver();
 });
 
@@ -77,27 +115,9 @@ bus.in('set name', function (message, socket) {
 
 bus.in('post', function (message, socket) {
   message.target(message.content().pop());
-  if (message.content().length && message.content()[0].length > 128) {
+  if (message.content().length && message.content().length > 128) {
     message.content(message.content().slice(0,125)+'...');
   }
-  message.deliver();
-});
-
-/*
- * When the Bus finnaly gets the "post" message just deliver to the target.  We
- * are handling this message on the Bus.
- */
-
-bus.on('post', function (message) {
-  message.deliver();
-});
-
-/*
- * When the Bus finally gets the "set name" message just deliver to the target.
- * We are handling this message on the Bus.
- */
-
-bus.on('set name', function (message) {
   message.deliver();
 });
 
