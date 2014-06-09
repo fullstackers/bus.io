@@ -27,6 +27,7 @@ $(function () {
 
   // Call this method to set this user's username
   function setName() {
+    me = $('#name').val();
     socket.emit('set name', $('#name').val());
   }
 
@@ -43,13 +44,26 @@ $(function () {
     $('#connection').removeClass('connected').addClass('disconnected').html('disconnected').show();
   });
 
-  socket.on('set name', function (who, what) {
-    console.log('who', who, 'what', what);
-    me = what;
-    $('#error').hide();
-    $('#login').hide();
-    $('#update').show();
-    $('#status').focus();
+  socket.on('set name', function (who, what, to, when) {
+    if (me === what) {
+      $('#error').hide();
+      $('#login').hide();
+      $('#update').show();
+      $('#status').focus();
+    }
+    $('#messages').prepend(
+      $('<li>')
+        .append($('<div>').addClass('user-box').addClass('you').append(who))
+        .append($('<div>').addClass('message-container').append(
+          $('<div>').addClass('bubble').append('just joined'),
+          $('<div>').addClass('message-summary').append(
+            'To:',
+            $('<span>').addClass('italic').append(to),
+            'At:',
+            $('<span>').addClass('italic').append(when)
+          )
+        ))
+    );
   });
 
   socket.on('post', function (who, what, to, when) {

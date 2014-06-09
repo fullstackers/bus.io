@@ -107,6 +107,14 @@ bus.in('set name', function (message, socket) {
   message.deliver();
 });
 
+/*
+ * Consume the message and send to everyone you joined
+ */
+
+bus.on('set name', function (message) {
+  message.consume().deliver('everyone');
+});
+
 
 /*
  * When we receive a "post" event from the socket, cap the content length to
@@ -123,11 +131,14 @@ bus.in('post', function (message, socket) {
 
 /*
  * Before we deliver the "set name" event to the socekt,  alias the socket to 
- * the "name". We are handling this message after it left the bus and on its
- * way to the socket.
+ * the "name" if we are the actor. We are handling this message after it left 
+ * the bus and on its way to the socket.
  */
 
 bus.out('set name', function (message, socket, next) {
-  bus.alias(socket, message.content());
+  console.log(message.data);
+  if (socket.handshake.session.name === message.actor()) {
+    bus.alias(socket, message.content());
+  }
   next();
 });
