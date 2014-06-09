@@ -1,5 +1,5 @@
 /*
- * Use Cluster to fork this process same number of times as we have cpus!
+ * Use Cluster to fork this process, each process is an app instance.
  */
 
 var cluster = require('cluster'), cpus = require('os').cpus().length;
@@ -83,6 +83,16 @@ bus.socket(function (socket, bus) {
 });
 
 /*
+ * We want our socket to trigger a "left" message when disconnected
+ */
+
+bus.socket(function (socket, bus) {
+  socket.on('disconnect', function () {
+    bus.message().i(socket.handshake.session.name).did('left').what('here').to('everyone');
+  });
+});
+
+/*
  * For all messages we will set the message actor to either the socket.name or 
  * socket.id. We are handling this message before it gets on the Bus.
  */
@@ -107,6 +117,14 @@ bus.in('set name', function (message, socket) {
   message.deliver();
 });
 
+/*
+ * Consume the message and send to everyone that you joined
+ */
+
+bus.on('set name', function (message) {
+  message.consume().deliver('everyone');
+});
+
 
 /*
  * When we receive a "post" event from the socket, cap the content length to
@@ -123,11 +141,13 @@ bus.in('post', function (message, socket) {
 
 /*
  * Before we deliver the "set name" event to the socekt,  alias the socket to 
- * the "name". We are handling this message after it left the bus and on its
- * way to the socket.
+ * the "name" if we are the actor. We are handling this message after it left 
+ * the bus and on its way to the socket.
  */
 
 bus.out('set name', function (message, socket, next) {
-  bus.alias(socket, message.content());
+  if (socket.handshake.session.name === message.actor()) {
+    bus.alias(socket, message.content());
+  }
   next();
 });
