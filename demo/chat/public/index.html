@@ -8,18 +8,18 @@
   </head>
   <body>
     <div id="header">
-      <a href='https://www.npmjs.org/package/bus.io' class='bus-io'>&nbsp;</a>
+      <a href='https://www.npmjs.org/package/bus.io' class='bus-io' tabIndex="2">&nbsp;</a>
       <h1 class='title'>Express Demo (<span id="connection"></span>)</h1>
     </div>
     <div id="login">
       <h2>Your name?</h2>
-      <input type="text" id="name" value="" autocomplete="off" />
-      <button id="go">Join the Conversation</button>
+      <input type="text" id="name" value="" autocomplete="off" tabIndex="1" />
+      <button id="go" tabIndex="1">Join the Conversation</button>
     </div>
     <div id="update">
       <h2>Status?</h2>
-      <input id="status" />
-      <select id="target">
+      <input id="status" type="text" tabIndex="1" />
+      <select id="target" tabIndex="1">
         <option value="everyone" selected="selected">Everyone</option>
         <option value="user">User</option>
       </select>

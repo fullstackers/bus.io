@@ -2,6 +2,7 @@ $(function () {
   var me = null,
     socket = io.connect();
 
+  // Call this method when you are ready to send a message to the server.
   function share() {
     var status = $.trim($('#status').val()),
         target = $('#target').val();
@@ -24,6 +25,14 @@ $(function () {
     $('#status').val('');
   }
 
+  // Call this method to set this user's username
+  function setName() {
+    socket.emit('set name', $('#name').val());
+  }
+
+  /**
+   * Socket Event Handlers
+   */
   socket.on('connect', function () {
     $('#connection').removeClass('disconnected').addClass('connected').html('connected').show();
     $('#update').hide();
@@ -40,26 +49,39 @@ $(function () {
     $('#error').hide();
     $('#login').hide();
     $('#update').show();
+    $('#status').focus();
   });
 
   socket.on('post', function (who, what, to, when) {
+    var userClass = who === me ? '' : 'you';
+
     if (to === me) {
       to = 'you';
     }
+
     $('#messages').prepend(
       $('<li>')
-        .append($('<span>').addClass('who').append(who))
-        .append(' shared ')
-        .append($('<span>').addClass('what').append(what))
-        .append(' with ')
-        .append($('<span>').addClass('to').append(to))
-        .append(' at ')
-        .append($('<span>').addClass('when').append(when))
+        .append($('<div>').addClass('user-box').addClass(userClass).append(who))
+        .append($('<div>').addClass('message-container').append(
+          $('<div>').addClass('bubble').append(what),
+          $('<div>').addClass('message-summary').append(
+            'To:',
+            $('<span>').addClass('italic').append(to),
+            'At:',
+            $('<span>').addClass('italic').append(when)
+          )
+        ))
     );
   });
 
-  $('#go').click(function () {
-    socket.emit('set name', $('#name').val());
+  /**
+   * DOM Event Handlers
+   */
+  $('#go').click(setName);
+  $('#name').keypress(function(e) {
+    if(e.keyCode === 13) {
+      setName();
+    }
   });
 
   $('#share').click(share);
@@ -77,4 +99,5 @@ $(function () {
       $('#target_user').hide();
     }
   });
+
 });

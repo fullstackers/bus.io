@@ -26,13 +26,58 @@ ul {
     margin: 0; list-style-type: none; padding: 0; background:#FFF; 
 }
 
-li { 
+li {
     padding: 1em; 
     border-bottom:thin solid #DDD;
 }
 
 #header {
     margin: 0 0 20px 0;
+}
+
+.bubble {
+    display: table-cell;
+    position: relative;
+    min-width: 80px;
+    height: 50px;
+    padding: 8px;
+    background: #FFFFFF;
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+    border: #7F7F7F solid 3px;
+    vertical-align: middle;
+    text-align: center;
+
+    -webkit-box-shadow: 3px 3px 5px 0px rgba(50, 50, 50, 0.75);
+    -moz-box-shadow:    3px 3px 5px 0px rgba(50, 50, 50, 0.75);
+    box-shadow:         3px 3px 5px 0px rgba(50, 50, 50, 0.75);
+}
+
+.bubble:after {
+    content: '';
+    position: absolute;
+    border-style: solid;
+    border-width: 15px 15px 15px 0;
+    border-color: transparent #FFFFFF;
+    display: block;
+    width: 0;
+    z-index: 1;
+    left: -15px;
+    top: 19px;
+}
+
+.bubble:before {
+    content: '';
+    position: absolute;
+    border-style: solid;
+    border-width: 17px 17px 17px 0;
+    border-color: transparent #7F7F7F;
+    display: block;
+    width: 0;
+    z-index: 0;
+    left: -20px;
+    top: 17px;
 }
 
 .bus-io {
@@ -57,6 +102,31 @@ li {
     color: #070; 
 }
 
+.italic {
+  font-style: italic;
+}
+
+.message-container {
+  display: table-cell;
+  height: 100%;
+  position: relative;
+  padding-left: 20px;
+  vertical-align: top;
+}
+
+.message-container .message-summary {
+  font-size: 11px;
+  margin: 1em 0 0 0;
+}
+
+.message-container li {
+  display: table-row;
+}
+
+.you {
+  color: #070;
+}
+
 .who, 
 .what, 
 .to, 
@@ -64,6 +134,14 @@ li {
     font-size:150%;
 }
 
+.user-box {
+  background: transparent url(/img/logo.png) 0 0 no-repeat;
+  display: table-cell;
+  min-width: 75px;
+  padding-top: 90px;
+  width: 75px;
+  text-align: center;
+}
 
 #login,
 #update,
