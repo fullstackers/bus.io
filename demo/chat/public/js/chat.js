@@ -53,9 +53,25 @@ $(function () {
     }
     $('#messages').prepend(
       $('<li>')
+        .append($('<div>').addClass('user-box').addClass('you').append(what))
+        .append($('<div>').addClass('message-container').append(
+          $('<div>').addClass('bubble').append('just joined!'),
+          $('<div>').addClass('message-summary').append(
+            'To:',
+            $('<span>').addClass('italic').append(to),
+            'At:',
+            $('<span>').addClass('italic').append(when)
+          )
+        ))
+    );
+  });
+
+  socket.on('left', function (who, to, what, when) {
+    $('#messages').prepend(
+      $('<li>')
         .append($('<div>').addClass('user-box').addClass('you').append(who))
         .append($('<div>').addClass('message-container').append(
-          $('<div>').addClass('bubble').append('just joined'),
+          $('<div>').addClass('bubble').append('just left!'),
           $('<div>').addClass('message-summary').append(
             'To:',
             $('<span>').addClass('italic').append(to),

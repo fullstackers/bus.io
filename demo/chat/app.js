@@ -80,6 +80,9 @@ bus.io().use(function (socket, next) {
 
 bus.socket(function (socket, bus) {
   bus.alias(socket, 'everyone');
+  socket.on('disconnect', function () {
+    bus.message().i(socket.handshake.session.name).did('left').to('everyone');
+  });
 });
 
 /*
