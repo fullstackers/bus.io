@@ -1,5 +1,5 @@
 /*
- * Use Cluster to fork this process same number of times as we have cpus!
+ * Use Cluster to fork this process, each process is an app instance.
  */
 
 var cluster = require('cluster'), cpus = require('os').cpus().length;
@@ -108,7 +108,7 @@ bus.in('set name', function (message, socket) {
 });
 
 /*
- * Consume the message and send to everyone you joined
+ * Consume the message and send to everyone that you joined
  */
 
 bus.on('set name', function (message) {
@@ -136,7 +136,6 @@ bus.in('post', function (message, socket) {
  */
 
 bus.out('set name', function (message, socket, next) {
-  console.log(message.data);
   if (socket.handshake.session.name === message.actor()) {
     bus.alias(socket, message.content());
   }
