@@ -1,0 +1,10 @@
+<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+<script>
+  var client = io.connect();
+  client.on('connect', function () {
+    client.emit('echo', 'Hello, Bus.io!');
+  });
+  client.on('echo', function (who, what) {
+      document.body.innerHTML += '<h1>'+what+'</h1>';
+  });
+</script>
