@@ -72,11 +72,10 @@ describe 'Server', ->
       return new SocketMessages
 
   Given ->
-    @MessageExchange = class MessageExchange extends EventEmitter
-    @MessageExchange.Queue = class Queue extends EventEmitter
-    @MessageExchange.PubSub = class PubSub extends EventEmitter
-    @MessageExchange.Exchange = class Exchange extends EventEmitter
+    @BusIOExchange = class BusIOExchange extends EventEmitter
       constructor: ->
+        if not(@ instanceof BusIOExchange)
+          return new BusIOExchange
         @ee = new EventEmitter
         @h = new EventEmitter
         @q = new EventEmitter
@@ -86,8 +85,10 @@ describe 'Server', ->
       queue: -> @q
       pubsub: -> @p
       channel: -> @ee
-    @MessageExchange.make = ->
-      return new MessageExchange.Exchange
+    @BusIOExchange.make = ->
+      return new BusIOExchange
+    @BusIOExchange.Queue = class Queue extends EventEmitter
+    @BusIOExchange.PubSub = class PubSub extends EventEmitter
 
   Given ->
     @Server = requireSubject 'lib/server', {
@@ -97,11 +98,11 @@ describe 'Server', ->
       './handler': @Handler
       './receiver': @Receiver
       'socket-messages': @SocketMessages
-      'message-exchange': @MessageExchange
+      'bus.io-exchange': @BusIOExchange
     }
 
   Given -> @bus = @Server()
-  Then -> expect(@Server.Exchange).toEqual @MessageExchange
+  Then -> expect(@Server.Exchange).toEqual @BusIOExchange
 
   describe '#', ->
     
@@ -146,13 +147,13 @@ describe 'Server', ->
 
   xdescribe '#messageExchange', ->
 
-    Given -> @exchange = @MessageExchange.make()
+    Given -> @exchange = @BusIOExchange()
     When -> @res = @bus.messageExchange(@exchange).messageExchange()
     Then -> expect(@res).toEqual @exchange
 
   describe '#exchange', ->
 
-    Given -> @exchange = @MessageExchange.make()
+    Given -> @exchange = @BusIOExchange()
     When -> @res = @bus.exchange(@exchange).exchange()
     Then -> expect(@res).toEqual @exchange
 
@@ -380,7 +381,7 @@ describe 'Server', ->
 
     context 'queue:Queue', ->
 
-      Given -> @q = new @MessageExchange.Queue
+      Given -> @q = new @BusIOExchange.Queue
       Given -> @e = @bus.exchange().queue()
       Given -> spyOn(@e,['removeListener']).andCallThrough()
       Given -> spyOn(@q,['addListener']).andCallThrough()
@@ -397,7 +398,7 @@ describe 'Server', ->
 
     context 'pubsub:PubSub', ->
 
-      Given -> @q = new @MessageExchange.PubSub
+      Given -> @q = new @BusIOExchange.PubSub
       When -> @bus.pubsub(@q)
       Then -> expect(@bus.exchange().pubsub).toHaveBeenCalledWith @q
 
