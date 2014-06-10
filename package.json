@@ -8,12 +8,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:nathangromano/bus.io.git"
+    "url": "git@github.com:turbonetix/bus.io.git"
   },
   "keywords": [
     "bus",
     "io",
     "socket.io",
+    "kue",
     "redis",
     "message",
     "event",
