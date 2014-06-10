@@ -80,8 +80,15 @@ bus.io().use(function (socket, next) {
 
 bus.socket(function (socket, bus) {
   bus.alias(socket, 'everyone');
+});
+
+/*
+ * We want our socket to trigger a "left" message when disconnected
+ */
+
+bus.socket(function (socket, bus) {
   socket.on('disconnect', function () {
-    bus.message().i(socket.handshake.session.name).did('left').to('everyone');
+    bus.message().i(socket.handshake.session.name).did('left').what('here').to('everyone');
   });
 });
 
