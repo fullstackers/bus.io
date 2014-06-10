@@ -900,7 +900,7 @@ for more information.
 
 ```javascript
 
-var exchange = require('bus.io').Exchange.make();
+var exchange = require('bus.io').Exchange();
 bus.exchange(exchange);
 
 ```
@@ -924,7 +924,7 @@ See **[message-exchange](https://github.com/nathangromano/message-exchange "mess
 
 ```javascript
 
-var queue = require('bus.io').Exchange.Queue.make();
+var queue = require('bus.io').Exchange.Queue();
 bus.queue(queue);
 
 ```
@@ -948,7 +948,7 @@ Sets the `PubSub` the `Exchange` uses.
 
 ```javascript
 
-var pubsub = require('bus.io').Exchange.PubSub.make();
+var pubsub = require('bus.io').Exchange.PubSub();
 bus.pubsub(pubsub);
 
 ```
