@@ -2,7 +2,7 @@
 [![NPM version](https://badge.fury.io/js/bus.io.svg)](http://badge.fury.io/js/bus.io)
 [![David DM](https://david-dm.org/turbonetix/bus.io.png)](https://david-dm.org/turbonetix/bus.io.png)
 
-![Bus.IO](https://raw.github.com/nathangromano/bus.io/master/logo.png)
+![Bus.IO](https://raw.github.com/turbonetix/bus.io/master/logo.png)
 
 **Easily build distributed applications that scale!**
 
@@ -882,7 +882,7 @@ bus.message()
 
 Gets the exchange the server uses to publish information.
 
-See **[message-exchange](https://github.com/nathangromano/message-exchange "message-exchange")**
+See **[bus.io-exchange](https://github.com/turbonetix/bus.io-exchange "bus.io-exchange")**
 
 ```javascript
 
@@ -894,13 +894,13 @@ var exchange = bus.exchange();
 
 Sets the exchange the server uses to publish information.
 
-See **[message-exchange](https://github.com/nathangromano/message-exchange "message-exchange")**
+See **[bus.io-exchange](https://github.com/turbonetix/bus.io-exchange "bus.io-exchange")**
 
 for more information.
 
 ```javascript
 
-var exchange = require('bus.io').Exchange.make();
+var exchange = require('bus.io').Exchange();
 bus.exchange(exchange);
 
 ```
@@ -920,11 +920,11 @@ var queue = exchange.queue();
 
 Sets the `Queue` the `Exchange` uses.
 
-See **[message-exchange](https://github.com/nathangromano/message-exchange "message-exchange")**
+See **[bus.io-exchange](https://github.com/turbonetix/bus.io-exchange "bus.io-exchange")**
 
 ```javascript
 
-var queue = require('bus.io').Exchange.Queue.make();
+var queue = require('bus.io').Exchange.Queue();
 bus.queue(queue);
 
 ```
@@ -933,7 +933,7 @@ bus.queue(queue);
 
 Gets the `PubSub` the `Exchange` uses.
 
-See **[message-exchange](https://github.com/nathangromano/message-exchange "message-exchange")**
+See **[bus.io-exchange](https://github.com/turbonetix/bus.io-exchange "bus.io-exchange")**
 
 ```javascript
 
@@ -948,7 +948,7 @@ Sets the `PubSub` the `Exchange` uses.
 
 ```javascript
 
-var pubsub = require('bus.io').Exchange.PubSub.make();
+var pubsub = require('bus.io').Exchange.PubSub();
 bus.pubsub(pubsub);
 
 ```
