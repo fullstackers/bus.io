@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/NathanGRomano/bus.io.svg?branch=master)](https://travis-ci.org/NathanGRomano/bus.io)
+[![Build Status](https://travis-ci.org/turbonetix/bus.io.svg?branch=master)](https://travis-ci.org/turbonetix/bus.io)
 [![NPM version](https://badge.fury.io/js/bus.io.svg)](http://badge.fury.io/js/bus.io)
 [![David DM](https://david-dm.org/nathangromano/bus.io.png)](https://david-dm.org/nathangromano/bus.io.png)
 
@@ -56,7 +56,7 @@ Install redis (See download and install instructions http://redis.io/topics/quic
 
 Clone this repository
 
-    > git clone git@github.com:NathanGRomano/bus.io.git
+    > git clone git@github.com:turbonetix/bus.io.git
 
 cd into the directory and install the dependencies
 
