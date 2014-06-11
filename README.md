@@ -4,38 +4,35 @@
 
 ![Bus.IO](https://raw.github.com/turbonetix/bus.io/master/logo.png)
 
-**Easily build distributed applications that scale!**
+An [express](https://github.com/visionmedia/express "express") inspired distributed event-driven framework for building real time applications with [socket.io](https://github.com/Automattic/socket.io "socket.io") and [redis](https://github.com/antirez/redis "redis").
 
 ### The Server
 
 ```javascript
-var bus = require('bus.io')(3000);
+var express = reuqire('express');
+
+var app = express();
+app.use(express.static(__dirname+'/public'));
+
+var server = require('http').Server(app).listen(3000);
+
+var bus = require('bus.io')(server);
 ```
 
 ### The Client
 
-```javascript
-var client = io.connect();
-client.on('connect', function () {
-  client.emit('echo', 'Hello, World!');
-});
-client.on('echo', function (who, what) {
-  console.log(what);
-});
+```html
+<script type="text/javascript" src="/socket.io/socket.io"></script>
+<script type="text/javascript">
+  var client = io.connect();
+  client.on('connect', function () {
+    client.emit('echo', 'Hello, World!');
+  });
+  client.on('echo', function (who, what) {
+    console.log(what);
+  });
+</script>
 ```
-
-Bus.io seamlessly connects clients and servers together over a network using 
-**[socket.io](https://github.com/Automattic/socket.io "socket.io")** and 
-**[redis](https://github.com/antirez/redis "redis")**. Providing a message
-bus that all app instances communicate on.
-
-Bus.io enables your app instances to all work together by providing a way for all 
-of them to *produce*, *handle*, and *distribute* messages.  Your app instances 
-become both a producer and a consumer on the backbone of redis. Bus.io abstracts
-the **socket** away by introducing actors.  Actors are the people, services or
-clients that are producing messages.  By associating a socket with an actor
-it enables that when the message is delivered to that **actor** it will be 
-delivered to each **socket** associated with it.
 
 # How this works (nutshell)
 
@@ -43,9 +40,9 @@ Each **socket** is associated with one ore more **actors**.  When a socket
 receives data, the data is encapsulated as a **messsage** and written to a 
 **queue**.  Since *all* of your app instances are connected to that queue,
 one of them will receive the message for processing.  After the instance
-procsses the message it can be delivered to the **target**. A target is just
+handles the message it can be delivered to the **target**. A target is just
 another actor, so if your actor is associated with multiple sockets.  Each
-socket regardless of which app instance it is connected to, it will receive the 
+socket, regardless of which app instance it is connected to, will receive the 
 data from the message.
 
 # Installation and Environment Setup
