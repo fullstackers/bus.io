@@ -28,6 +28,7 @@ var session = require('express-session');
 var connectRedis = require('connect-redis')(session);
 var cookieParser = require('cookie-parser');
 var config = { session: { secret:'secret', key: 'bus.io', store: new connectRedis() } };
+var handshake = require('socket.io-handshake');
 
 var app = express();
 
@@ -54,25 +55,7 @@ bus.addListener('error', function () {
 /*
  * Hook up our express session to socket.io
  */
-
-bus.io().use(function (socket, next) {
-  var handshake = socket.handshake;
-  if (handshake.headers.cookie) {
-    cookieParser()(handshake, {}, function (err) {
-      handshake.sessionID = connect.utils.parseSignedCookie(handshake.cookies[config.session.key], config.session.secret);
-      handshake.sessionStore = config.session.store;
-      handshake.sessionStore.get(handshake.sessionID, function (err, data) {
-        if (err) return next(err);
-        if (!data) return next(new Error('Invalid Session'));
-        handshake.session = new session.Session(handshake, data);
-        next();
-      });
-    });
-  }
-  else {
-    next(new Error('Missing Cookies'));
-  }
-});
+bus.io().use(handshake(config.session));
 
 /*
  * We want our socket to receive messages when sent to everyone
