@@ -978,15 +978,15 @@ messages from going into your `bus`.
 
 Bus.io is broken down into other components.
 
-* **[bus.io-common](https://github.com/turbonetix/bus.io-common "bus.io-common") contains all the common
+* **[bus.io-common](https://github.com/turbonetix/bus.io-common "bus.io-common")** contains all the common
 code such as the `Message`, `Builder`, and `Controller` classes.
-* **[bus.io-exchange](https://github.com/turbonetix/bus.io-exchange "bus.io-exchange") contains all
+* **[bus.io-exchange](https://github.com/turbonetix/bus.io-exchange "bus.io-exchange")** contains all
 the code that will be used to handle messages going into the `Queue` and propagation on the `PubSub`.
-* **[bus.io-messsages](https://github.com/turbonetix/bus.io-messages "bus.io-messages") contains the
+* **[bus.io-messsages](https://github.com/turbonetix/bus.io-messages "bus.io-messages")** contains the
 code that handles listening to a socket.io `Socket` for an `event` and building that into a `message`.
-* **[bus.io-driver](https://github.com/turbonetix/bus.io-driver "bus.io-driver") **Needs Implemented** 
+* **[bus.io-driver](https://github.com/turbonetix/bus.io-driver "bus.io-driver")** **(Needs Implemented)** 
 The driver helps you test driver bus.io in your apps.
-* **[bus.io-client](https://github.com/turbonetix/bus.io-client "bus.io-client") **Needs Implemented**
+* **[bus.io-client](https://github.com/turbonetix/bus.io-client "bus.io-client")** **(Needs Implemented)**
 The bus.io client is a wrapper for the socket.io client and it helps you build and process messages.
 
 # Running Tests
