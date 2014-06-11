@@ -44,7 +44,8 @@ describe 'Router', ->
   Given -> @Router = requireSubject 'lib/router', {
     './route': @Route,
     './point': @Point,
-    './message': @Message
+    'bus.io-common':
+      Message: @Message
   }
 
   describe '#()', ->

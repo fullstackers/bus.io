@@ -43,7 +43,8 @@ describe 'Receiver', ->
 
   Given -> @MessageReceiver = requireSubject 'lib/receiver', {
     './router': @Router
-    './message': @Message
+    './bus.io-common':
+      Message: @Message
   }
 
   Given -> @instance = @MessageReceiver()

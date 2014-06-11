@@ -40,14 +40,6 @@ describe 'Server', ->
       deliver: ->
 
   Given ->
-    @Handler = class Handler extends EventEmitter
-      constructor: ->
-        if not (@ instanceof Handler)
-          return new Handler
-      handle: (message) ->
-      fn: ->
-
-  Given ->
     @Receiver = class Receiver extends EventEmitter
       constructor: ->
         if not (@ instanceof Receiver)
@@ -95,8 +87,11 @@ describe 'Server', ->
       'socket.io': @Sio
       './message': @Message
       './builder': @Builder
-      './handler': @Handler
       './receiver': @Receiver
+      'bus.io-common':
+        Message: @Message
+        Builder: @Builder
+        Controller: @Contoller
       'bus.io-messages': @Messages
       'bus.io-exchange': @BusIOExchange
     }
@@ -194,18 +189,6 @@ describe 'Server', ->
       When -> @bus.on @fn
       Then -> expect(@bus.processing).toHaveBeenCalled()
       And -> expect(@bus.processing().use).toHaveBeenCalledWith @fn
-
-    ### 
-    Given -> @fn = ->
-    Given -> spyOn(@bus.exchange().handler(),['on']).andCallThrough()
-    Given -> spyOn(@bus.messages(),['action']).andCallThrough()
-    When -> @bus.on 'name', @fn
-    Then -> expect(@bus.exchange().handler().on).toHaveBeenCalled()
-    And -> expect(@bus.exchange().handler().on.mostRecentCall.args[0]).toBe 'name'
-    And -> expect(typeof @bus.exchange().handler().on.mostRecentCall.args[1]).toBe 'function'
-    And -> expect(@bus.messages().action).toHaveBeenCalledWith 'name'
-    ###
-
 
   describe '#onPublish', ->
 

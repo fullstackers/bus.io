@@ -49,8 +49,9 @@ describe 'Route', ->
         @emit 'consume', @message
 
   Given -> @Route = requireSubject 'lib/route', {
-    './controller':@Controller,
-    './message': @Message,
+    'bus.io-common':
+      Controller:@Controller
+      Message: @Message
     './point': @Point
   }
 
