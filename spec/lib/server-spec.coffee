@@ -57,7 +57,7 @@ describe 'Server', ->
 
 
   Given ->
-    @SocketMessages = class SocketMessages extends EventEmitter
+    @Messages = class Messages extends EventEmitter
       constructor: ->
         @v = false
       attach: ->
@@ -68,8 +68,8 @@ describe 'Server', ->
       exchange: -> @ee
       ee: new EventEmitter
       autoPropagate: (v) -> if v? then @v = v else @v 
-    @SocketMessages.make = ->
-      return new SocketMessages
+    @Messages.make = ->
+      return new Messages
 
   Given ->
     @BusIOExchange = class BusIOExchange extends EventEmitter
@@ -97,7 +97,7 @@ describe 'Server', ->
       './builder': @Builder
       './handler': @Handler
       './receiver': @Receiver
-      'socket-messages': @SocketMessages
+      'bus.io-messages': @Messages
       'bus.io-exchange': @BusIOExchange
     }
 
@@ -159,7 +159,7 @@ describe 'Server', ->
 
   describe '#messages', ->
 
-    Given -> @messages = new @SocketMessages
+    Given -> @messages = new @Messages
     Given -> spyOn(@messages.exchange(),['on']).andCallThrough()
     When -> @res = @bus.messages(@messages).messages()
     Then -> expect(@res).toEqual @messages
