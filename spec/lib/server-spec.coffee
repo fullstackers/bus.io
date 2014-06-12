@@ -4,40 +4,12 @@ describe 'Server', ->
 
   date = new Date
 
-  Given ->
-    @Message = class Message
-      constructor: () ->
-        if not (@ instanceof Message)
-          return new Message
-        @data =
-          actor: 'me'
-          action: 'say'
-          content: 'hello'
-          target: 'you'
-          created: date
-          id: 2
-          reference: 1
-          published: undefined
-
-  Given ->
-    @Sio = class Sio extends EventEmitter
-      constructor: ->
-        if not (@ instanceof Sio)
-          return new Sio
-      listen: ->
-
-  Given ->
-    @Builder = class Builder extends EventEmitter
-      constructor: ->
-        if not (@ instanceof Builder)
-          return new Builder
-      data: ->
-        actor: 'me'
-        action: 'say'
-        content: 'hello'
-        target: 'you'
-        created: date
-      deliver: ->
+  Given -> @Common = require('bus.io-common')
+  Given -> @Message = @Common.Message
+  Given -> @Builder = @Common.Builder
+  Given -> @Exchange = require('bus.io-exchange')
+  Given -> @Messages = require('bus.io-messages')
+  Given -> @Sio = require('socket.io')
 
   Given ->
     @Receiver = class Receiver extends EventEmitter
@@ -47,57 +19,19 @@ describe 'Server', ->
       use: ->
       onReceive: ->
 
-
-  Given ->
-    @Messages = class Messages extends EventEmitter
-      constructor: ->
-        @v = false
-      attach: ->
-      actor: (a, b) -> b null, a.id
-      target: (a,b,c) -> c null, b
-      dettach: ->
-      action: ->
-      publisher: -> @ee
-      ee: new EventEmitter
-      autoPropagate: (v) -> if v? then @v = v else @v 
-    @Messages.make = ->
-      return new Messages
-
-  Given ->
-    @BusIOExchange = class BusIOExchange extends EventEmitter
-      constructor: ->
-        if not(@ instanceof BusIOExchange)
-          return new BusIOExchange
-        @ee = new EventEmitter
-        @h = new EventEmitter
-        @q = new EventEmitter
-        @p = new EventEmitter
-      publish: ->
-      handler: -> @h
-      queue: -> @q
-      pubsub: -> @p
-      channel: -> @ee
-    @BusIOExchange.make = ->
-      return new BusIOExchange
-    @BusIOExchange.Queue = class Queue extends EventEmitter
-    @BusIOExchange.PubSub = class PubSub extends EventEmitter
-
   Given ->
     @Server = requireSubject 'lib/server', {
       'socket.io': @Sio
-      './message': @Message
       './builder': @Builder
       './receiver': @Receiver
-      'bus.io-common':
-        Message: @Message
-        Builder: @Builder
-        Controller: @Contoller
+      'bus.io-common': @Common
       'bus.io-messages': @Messages
-      'bus.io-exchange': @BusIOExchange
+      'bus.io-exchange': @Exchange
     }
 
+  Then -> expect(@Server.Exchange).toBe @Exchange
+
   Given -> @bus = @Server()
-  Then -> expect(@Server.Exchange).toEqual @BusIOExchange
 
   describe '#', ->
     
@@ -140,21 +74,15 @@ describe 'Server', ->
     And -> expect(@message.listeners('built').length).toBe 1
     And -> expect(@message.listeners('built')[0]).toEqual @bus.onPublish
 
-  xdescribe '#messageExchange', ->
+  describe '#exchange (exchange:Exchange)', ->
 
-    Given -> @exchange = @BusIOExchange()
-    When -> @res = @bus.messageExchange(@exchange).messageExchange()
-    Then -> expect(@res).toEqual @exchange
-
-  describe '#exchange', ->
-
-    Given -> @exchange = @BusIOExchange()
+    Given -> @exchange = @Exchange()
     When -> @res = @bus.exchange(@exchange).exchange()
     Then -> expect(@res).toEqual @exchange
 
   describe '#messages', ->
 
-    Given -> @messages = new @Messages
+    Given -> @messages = @Messages()
     Given -> spyOn(@messages,['on']).andCallThrough()
     When -> @res = @bus.messages(@messages).messages()
     Then -> expect(@res).toEqual @messages
@@ -199,14 +127,14 @@ describe 'Server', ->
         @message.data.published = date
       Given -> spyOn(@bus.exchange(),['publish']).andCallThrough()
       When -> @bus.onPublish @message
-      Then -> expect(@bus.exchange().publish).toHaveBeenCalledWith @message.data, @message.data.target
+      Then -> expect(@bus.exchange().publish).toHaveBeenCalledWith @message, @message.target()
 
    context 'unpublished', ->
       
       Given -> @message = @Message()
       Given -> spyOn(@bus.exchange(),['publish']).andCallThrough()
       When -> @bus.onPublish @message
-      Then -> expect(@bus.exchange().publish).toHaveBeenCalledWith @message.data
+      Then -> expect(@bus.exchange().publish).toHaveBeenCalledWith @message
 
   describe '#onConnection', ->
 
@@ -214,13 +142,11 @@ describe 'Server', ->
       @socket = new EventEmitter
       @socket.id = 'me'
     Given -> spyOn(@bus.messages(),['actor']).andCallThrough()
-    Given -> spyOn(@bus.exchange(),['channel']).andCallThrough()
-    Given -> spyOn(@bus.exchange().channel('me'),['on']).andCallThrough()
+    Given -> spyOn(@bus.exchange(),['subscribe']).andCallThrough()
     Given -> spyOn(@socket,['on']).andCallThrough()
     When -> @bus.onConnection @socket
     Then -> expect(@bus.messages().actor).toHaveBeenCalledWith @socket, jasmine.any(Function)
-    And -> expect(@bus.exchange().channel).toHaveBeenCalledWith 'me'
-    And -> expect(@bus.exchange().channel('me').on).toHaveBeenCalledWith 'message', jasmine.any(Function)
+    And -> expect(@bus.exchange().subscribe).toHaveBeenCalledWith 'me', jasmine.any(Function), jasmine.any(Function)
     And -> expect(@socket.on).toHaveBeenCalledWith 'disconnect', jasmine.any(Function)
 
   describe '#onError', ->
@@ -238,7 +164,7 @@ describe 'Server', ->
 
   describe '#onReceivedPubSub', ->
 
-    Given -> @message = new Message
+    Given -> @message = @Message
     Given -> @socket = new EventEmitter
     When -> @bus.onReceivedPubSub @message, @socket
     And -> expect(@socket.emit).toHaveBeenCalledWith @message.data.action, @message.data.actor, @message.data.content, @message.data.target, @message.data.created
@@ -248,7 +174,7 @@ describe 'Server', ->
     Given -> spyOn(@bus,['emit']).andCallThrough()
     Given -> @message = @Message()
     When -> @bus.onReceivedQueue @message
-    Then -> expect(@bus.emit).toHaveBeenCalledWith 'from exchange queue', @message.data
+    Then -> expect(@bus.emit).toHaveBeenCalledWith 'from exchange queue', @message
 
   describe '#onReceivedSocket', ->
 
@@ -335,26 +261,26 @@ describe 'Server', ->
     Given -> @name = 'me'
     Given -> @socket = new EventEmitter
     Given -> @socket.id = 'you'
-    Given -> spyOn(@bus.exchange(),['channel']).andCallThrough()
-    Given -> spyOn(@bus.exchange().channel(@name),['on']).andCallThrough()
     Given -> spyOn(@socket,['on']).andCallThrough()
-    When -> @bus.alias @socket, @name
-    Then -> expect(@bus.exchange().channel).toHaveBeenCalledWith @name
-    And -> expect(@bus.exchange().channel(@name).on).toHaveBeenCalledWith 'message', jasmine.any(Function)
+    Given -> spyOn(@bus.exchange(),['subscribe']).andCallThrough()
+    Given -> spyOn(@bus.exchange(),['addListener']).andCallThrough()
+    Given (done) -> @bus.alias @socket, @name, done
+    Then -> expect(@bus.exchange().subscribe).toHaveBeenCalledWith @name, jasmine.any(Function), jasmine.any(Function)
     And -> expect(@socket.on).toHaveBeenCalledWith 'disconnect', jasmine.any(Function)
+    And -> expect(@bus.exchange().addListener).toHaveBeenCalledWith 'channel ' + @name, jasmine.any(Function)
 
     context 'triggering an event', ->
     
       Given -> @message = @Message()
       Given -> @message.data.target = @name
       Given -> spyOn(@bus,['emit']).andCallThrough()
-      When -> @bus.exchange().channel(@name).emit 'message', @message
+      When -> @bus.exchange().emit 'channel ' + @name, @message
       Then -> expect(@bus.emit).toHaveBeenCalledWith 'from exchange pubsub', @message, @socket
 
     context 'soscket disconnect', ->
 
       When -> @socket.emit 'disconnect'
-      Then -> expect(@bus.exchange().channel(@name).listeners('message').length).toBe 0
+      Then -> expect(@bus.exchange().listeners('channel ' + @name).length).toBe 0
 
   describe '#queue', ->
 
@@ -364,7 +290,7 @@ describe 'Server', ->
 
     context 'queue:Queue', ->
 
-      Given -> @q = new @BusIOExchange.Queue
+      Given -> @q = @Exchange.Queue()
       Given -> @e = @bus.exchange().queue()
       Given -> spyOn(@e,['removeListener']).andCallThrough()
       Given -> spyOn(@q,['addListener']).andCallThrough()
@@ -381,7 +307,7 @@ describe 'Server', ->
 
     context 'pubsub:PubSub', ->
 
-      Given -> @q = new @BusIOExchange.PubSub
+      Given -> @q = new @Exchange.PubSub
       When -> @bus.pubsub(@q)
       Then -> expect(@bus.exchange().pubsub).toHaveBeenCalledWith @q
 
