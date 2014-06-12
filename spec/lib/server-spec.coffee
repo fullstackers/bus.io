@@ -155,10 +155,10 @@ describe 'Server', ->
   describe '#messages', ->
 
     Given -> @messages = new @Messages
-    Given -> spyOn(@messages.publisher(),['on']).andCallThrough()
+    Given -> spyOn(@messages,['on']).andCallThrough()
     When -> @res = @bus.messages(@messages).messages()
     Then -> expect(@res).toEqual @messages
-    And -> expect(@messages.publisher().on).toHaveBeenCalledWith 'message', @bus.onMessage
+    And -> expect(@messages.on).toHaveBeenCalledWith 'message', @bus.onMessage
 
   describe '#io', ->
 
