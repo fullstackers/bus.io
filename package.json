@@ -1,6 +1,6 @@
 {
   "name": "bus.io",
-  "version": "0.0.73-beta",
+  "version": "0.0.74-beta",
   "description": "An express inspired, event-driven framework for building real time distributed applications over socket.io and redis.",
   "main": "index.js",
   "scripts": {
@@ -43,8 +43,6 @@
     "bus.io-exchange": "~0.1.5",
     "bus.io-messages": "^0.1.3",
     "socket.io": "^1.0.2",
-    "node-uuid": "~1.4.1",
-    "extend": "~1.2.1",
     "async": "~0.9.0",
     "bus.io-common": "0.0.2"
   },
