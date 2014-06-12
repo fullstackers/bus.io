@@ -57,7 +57,7 @@ describe 'Server', ->
       target: (a,b,c) -> c null, b
       dettach: ->
       action: ->
-      exchange: -> @ee
+      publisher: -> @ee
       ee: new EventEmitter
       autoPropagate: (v) -> if v? then @v = v else @v 
     @Messages.make = ->
@@ -155,10 +155,10 @@ describe 'Server', ->
   describe '#messages', ->
 
     Given -> @messages = new @Messages
-    Given -> spyOn(@messages.exchange(),['on']).andCallThrough()
+    Given -> spyOn(@messages.publisher(),['on']).andCallThrough()
     When -> @res = @bus.messages(@messages).messages()
     Then -> expect(@res).toEqual @messages
-    And -> expect(@messages.exchange().on).toHaveBeenCalledWith 'message', @bus.onMessage
+    And -> expect(@messages.publisher().on).toHaveBeenCalledWith 'message', @bus.onMessage
 
   describe '#io', ->
 
