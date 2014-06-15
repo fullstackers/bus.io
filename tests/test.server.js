@@ -7,7 +7,7 @@ var Messages = require('bus.io-messages')
 describe('Testing Server.js', function () {
 	// body...
 	var bus = new server();
-	it('It should be instance fof server', function() {
+	it('It should be instance of server', function() {
 		expect(bus).to.be.an.instanceof(server);
 	});
 
