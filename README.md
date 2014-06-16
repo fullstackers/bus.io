@@ -988,7 +988,7 @@ function tracker (emitter) {
   return function (bus) {
     function handler (event) {
       return function (message, next) {
-        emitter.emit(event, message);
+        emitter.emit('track', event, message);
         next();
       }
     }
@@ -997,6 +997,17 @@ function tracker (emitter) {
     bus.on(handler('out'));
   }
 }
+
+receiver.on('track', function (point, message) {
+  this.data = this.data || {};
+  this.data[point] = this.data[point] || {};
+  this.data[point][message.action()] = this.data[point][message.action()] || 0;
+  this.data[point][message.action()] += 1;
+});
+
+var receiver = new require('events').EventEmitter();
+
+bus.use(tracker(receiver));
 
 ```
 
