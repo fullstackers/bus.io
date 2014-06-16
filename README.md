@@ -998,16 +998,24 @@ function tracker (emitter) {
   }
 }
 
-receiver.on('track', function (point, message) {
+var receiver = new require('events').EventEmitter();
+
+report.on('track', function (point, message) {
   this.data = this.data || {};
   this.data[point] = this.data[point] || {};
   this.data[point][message.action()] = this.data[point][message.action()] || 0;
   this.data[point][message.action()] += 1;
 });
 
-var receiver = new require('events').EventEmitter();
+report.on('report', function () {
+  console.log(this.data);
+});
 
-bus.use(tracker(receiver));
+setInterval(function () {
+  report.emit('report');
+}, 1000);
+
+bus.use(tracker(report));
 
 ```
 
