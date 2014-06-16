@@ -974,6 +974,32 @@ bus.autoPropagate(true);
 Auto-propagation is **on** by default.  You may turn it off to prevent unwanted
 messages from going into your `bus`.
 
+### Server#use(fn:Function)
+
+Passes a function that can plugin into bus.io.
+
+In this example we create a middleware that will emit an event
+whenever we handle a message going `in()`, `on()`, or `out()` of
+the bus.
+
+```javascript
+
+function tracker (emitter) {
+  return function (bus) {
+    function handler (event) {
+      return function (message, next) {
+        emitter.emit(event, message);
+        next();
+      }
+    }
+    bus.in(handler('in'));
+    bus.on(handler('on'));
+    bus.on(handler('out'));
+  }
+}
+
+```
+
 ## Components and their Documentation
 
 Bus.io is broken down into other components.
