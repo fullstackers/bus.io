@@ -9,7 +9,7 @@ An [express](https://github.com/visionmedia/express "express") inspired, event-d
 ### The Server
 
 ```javascript
-var express = reuqire('express');
+var express = require('express');
 
 var app = express();
 app.use(express.static(__dirname+'/public'));
