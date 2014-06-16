@@ -330,3 +330,8 @@ describe 'Server', ->
       Then -> expect(@res).toBe @bus
       And -> expect(@bus.messages().autoPropagate).toHaveBeenCalledWith false
 
+  describe '#use (fn:Function)', ->
+
+    Given -> @fn = jasmine.createSpy 'fn'
+    When -> @bus.use @fn
+    Then -> expect(@fn).toHaveBeenCalledWith @bus
