@@ -23,7 +23,6 @@ if (cluster.isMaster) {
  */
 
 var express = require('express');
-var connect = require('connect');
 var session = require('express-session');
 var connectRedis = require('connect-redis')(session);
 var cookieParser = require('cookie-parser');

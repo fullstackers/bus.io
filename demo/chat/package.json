@@ -14,7 +14,6 @@
     "cookie-parser": "^1.1.0",
     "express-session": "^1.2.1",
     "connect-redis": "^2.0.0",
-    "connect": "^2.19.4",
     "socket.io-handshake": "0.0.1"
   }
 }
