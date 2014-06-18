@@ -4,7 +4,7 @@
 
 ![Bus.IO](https://raw.github.com/turbonetix/bus.io/master/logo.png)
 
-An [express](https://github.com/visionmedia/express "express") inspired, event-driven framework for building real time distributed applications over [socket.io](https://github.com/Automattic/socket.io "socket.io") and [redis](https://github.com/antirez/redis "redis").
+An [express](https://github.com/visionmedia/express "express") inspired, event-driven framework for building real time distributed with [socket.io](https://github.com/Automattic/socket.io "socket.io") and [redis](https://github.com/antirez/redis "redis").
 
 ### The Server
 
@@ -34,7 +34,7 @@ var bus = require('bus.io')(server);
 </script>
 ```
 
-# How this works (nutshell)
+# How this works
 
 Each **socket** is associated with one ore more **actors**.  When a socket 
 receives data, the data is encapsulated as a **messsage** and written to a 
@@ -67,9 +67,6 @@ This is a simple server that will process a message and deliver it to the target
 ```javascript
 
 var bus = require('bus.io')(3000);
-bus.on('echo', function (message) {
-  message.deliver(); 
-});
 
 ```
 
@@ -420,7 +417,7 @@ bus.out('chat', function (message, socket, next) {
 
 ```
 
-# API Documentation
+# API
 
 Most methods are chain-able.  Excepts for when you are getting an object.
 
@@ -1029,8 +1026,12 @@ code such as the `Message`, `Builder`, and `Controller` classes.
 the code that will be used to handle messages going into the `Queue` and propagation on the `PubSub`.
 * **[bus.io-messsages](https://github.com/turbonetix/bus.io-messages "bus.io-messages")** contains the
 code that handles listening to a socket.io `Socket` for an `event` and building that into a `message`.
-* **[bus.io-driver](https://github.com/turbonetix/bus.io-driver "bus.io-driver")** **(Needs Implemented)** 
+* **[bus.io-driver](https://github.com/turbonetix/bus.io-driver "bus.io-driver")**
 The driver helps you test driver bus.io in your apps.
+* **[bus.io-monitor](https://github.com/turbonetix/bus.io-monitor "bus.io-monitor")**
+The monitor helps your bus.io apps report on the messages being processed.
+* **[bus.io-session](https://github.com/turbonetix/bus.io-session "bus.io-sesion")**
+The session is used to maintain state for socket connections and multiple servers.
 * **[bus.io-client](https://github.com/turbonetix/bus.io-client "bus.io-client")** **(Needs Implemented)**
 The bus.io client is a wrapper for the socket.io client and it helps you build and process messages.
 
