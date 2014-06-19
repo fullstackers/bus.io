@@ -40,7 +40,7 @@ Each **socket** is associated with one ore more **actors**.  When a socket
 receives data, the data is encapsulated as a **messsage** and written to a 
 **queue**.  Since *all* of your app instances are connected to that queue,
 one of them will receive the message for processing.  After the instance
-handles the message it can be delivered to the **target**. A target is just
+processes the message it can be delivered to the **target**. A target is just
 another actor, so if your actor is associated with multiple sockets.  Each
 socket, regardless of which app instance it is connected to, will receive the 
 data from the message.
@@ -49,9 +49,15 @@ data from the message.
 
 Install node.js (See download and install instructions here: http://nodejs.org/).
 
-Install redis (See download and install instructions http://redis.io/topics/quickstart)
+Install redis (See download and install instructions http://redis.io/topics/quickstart).
 
-Clone this repository
+## For using bus.io
+
+    > npm install bus.io
+
+## For developing bus.io
+
+Clone this repository.
 
     > git clone git@github.com:turbonetix/bus.io.git
 
@@ -59,30 +65,6 @@ cd into the directory and install the dependencies
 
     > cd bus.io
     > npm install && npm shrinkwrap --dev
-
-## Simple Server
-
-This is a simple server that will process a message and deliver it to the target.
-
-```javascript
-
-var bus = require('bus.io')(3000);
-
-```
-
-On the client could do this
-
-```javascript
-
-var socket = require('socket.io-client')('http://localhost:3000');
-socket.on('connect', function () {
-  socket.emit('echo', 'hello');
-});
-socket.on('echo', function (who, what, target, created) {
-  console.log('Socket ' + who + ' said ' + what + ' to ' + target + ' at ' + created);
-});
-
-```
 
 # Examples
 
@@ -113,9 +95,7 @@ You can listen to a server with express.
 ```javascript
 
 var app = require('express')();
-
 var server = require('http').createServer(app).listen(3000, function (err) { });
-
 var bus = require('bus.io')(server);
 
 ```
@@ -125,11 +105,8 @@ You can even sperate out **express**, **socket.io**, and **bus.io**.
 ```javascript
 
 var app = require('express')();
-
 var server = require('http').createServer(app).listen(3000, function (err) { });
-
 var io = require('socket.io')(server);
-
 var bus = require('bus.io')(io);
 
 ```
@@ -245,7 +222,9 @@ calling `addListener('event', function() {})`.
 ### Messages from the Socket going into the Bus
 
 You can specify middleware functions to manipulate the messages incoming from
-the socket before going into the bus
+the socket before going into the bus.
+
+Here we are processing *all* messages.
 
 ```javascript
 
@@ -257,7 +236,7 @@ bus.in(function (message, socket, next) {
 
 ```
 
-Or
+Here we are processing only *chat* messages.
 
 ```javascript
 
@@ -275,10 +254,11 @@ Messages received can be propagated to their target by calling *deliver*.
 Here we are writing out the message contents.  After this handler is executed the 
 message will continue to propagate.
 
+#### Delivering messages
+
 ```javascript
 
 bus.on('some message', function (message) {
-  console.log(message);
   message.deliver();
 }).
 
@@ -294,7 +274,7 @@ bus.on('some message', function (message) {
 
 ```
 
-Or many targets either passing in multiple recipients or calling deliver multiple times.
+Or propagate to  many targets either passing in multiple recipients or calling deliver multiple times.
 
 ```javascript
 
@@ -303,6 +283,8 @@ bus.on('some message', function (message) {
 });
 
 ```
+
+#### Consuming messages
 
 It is possible to consume a message so it won't be delivered to the original recipient and then deliver it
 to other recipients.
@@ -320,19 +302,18 @@ You can respond to messages too.
 ```javascript
 
 bus.on('some message', function (message) {
-
   message.respond({some:'some other content'});
-
 });
 
 ```
+
+#### Creating messages
 
 Or even create new messages.
 
 ```javascript
 
 bus.on('some message', function (message) {
-  
   bus.message({
     actor:'I',
     action:'say',
@@ -341,7 +322,6 @@ bus.on('some message', function (message) {
   }).deliver();
 
   message.deliver();
-
 });
 
 ```
@@ -351,41 +331,46 @@ A chain-able approach.
 ```javascript
 
 bus.on('some message', function (message) {
-  
   bus.message()
     .actor('me')
     .action('say')
     .content('hello')
     .target('you')
     .deliver();
-
 });
 
 ```
 
-Or simply
+Simply put.
 
 ```javascript
 
 bus.on('some message', function (message) {
-  
   bus.message()
     .i('me')
     .did('say')
     .what('hello')
     .to('you');
-
 });
 
 ```
 
-You can write handlers middleware functions too.
-
-This example will uppercase the content for all messages.
+You can add a middleware function that all messages will go through.
 
 ```javascript
 
 bus.on(function (message, next) {
+  message.content(message.content().toUpperCase());
+  next();
+});
+
+```
+
+Try adding middleware for specific events.
+
+```javascript
+
+bus.on('some event', function (message, next) {
   message.content(message.content().toUpperCase());
   next();
 });
@@ -406,7 +391,7 @@ bus.out(function (message, socket, next) {
 
 ```
 
-Or
+Try adding middleware for specific events.
 
 ```javascript
 
@@ -419,40 +404,52 @@ bus.out('chat', function (message, socket, next) {
 
 # API
 
-Most methods are chain-able.  Excepts for when you are getting an object.
-
-e.g.
-
-**Chanin-able**
-
-```javascript
-
-require('bus.io')()
-  .actor(function (socket, cb) { ... })
-  .target(function (socket, params, cb) { ... })
-  .socket(function (socket, bus) { ... })
-  .in(function (message, socket, next) { ... })
-  .on('some event', function (message) { ... })
-  .out(function (message, socket, next) { ... })
-  .listen(3000)
-
-```
-
-**Not chain-able**
-
-This will produce a runtime error.
-
-```javascript
-
-require('bus.io')().actor().target()
-
-```
-
 ## Server
 
-The **Server** is exposed by `require('bus.io')`
+The `Server` connects the `Messages` instance to the `Exchange instance.  It
+also provides ways to bind middleware functions to manipulate messages *incomming* from
+the client to the bus, messages *processing* on the bus, and finally messages *outgoing* from
+the bus to the client.
 
-### Server()
+```javscript
+
+var Bus = require('bus.io');
+
+```
+
+### Server.version
+
+The current version of the software.
+
+```javascript
+
+console.log(bus.version);
+
+```
+
+### Server.Exchange
+
+The `Exchange` class queues and propagates messages to your `Server`.
+See [bus.io-exchange](https://github.com/turbonetix/bus.io-exchange "bus.io-exchange") for more information.
+
+```javascript
+
+var Exchange = require('bus.io').Exchange;
+
+```
+
+### Server.Messages
+
+The `Messages` class is the interface between the `Server` and the client.
+See [bus.io-messages](https://github.com/turbonetix/bus.io-messages "bus.io-messages") for more information.
+
+```javascript
+
+var Messages = require('bus.io').Messages;
+
+```
+
+### Server#()
 
 ```javascript
 
@@ -460,7 +457,7 @@ var bus = require('bus.io')();
 
 ```
 
-### Server(port:Number)
+### Server#(port:Number)
 
 ```javascript
 
@@ -468,7 +465,7 @@ var bus = require('bus.io')(3000);
 
 ```
 
-### Server(io:socket.io#Server)
+### Server#(io:socket.io#Server)
 
 ```javascript
 
@@ -477,7 +474,7 @@ var bus = require('bus.io')(io);
 
 ```
 
-### Server(server:http#Server)
+### Server#(server:http#Server)
 
 ```javascript
 
@@ -691,8 +688,7 @@ bus.in(function (message, socket, next) {
 });
 
 bus.in(function (message, socket, next) {
-  // will not be called because the message will delivered to the target 
-  // as a result of calling deliver!!
+  // will not be called because the message will delivered to the target as a result of calling deliver!!
 });
 
 // consume()
@@ -790,7 +786,7 @@ bus.out('chat', function (message, socket, next) {
   next();
 });
 
-// The output of message.content() will be 'ABC';
+assert.equal(message.content(), 'ABC');
 
 ```
 
@@ -803,17 +799,13 @@ bus.out(function (message, socket, next) {
 });
 
 bus.out(function (message, socket, next) {
-  // will not be called because the message will delivered to the target 
-  // as a result of calling deliver!!
+  // will not be called because the message will delivered to the target as a result of calling deliver!!
 });
-
-// consume()
 
 bus.out(function (message, socket, next) {
   message.consume();
   // the message will just die here
 });
-
 
 ```
 
@@ -909,7 +901,6 @@ var queue = exchange.queue();
 
 ```
 
-
 ### Server#queue(queue:Server.Exchange.Queue)
 
 Sets the `Queue` the `Exchange` uses.
@@ -934,7 +925,6 @@ See **[bus.io-exchange](https://github.com/turbonetix/bus.io-exchange "bus.io-ex
 var pubsub = exchange.pubsub();
 
 ```
-
 
 ### Server#pubsub(pubsub:Server.Exchange.PubSub)
 
@@ -1016,9 +1006,9 @@ bus.use(tracker(report));
 
 ```
 
-## Components and their Documentation
+## Core Components
 
-Bus.io is broken down into other components.
+bus.io is broken down into other components.
 
 * **[bus.io-common](https://github.com/turbonetix/bus.io-common "bus.io-common")** contains all the common
 code such as the `Message`, `Builder`, and `Controller` classes.
@@ -1026,14 +1016,22 @@ code such as the `Message`, `Builder`, and `Controller` classes.
 the code that will be used to handle messages going into the `Queue` and propagation on the `PubSub`.
 * **[bus.io-messsages](https://github.com/turbonetix/bus.io-messages "bus.io-messages")** contains the
 code that handles listening to a socket.io `Socket` for an `event` and building that into a `message`.
+
+## Testing
+
+Test drive your apps with bus.io-driver.
+
 * **[bus.io-driver](https://github.com/turbonetix/bus.io-driver "bus.io-driver")**
 The driver helps you test driver bus.io in your apps.
+
+## Middleware
+
+Middleware components you can use in your apps.
+
 * **[bus.io-monitor](https://github.com/turbonetix/bus.io-monitor "bus.io-monitor")**
 The monitor helps your bus.io apps report on the messages being processed.
 * **[bus.io-session](https://github.com/turbonetix/bus.io-session "bus.io-sesion")**
 The session is used to maintain state for socket connections and multiple servers.
-* **[bus.io-client](https://github.com/turbonetix/bus.io-client "bus.io-client")** **(Needs Implemented)**
-The bus.io client is a wrapper for the socket.io client and it helps you build and process messages.
 
 # Running Tests
 
@@ -1051,59 +1049,19 @@ To run the tests, just run grunt
 
     > grunt spec
 
-# TODO
-
-There are open issues ff you would like to contribute please fork and send me 
-a pull request!
-
 # Working Examples and Demos
 
 You will need a redis server up and running to run the demos at this time
 
-    > node examples/hello.js
+## Examples
 
-# Demos
+    > node examples/echo.js
+
+# #Demos
 
 Demos are under the `/demo` directory.  There is currently a basic chat program.
 
-# Ideas
+# TODO
 
-## Regex support / wild cards for actions
-
-Using regex instead of just string literals.
-
-```javascript
-
-bus.in(/\w+/, function (message, socket, next) {
-  next();
-});
-
-// or
-
-bus.in('user does *', function (message, socket, next) {
-  next();
-});
-
-```
-
-## Message Verification
-
-When messages are published it would be nice if we can validate the message and verify
-the integrity of the message.
-
-## Use socket.io rooms
-
-**This could be implemented using a middleware**
-
-Each actor has their own channel currently.  It maybe nice to utilize that functionality.
-One can broadcast their message to a number of targets
-
-```javascript
-
-bus.on('some event', function (message) {
-  message.deliver('a','b','c','d','e');
-
-});
-
-```
-
+There are open issues ff you would like to contribute please fork and send me 
+a pull request!
