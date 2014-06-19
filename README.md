@@ -919,7 +919,7 @@ You will need a redis server up and running to run the demos at this time
 
     > node examples/echo.js
 
-# #Demos
+## Demos
 
 Demos are under the `/demo` directory.  There is currently a basic chat program.
 
