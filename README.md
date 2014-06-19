@@ -4,7 +4,7 @@
 
 ![Bus.IO](https://raw.github.com/turbonetix/bus.io/master/logo.png)
 
-An [express](https://github.com/visionmedia/express "express") inspired, event-driven framework for building real time distributed apps with [socket.io](https://github.com/Automattic/socket.io "socket.io") and [redis](https://github.com/antirez/redis "redis").
+An [express](https://github.com/visionmedia/express "express") inspired, event-driven framework for building real-time distributed apps with [socket.io](https://github.com/Automattic/socket.io "socket.io") and [redis](https://github.com/antirez/redis "redis").
 
 ### The Server
 
