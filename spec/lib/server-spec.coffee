@@ -41,32 +41,37 @@ describe 'Server', ->
     
     Then -> expect(@Server() instanceof @Server).toBe true
 
+    context '(a:mixed)', ->
+
+      Given -> @mixed = 3000
+      Given -> spyOn(@Server.prototype,['listen'])
+      When -> @res = @Server @mixed
+      Then -> expect(@res.listen).toHaveBeenCalledWith @mixed
+
   describe 'prototype', ->
 
     Given -> @bus = @Server()
 
-    describe '#listen', ->
+    describe '#listen (a:Number)', ->
 
-      context 'with port', ->
+      Given -> @port = 3000
+      Given -> spyOn(@bus.io(),['listen'])
+      When -> @bus.listen @port
+      Then -> expect(@bus.io().listen).toHaveBeenCalled()
 
-        Given -> @port = 3000
-        Given -> spyOn(@bus.io(),['listen'])
-        When -> @bus.listen @port
-        Then -> expect(@bus.io().listen).toHaveBeenCalled()
+    describe '#listen (a:SockeIO.Server)', ->
 
-      context 'socket.io instance', ->
+      Given -> @io = @Sio()
+      Given -> spyOn(@io,['listen'])
+      When -> @bus.listen @io
+      Then -> expect(@bus.io()).toEqual @io
 
-        Given -> @io = @Sio()
-        Given -> spyOn(@io,['listen'])
-        When -> @bus.listen @io
-        Then -> expect(@bus.io()).toEqual @io
+    describe '#listen (a:http.Server)', ->
 
-      xcontext 'with server', ->
-
-        Given -> @server = require('http').createServer (req, res) ->
-        Given -> @spyOn(@server,['on'])
-        When -> @bus.listen @server
-        Then -> expect(@server.on).toHaveBeenCalled()
+      Given -> @server = require('http').createServer (req, res) ->
+      Given -> @spyOn(@server,['on'])
+      When -> @bus.listen @server
+      Then -> expect(@server.on).toHaveBeenCalled()
 
     describe '#message', ->
 
@@ -285,7 +290,7 @@ describe 'Server', ->
         When -> @bus.exchange().emit 'channel ' + @name, @message
         Then -> expect(@bus.emit).toHaveBeenCalledWith 'from exchange pubsub', @message, @socket
 
-      context 'soscket disconnect', ->
+      context 'socket disconnect', ->
 
         When -> @socket.emit 'disconnect'
         Then -> expect(@bus.exchange().listeners('channel ' + @name).length).toBe 0
@@ -296,7 +301,7 @@ describe 'Server', ->
       When -> @bus.queue()
       Then -> expect(@bus.exchange().queue).toHaveBeenCalled()
 
-      context 'queue:Queue', ->
+      context '(queue:Queue)', ->
 
         Given -> @q = @Exchange.Queue()
         Given -> @e = @bus.exchange().queue()
