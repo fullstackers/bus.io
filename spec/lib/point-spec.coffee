@@ -1,6 +1,7 @@
 describe 'Point', ->
 
   Given -> @Point = requireSubject 'lib/point', {}
+  Then -> expect(typeof @Point).toBe 'function'
 
   describe '#(index:Number=0, fn:Function, action:String="say")', ->
 
