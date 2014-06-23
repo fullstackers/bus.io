@@ -4,7 +4,8 @@ Common = require 'bus.io-common'
 Message = Common.Message
 Builder = Common.Builder
 Messages = require 'bus.io-messages'
-Exchange = require('bus.io-exchange')
+Exchange = require 'bus.io-exchange'
+Receiver = require 'bus.io-receiver'
 
 describe 'Server', ->
 
@@ -13,17 +14,9 @@ describe 'Server', ->
   Given -> @Package = version: 1
 
   Given ->
-    @Receiver = class Receiver extends EventEmitter
-      constructor: ->
-        if not (@ instanceof Receiver)
-          return new Receiver
-      use: ->
-      onReceive: ->
-
-  Given ->
-    @Server = requireSubject 'lib/server', {
+    @Server = requireSubject 'lib', {
       'socket.io': Sio
-      './receiver': @Receiver
+      'bus.io-receiver': Receiver
       'bus.io-common': Common
       'bus.io-messages': Messages
       'bus.io-exchange': Exchange
@@ -228,7 +221,7 @@ describe 'Server', ->
     describe '#incomming', ->
 
       Given -> spyOn(@bus,['addListener']).andCallThrough()
-      Given -> @receiver = @Receiver()
+      Given -> @receiver = Receiver()
       Given -> spyOn(@receiver,['addListener']).andCallThrough()
       When -> @res = @bus.incomming(@receiver).incomming()
       Then -> expect(@res).toEqual @receiver
@@ -247,7 +240,7 @@ describe 'Server', ->
     describe '#processing', ->
 
       Given -> spyOn(@bus,['addListener']).andCallThrough()
-      Given -> @receiver = @Receiver()
+      Given -> @receiver = Receiver()
       Given -> spyOn(@receiver,['addListener']).andCallThrough()
       When -> @res = @bus.processing(@receiver).processing()
       Then -> expect(@res).toEqual @receiver
@@ -258,7 +251,7 @@ describe 'Server', ->
     describe '#outgoing', ->
 
       Given -> spyOn(@bus,['addListener']).andCallThrough()
-      Given -> @receiver = @Receiver()
+      Given -> @receiver = Receiver()
       Given -> spyOn(@receiver,['addListener']).andCallThrough()
       When -> @res = @bus.outgoing(@receiver).outgoing()
       Then -> expect(@res).toEqual @receiver
