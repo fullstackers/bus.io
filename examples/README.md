@@ -1,6 +1,6 @@
 #Examples
 
-To run each examples
+To run each example.
 
 ```
 $ ./run

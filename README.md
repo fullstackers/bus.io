@@ -878,6 +878,8 @@ code such as the `Message`, `Builder`, and `Controller` classes.
 the code that will be used to handle messages going into the `Queue` and propagation on the `PubSub`.
 * **[bus.io-messsages](https://github.com/turbonetix/bus.io-messages "bus.io-messages")** contains the
 code that handles listening to a socket.io `Socket` for an `event` and building that into a `message`.
+* **[bus.io-receiver](https://github.com/turbonetix/bus.io-receiver "bus.io-receiver")** contains the
+code that handles receiving messages *in*, *on*, and *out* the bus.
 
 ## Testing
 
