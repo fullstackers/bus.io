@@ -1,15 +1,15 @@
 EventEmitter = require('events').EventEmitter
+Sio = require 'socket.io'
+Common = require 'bus.io-common'
+Message = Common.Message
+Builder = Common.Builder
+Messages = require 'bus.io-messages'
+Exchange = require('bus.io-exchange')
 
 describe 'Server', ->
 
   date = new Date
 
-  Given -> @Common = require('bus.io-common')
-  Given -> @Message = @Common.Message
-  Given -> @Builder = @Common.Builder
-  Given -> @Exchange = require('bus.io-exchange')
-  Given -> @Messages = require('bus.io-messages')
-  Given -> @Sio = require('socket.io')
   Given -> @Package = version: 1
 
   Given ->
@@ -22,20 +22,19 @@ describe 'Server', ->
 
   Given ->
     @Server = requireSubject 'lib/server', {
-      'socket.io': @Sio
-      './builder': @Builder
+      'socket.io': Sio
       './receiver': @Receiver
-      'bus.io-common': @Common
-      'bus.io-messages': @Messages
-      'bus.io-exchange': @Exchange
+      'bus.io-common': Common
+      'bus.io-messages': Messages
+      'bus.io-exchange': Exchange
       './../package.json': @Package
     }
 
   Then -> expect(typeof @Server).toBe 'function'
   And -> expect(@Server.version).toBe @Package.version
   And -> expect(@Server.Server).toBe @Server
-  And -> expect(@Server.Exchange).toBe @Exchange
-  And -> expect(@Server.Messages).toBe @Messages
+  And -> expect(@Server.Exchange).toBe Exchange
+  And -> expect(@Server.Messages).toBe Messages
 
   describe '#', ->
     
@@ -61,7 +60,7 @@ describe 'Server', ->
 
     describe '#listen (a:SockeIO.Server)', ->
 
-      Given -> @io = @Sio()
+      Given -> @io = Sio()
       Given -> spyOn(@io,['listen'])
       When -> @bus.listen @io
       Then -> expect(@bus.io()).toEqual @io
@@ -89,13 +88,13 @@ describe 'Server', ->
 
     describe '#exchange (exchange:Exchange)', ->
 
-      Given -> @exchange = @Exchange()
+      Given -> @exchange = Exchange()
       When -> @res = @bus.exchange(@exchange).exchange()
       Then -> expect(@res).toEqual @exchange
 
     describe '#messages', ->
 
-      Given -> @messages = @Messages()
+      Given -> @messages = Messages()
       Given -> spyOn(@messages,['on']).andCallThrough()
       When -> @res = @bus.messages(@messages).messages()
       Then -> expect(@res).toEqual @messages
@@ -104,7 +103,7 @@ describe 'Server', ->
     describe '#io', ->
 
       Given -> spyOn(@bus.messages(),['attach']).andCallThrough()
-      Given -> @io = @Sio()
+      Given -> @io = Sio()
       When -> @res = @bus.io(@io).io()
       Then -> expect(@res).toEqual @io
       And -> expect(@bus.messages().attach).toHaveBeenCalledWith @io
@@ -136,7 +135,7 @@ describe 'Server', ->
       context 'published', ->
 
         Given ->
-          @message = @Message()
+          @message = Message()
           @message.data.published = date
         Given -> spyOn(@bus.exchange(),['publish']).andCallThrough()
         When -> @bus.onPublish @message
@@ -144,7 +143,7 @@ describe 'Server', ->
 
      context 'unpublished', ->
         
-        Given -> @message = @Message()
+        Given -> @message = Message()
         Given -> spyOn(@bus.exchange(),['publish']).andCallThrough()
         When -> @bus.onPublish @message
         Then -> expect(@bus.exchange().publish).toHaveBeenCalledWith @message
@@ -162,40 +161,41 @@ describe 'Server', ->
       And -> expect(@bus.exchange().subscribe).toHaveBeenCalledWith 'me', jasmine.any(Function), jasmine.any(Function)
       And -> expect(@socket.on).toHaveBeenCalledWith 'disconnect', jasmine.any(Function)
 
-    describe '#onError', ->
+    describe '#onError (err:Error)', ->
       Given -> spyOn(console,['error'])
       When -> @bus.onError 'message'
       Then -> expect(console.error).toHaveBeenCalledWith 'message'
 
-    describe '#onMessage', ->
+    describe '#onMessage (message:Message, socket:Socket)', ->
 
-      Given -> @message = actor: 'me', action: 'say', content: 'hello', target: 'you'
+      Given -> @message = Message()
       Given -> @socket = new EventEmitter
       Given -> spyOn(@bus,['emit']).andCallThrough()
       When -> @bus.onMessage @message, @socket
       Then -> expect(@bus.emit).toHaveBeenCalledWith 'from socket', @message, @socket
 
-    describe '#onReceivedPubSub', ->
+    describe '#onReceivedPubSub (message:Message, socket:Socket)', ->
 
-      Given -> @message = @Message
+      Given -> @message = Message()
       Given -> @socket = new EventEmitter
       When -> @bus.onReceivedPubSub @message, @socket
       And -> expect(@socket.emit).toHaveBeenCalledWith @message.data.action, @message.data.actor, @message.data.content, @message.data.target, @message.data.created
 
-    describe '#onReceivedQueue', ->
+    describe '#onReceivedQueue (message:Message, socket:Socket)', ->
 
       Given -> spyOn(@bus,['emit']).andCallThrough()
-      Given -> @message = @Message()
+      Given -> @message = Message()
       When -> @bus.onReceivedQueue @message
       Then -> expect(@bus.emit).toHaveBeenCalledWith 'from exchange queue', @message
 
-    describe '#onReceivedSocket', ->
+    describe '#onReceivedSocket (message:Message, socket:Socket)', ->
 
-      Given -> @message = actor: 'me', action: 'say', content: 'hello', target: 'you'
-      Given -> @builder = new @Builder
+      Given -> @message = Message()
+      Given -> @socket = new EventEmitter
+      Given -> @builder = Builder()
       Given -> spyOn(@builder,['deliver']).andCallThrough()
       Given -> spyOn(@bus,['message']).andCallThrough().andReturn(@builder)
-      When -> @bus.onReceivedSocket @message
+      When -> @bus.onReceivedSocket @message, @socket
       Then -> expect(@bus.message).toHaveBeenCalled()
       And -> expect(@builder.deliver).toHaveBeenCalled()
 
@@ -205,11 +205,25 @@ describe 'Server', ->
       When -> @bus.actor()
       Then -> expect(@bus.messages().actor).toHaveBeenCalled()
 
+    describe '#actor (fn:Function)', ->
+
+      Given -> @fn = jasmine.createSpy 'fn'
+      Given -> spyOn(@bus.messages(),['actor'])
+      When -> @bus.actor @fn
+      Then -> expect(@bus.messages().actor).toHaveBeenCalledWith @fn
+
     describe '#target', ->
 
       Given -> spyOn(@bus.messages(),['target'])
       When -> @bus.target()
       Then -> expect(@bus.messages().target).toHaveBeenCalled()
+
+    describe '#target (fn:Function)', ->
+
+      Given -> @fn = jasmine.createSpy 'fn'
+      Given -> spyOn(@bus.messages(),['target'])
+      When -> @bus.target @fn
+      Then -> expect(@bus.messages().target).toHaveBeenCalledWith @fn
 
     describe '#incomming', ->
 
@@ -284,7 +298,7 @@ describe 'Server', ->
 
       context 'triggering an event', ->
       
-        Given -> @message = @Message()
+        Given -> @message = Message()
         Given -> @message.data.target = @name
         Given -> spyOn(@bus,['emit']).andCallThrough()
         When -> @bus.exchange().emit 'channel ' + @name, @message
@@ -303,7 +317,7 @@ describe 'Server', ->
 
       context '(queue:Queue)', ->
 
-        Given -> @q = @Exchange.Queue()
+        Given -> @q = Exchange.Queue()
         Given -> @e = @bus.exchange().queue()
         Given -> spyOn(@e,['removeListener']).andCallThrough()
         Given -> spyOn(@q,['addListener']).andCallThrough()
@@ -320,7 +334,7 @@ describe 'Server', ->
 
       context 'pubsub:PubSub', ->
 
-        Given -> @q = new @Exchange.PubSub
+        Given -> @q = Exchange.PubSub()
         When -> @bus.pubsub(@q)
         Then -> expect(@bus.exchange().pubsub).toHaveBeenCalledWith @q
 

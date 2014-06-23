@@ -1,6 +1,6 @@
 {
   "name": "bus.io",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "An express inspired, event-driven framework for building real time distributed applications over socket.io and redis.",
   "main": "index.js",
   "scripts": {
@@ -40,9 +40,9 @@
   },
   "homepage": "https://github.com/turbonetix/bus.io",
   "dependencies": {
-    "bus.io-exchange": "^0.2.1",
-    "bus.io-messages": "^0.1.6",
-    "bus.io-common": "^0.0.5",
+    "bus.io-exchange": "^0.2.2",
+    "bus.io-messages": "^0.1.7",
+    "bus.io-common": "^0.0.7",
     "socket.io": "^1.0.2",
     "async": "~0.9.0",
     "debug": "~1.0.2"
