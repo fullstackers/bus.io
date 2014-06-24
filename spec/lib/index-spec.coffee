@@ -125,21 +125,10 @@ describe 'Server', ->
 
     describe '#onPublish', ->
 
-      context 'published', ->
-
-        Given ->
-          @message = Message()
-          @message.data.published = date
-        Given -> spyOn(@bus.exchange(),['publish']).andCallThrough()
-        When -> @bus.onPublish @message
-        Then -> expect(@bus.exchange().publish).toHaveBeenCalledWith @message, @message.target()
-
-     context 'unpublished', ->
-        
-        Given -> @message = Message()
-        Given -> spyOn(@bus.exchange(),['publish']).andCallThrough()
-        When -> @bus.onPublish @message
-        Then -> expect(@bus.exchange().publish).toHaveBeenCalledWith @message
+      Given -> @message = Message()
+      Given -> spyOn(@bus.exchange(),['publish']).andCallThrough()
+      When -> @bus.onPublish @message
+      Then -> expect(@bus.exchange().publish).toHaveBeenCalledWith @message
 
     describe '#onConnection', ->
 

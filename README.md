@@ -36,8 +36,8 @@ var bus = require('bus.io')(server);
 Each **socket** is associated with one ore more **actors**.  When a socket 
 receives data, the data is encapsulated as a **messsage** and written to a 
 **queue**.  Since *all* of your app instances are connected to that queue,
-one of them will receive the message for processing.  After the instance
-processes the message it can be delivered to the **target**. A target is just
+one of them will receive the `message` for processing.  After the instance
+processes the `message` it can be delivered to the **target**. A target is just
 another actor, so if your actor is associated with multiple sockets.  Each
 socket, regardless of which app instance it is connected to, will receive the 
 data from the message.
@@ -67,7 +67,7 @@ cd into the directory and install the dependencies
 
 ##Getting a bus is simple.
 
-Here we can use an already existing **socket.io** instance.
+Here we can use an already existing **[socket.io](https://github.com/Automattic/socket.io "socket.io")** instance.
 
 ```javascript
 var io = require('socket.io')();
@@ -82,7 +82,7 @@ var bus = require('bus.io')();
 bus.listen(3000);
 ```
 
-You can listen to a server with express.
+You can listen to a server with [express](https://github.com/visionmedia/express "express").
 
 ```javascript
 var app = require('express')();
@@ -90,7 +90,7 @@ var server = require('http').createServer(app).listen(3000, function (err) { });
 var bus = require('bus.io')(server);
 ```
 
-You can even sperate out **express**, **socket.io**, and **bus.io**.
+You can even sperate out **[express](https://github.com/visionmedia/express "express")**, **[socket.io](https://github.com/Automattic/socket.io "socket.io")**, and **bus.io**.
 
 ```javascript
 var app = require('express')();
@@ -99,7 +99,7 @@ var io = require('socket.io')(server);
 var bus = require('bus.io')(io);
 ```
 
-You have the ability to control the underlying socket.io instance
+You have the ability to control the underlying [socket.io](https://github.com/Automattic/socket.io "socket.io") instance
 
 ```javascript
 bus.io().on('connection', function (socket) {
@@ -107,11 +107,21 @@ bus.io().on('connection', function (socket) {
 });
 ```
 
+You can quickly attach a `connection` listener.
+
+```javascript
+bus.socket(function (socket) {
+  socket.on('some thing', function () {
+    socket.emit('some thing', new Date());
+  });
+});
+```
+
 ## Configuration
 
 ### Setting the Actor
 
-You can bind custom **socket.io** handlers to each **socket** when it is connected.
+You can bind custom **[socket.io](https://github.com/Automattic/socket.io "socket.io")** handlers to each **socket** when it is connected.
 
 ```javascript
 bus.socket(function (socket, bus) {
