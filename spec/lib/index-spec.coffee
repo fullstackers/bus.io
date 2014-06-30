@@ -156,12 +156,30 @@ describe 'Server', ->
       When -> @bus.onMessage @message, @socket
       Then -> expect(@bus.emit).toHaveBeenCalledWith 'from socket', @message, @socket
 
+    describe '#onMessage (message:Message, socket:Socket)', ->
+
+      Given -> @message = Message().action('_flag')
+      Given -> @socket = new EventEmitter
+      Given -> spyOn(@socket,['emit']).andCallThrough()
+      When -> @bus.onMessage @message, @socket
+      Then -> expect(@socket.emit).toHaveBeenCalledWith '_flag', 1
+
     describe '#onReceivedPubSub (message:Message, socket:Socket)', ->
 
       Given -> @message = Message()
       Given -> @socket = new EventEmitter
+      Given -> spyOn(@socket,['emit']).andCallThrough()
       When -> @bus.onReceivedPubSub @message, @socket
-      And -> expect(@socket.emit).toHaveBeenCalledWith @message.data.action, @message.data.actor, @message.data.content, @message.data.target, @message.data.created
+      Then -> expect(@socket.emit).toHaveBeenCalledWith @message.data.action, @message.data.actor, @message.data.target, @message.data.created
+
+    describe '#onReceivedPubSub (message:Message, socket:Socket) with flag', ->
+
+      Given -> @message = Message()
+      Given -> @socket = new EventEmitter
+      Given -> @socket._flag = 1
+      Given -> spyOn(@socket,['emit']).andCallThrough()
+      When -> @bus.onReceivedPubSub @message, @socket
+      Then -> expect(@socket.emit).toHaveBeenCalledWith @message.data.action, @message
 
     describe '#onReceivedQueue (message:Message, socket:Socket)', ->
 
