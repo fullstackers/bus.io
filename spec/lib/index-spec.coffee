@@ -43,7 +43,7 @@ describe 'Server', ->
 
     context '(a:Http.Server,b:Object)', ->
 
-      Given -> @server = Http.Server()
+      Given -> @server = Http.Server (req, res) ->
       Given -> @opts = {}
       Given -> spyOn(@Server.prototype,['listen']).andCallThrough()
       Given -> spyOn(@Server.prototype,'io')
@@ -57,10 +57,10 @@ describe 'Server', ->
 
     describe '#listen (a:Number)', ->
 
-      Given -> @port = 3000
-      Given -> spyOn(@bus.io(),['listen'])
+      Given -> @port = 3001
+      Given -> spyOn(@bus, 'io')
       When -> @bus.listen @port
-      Then -> expect(@bus.io().listen).toHaveBeenCalled()
+      Then -> expect(@bus.io).toHaveBeenCalledWith jasmine.any(Sio)
 
     describe '#listen (a:SockeIO.Server)', ->
 
@@ -72,8 +72,8 @@ describe 'Server', ->
     describe '#listen (a:http.Server,b:Options)', ->
 
       Given -> @opts = {}
-      Given -> @server = require('http').createServer (req, res) ->
-      Given -> @spyOn(@server,['on'])
+      Given -> @server = Http.Server (req, res) ->
+      Given -> spyOn(@server,['on'])
       When -> @bus.listen @server, @opts
       Then -> expect(@server.on).toHaveBeenCalled()
 
