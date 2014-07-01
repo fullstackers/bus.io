@@ -2,7 +2,7 @@
 <script>
   var client = io.connect();
   client.on('connect', function () {
-    client.message().action('echo').content('Hello, Bus.io!');
+    client.message().action('echo').content('Hello, Bus.io!').deliver();
   });
   client.on('echo', function (msg) {
     document.body.innerHTML += '<h1>'+msg.content()+'</h1>';
