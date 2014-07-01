@@ -36,14 +36,15 @@ bus.listen(8080);
 // do some client stuff
 
 setTimeout(function () {
-  var client = require('socket.io-client')('http://localhost:8080');
+  var client = require('bus.io-client')('http://localhost:8080');
   client.on('connect', function () {
-    client.on('say', function (who, what) {
-      console.log(who + ' echo ' + what);
-      ok(who,'Zion');
-      ok(what,'hi');
+    client.on('say', function (msg) {
+      console.log(msg.actor() + ' echo ' + msg.content());
+      ok(msg.actor(),'Zion');
+      ok(msg.content(),'hi');
       process.exit();
     });
+    //using emit instead of message()
     client.emit('say','hello', 'Zion');
   });
 },1000);

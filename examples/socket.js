@@ -25,14 +25,14 @@ bus.out(function (message, socket, next) {
 
 setTimeout(function () {
 
-  var socket = require('socket.io-client')('http://localhost:3000');
+  var socket = require('bus.io-client')('http://localhost:3000');
   socket.on('connect', function () {
     socket.emit('shout', 'hello', 'zion');
   });
-  socket.on('shout', function (who, what) {
-    console.log(who + ' shout ' + what);
-    ok(who,'zion');
-    ok(what,'hello!!!!!!');
+  socket.on('shout', function (msg) {
+    console.log(msg.actor() + ' shout ' + msg.content());
+    ok(msg.actor(),'zion');
+    ok(msg.content(),'hello!!!!!!');
     process.exit();
   });
 

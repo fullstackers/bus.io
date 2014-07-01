@@ -33,14 +33,14 @@ bus.out('test', function (message, socket, next) {
 });
 
 setTimeout(function () {
-  var client = require('socket.io-client')('http://localhost:8080');
+  var client = require('bus.io-client')('http://localhost:8080');
   client.on('connect', function () {
     client.emit('test', '');
   });
-  client.on('test', function (who, what) {
-    console.log('test', who + ' knows their ' + what);
-    ok(who, '1st graders');
-    ok(what, 'ABC\'s');
+  client.on('test', function (msg) {
+    console.log('test', msg.actor() + ' knows their ' + msg.content());
+    ok(msg.actor(), '1st graders');
+    ok(msg.content(), 'ABC\'s');
     process.exit();
   })
 

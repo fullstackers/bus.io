@@ -8,14 +8,14 @@ bus.on('say', function (message) {
 });
 
 setTimeout(function () {
-  var client = require('socket.io-client')('http://localhost:8080');
+  var client = require('bus.io-client')('http://localhost:8080');
   client.on('connect', function () {
-    client.emit('say','hello');
+    client.message().action('say').content('hello').deliver();
   });
-  client.on('consumed', function (who, what) {
-    console.log(who + ' consumed ' + what);
-    ok(who, 'server');
-    ok(what, 'your message');
+  client.on('consumed', function (msg) {
+    console.log(msg.actor() + ' consumed ' + msg.content());
+    ok(msg.actor(), 'server');
+    ok(msg.content(), 'your message');
     process.exit();
   });
 },1000);

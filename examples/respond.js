@@ -7,15 +7,15 @@ bus.on('greet', function (message) {
 });
 
 setTimeout(function () {
-  var client = require('socket.io-client')('http://localhost:8080');
+  var client = require('bus.io-client')('http://localhost:8080');
 
   var i = 0, msgs = [];
 
   client.on('connect', function () {
     
-    client.on('greet', function (who, what) {
-      console.log(what);
-      msgs.push(what);
+    client.on('greet', function (msg) {
+      console.log(msg.content());
+      msgs.push(msg.content());
       if (++i > 1) {
         ok(msgs[0],'how are you?');
         ok(msgs[1],'I am fine');

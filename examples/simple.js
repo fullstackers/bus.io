@@ -4,6 +4,7 @@ var bus = require('./..')(8080);
 
 setTimeout(function () {
 
+  // just using socket.io client instead of bus.io client
   var client = require('socket.io-client')('http://localhost:8080');
   client.on('connect', function () {
     client.once('echo', function (who, what) {

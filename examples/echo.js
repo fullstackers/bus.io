@@ -2,13 +2,13 @@ var ok = require('assert').equal;
 var bus = require('./..')(8080);
 
 setTimeout(function () {
-  var client = require('socket.io-client')('http://localhost:8080');
+  var client = require('bus.io-client')('http://localhost:8080');
   client.on('connect', function () {
-    client.once('echo', function (who, what) {
-      console.log(who + ' says ' + what);
-      ok(what,'hello');
+    client.once('echo', function (msg) {
+      console.log(msg.action() + ' says ' + msg.content());
+      ok(msg.content(),'hello');
       process.exit();
     });
-    client.emit('echo','hello');
+    client.message().action('echo').content('hello').deliver();
   });
 },1000);
