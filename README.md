@@ -31,7 +31,7 @@ var bus = require('bus.io')(server);
 </script>
 ```
 
-### Features
+# Features
 
 * An event-driven architecture provides scalability.
 * Socket events are encapsulate as `Message` objects.
