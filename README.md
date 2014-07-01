@@ -602,6 +602,9 @@ the code that will be used to handle messages going into the `Queue` and propaga
 code that handles listening to a socket.io `Socket` for an `event` and building that into a `message`.
 * **[bus.io-receiver](https://github.com/turbonetix/bus.io-receiver "bus.io-receiver")** contains the
 code that handles receiving messages *in*, *on*, and *out* the bus.
+* **[bus.io-client](https://github.com/turbonetix/bus.io-client "bus.io-client")** is a wrapper for
+[socket.io-client](https://github.com/Automattic/socket.io-client "socket.io-client") that provides the
+[bus.io-common](https://github.com/turbonetix/bus.io-common "bus.io-common") interface on the client.
 
 ## Testing
 
