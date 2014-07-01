@@ -1,3 +1,4 @@
+Http = require 'http'
 EventEmitter = require('events').EventEmitter
 Sio = require 'socket.io'
 Common = require 'bus.io-common'
@@ -40,6 +41,16 @@ describe 'Server', ->
       When -> @res = @Server @mixed
       Then -> expect(@res.listen).toHaveBeenCalledWith @mixed
 
+    context.only '(a:Http.Server,b:Object)', ->
+
+      Given -> @server = Http.Server()
+      Given -> @opts = {}
+      Given -> spyOn(@Server.prototype,['listen']).andCallThrough()
+      Given -> spyOn(@Server.prototype,'io')
+      When -> @res = @Server @server, @opts
+      Then -> expect(@res.listen).toHaveBeenCalledWith @server, @opts
+      And -> expect(@res.io).toHaveBeenCalledWith jasmine.any(Object)
+
   describe 'prototype', ->
 
     Given -> @bus = @Server()
@@ -58,11 +69,12 @@ describe 'Server', ->
       When -> @bus.listen @io
       Then -> expect(@bus.io()).toEqual @io
 
-    describe '#listen (a:http.Server)', ->
+    describe '#listen (a:http.Server,b:Options)', ->
 
+      Given -> @opts = {}
       Given -> @server = require('http').createServer (req, res) ->
       Given -> @spyOn(@server,['on'])
-      When -> @bus.listen @server
+      When -> @bus.listen @server, @opts
       Then -> expect(@server.on).toHaveBeenCalled()
 
     describe '#message', ->
