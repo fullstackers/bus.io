@@ -19,17 +19,25 @@ var bus = require('bus.io')(server);
 ### The Client
 
 ```html
-<script type="text/javascript" src="/socket.io/socket.io"></script>
+<script type="text/javascript" src="/bus.io/bus.io"></script>
 <script type="text/javascript">
   var client = io.connect();
   client.on('connect', function () {
-    client.emit('echo', 'Hello, World!');
+    client.message().action('echo').content('Hello, World!');
   });
-  client.on('echo', function (who, what) {
-    console.log(what);
+  client.on('echo', function (msg) {
+    console.log(msg.content());
   });
 </script>
 ```
+
+### Features
+
+* An event-driven architecture provides scalability.
+* Socket events are encapsulate as `Message` objects.
+* `Message` objects are evenly distributed over all running bus.io app processes.
+* Standard interface for creating, handling, propagating, and consuming messages.
+* Sockets are associated to *actors* because messages are delivered to actors.
 
 # How this works
 
