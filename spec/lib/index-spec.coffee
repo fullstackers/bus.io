@@ -39,9 +39,9 @@ describe 'Server', ->
       Given -> @mixed = 3000
       Given -> spyOn(@Server.prototype,['listen'])
       When -> @res = @Server @mixed
-      Then -> expect(@res.listen).toHaveBeenCalledWith @mixed
+      Then -> expect(@res.listen).toHaveBeenCalledWith @mixed, undefined
 
-    context.only '(a:Http.Server,b:Object)', ->
+    context '(a:Http.Server,b:Object)', ->
 
       Given -> @server = Http.Server()
       Given -> @opts = {}
