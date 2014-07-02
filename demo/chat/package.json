@@ -10,10 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.4.1",
-    "bus.io": "*",
-    "cookie-parser": "^1.1.0",
     "express-session": "^1.2.1",
-    "connect-redis": "^2.0.0",
+    "bus.io": "*",
     "bus.io-session": "*"
   }
 }

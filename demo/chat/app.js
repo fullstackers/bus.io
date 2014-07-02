@@ -24,15 +24,10 @@ if (cluster.isMaster) {
 
 var express = require('express');
 var expressSession = require('express-session');
-var connectRedis = require('connect-redis')(expressSession);
-var cookieParser = require('cookie-parser');
-var config = { session: { secret:'secret', key: 'bus.io', store: new connectRedis() } };
-var session = require('bus.io-session');
+var session = require('bus.io-session')();
 
 var app = express();
-
-app.use(cookieParser());
-app.use(expressSession(config.session));
+app.use(expressSession(session.config));
 app.use(express.static(__dirname + '/public/'));
 
 /*
@@ -46,7 +41,6 @@ var server = require('http').Server(app).listen(process.env.PORT || 3000);
  */
 
 var bus = require('bus.io')(server);
-
 bus.addListener('error', function () {
   console.error(Array.prototype.slice.call(arguments));
 });
@@ -54,7 +48,8 @@ bus.addListener('error', function () {
 /*
  * Hook up our express session to socket.io
  */
-bus.use(session(config.session));
+
+bus.use(session);
 
 /*
  * We want our socket to receive messages when sent to everyone
