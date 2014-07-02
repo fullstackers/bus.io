@@ -321,7 +321,7 @@ describe 'Server', ->
         When -> @socket.emit 'disconnect'
         Then -> expect(@bus.exchange().listeners('channel ' + @name).length).toBe 0
 
-    describe.only '#unalias', ->
+    describe '#unalias', ->
 
       Given -> @name = 'me'
       Given -> @socket = new EventEmitter
