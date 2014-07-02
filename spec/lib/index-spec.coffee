@@ -321,6 +321,32 @@ describe 'Server', ->
         When -> @socket.emit 'disconnect'
         Then -> expect(@bus.exchange().listeners('channel ' + @name).length).toBe 0
 
+    describe.only '#unalias', ->
+
+      Given -> @name = 'me'
+      Given -> @socket = new EventEmitter
+      Given -> @socket.id = 'you'
+      Given -> @
+      Given -> spyOn(@socket,['on']).andCallThrough()
+      Given -> spyOn(@bus.exchange(),['unsubscribe']).andCallThrough()
+      Given -> spyOn(@bus.exchange(),['removeListener']).andCallThrough()
+      Given (done) -> @bus.alias @socket, @name, => @bus.unalias @socket, @name, done
+      Then -> expect(@bus.exchange().unsubscribe).toHaveBeenCalledWith @name, jasmine.any(Function), jasmine.any(Function)
+      And -> expect(@bus.exchange().removeListener).toHaveBeenCalledWith 'channel ' + @name, jasmine.any(Function)
+
+      context 'triggering an event', ->
+      
+        Given -> @message = Message()
+        Given -> @message.data.target = @name
+        Given -> spyOn(@bus,['emit']).andCallThrough()
+        When -> @bus.exchange().emit 'channel ' + @name, @message
+        Then -> expect(@bus.emit).not.toHaveBeenCalledWith 'from exchange pubsub', @message, @socket
+
+      context 'socket disconnect', ->
+
+        When -> @socket.emit 'disconnect'
+        Then -> expect(@bus.exchange().listeners('channel ' + @name).length).toBe 0
+
     describe '#queue', ->
 
       Given -> spyOn(@bus.exchange(),['queue']).andCallThrough()

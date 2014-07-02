@@ -258,6 +258,24 @@ bus.socket(function (socket, bus) {
 });
 ```
 
+### Server#unalias(socket:Object, name:String)
+
+With **unalias** your **actor** will no longer receive messages whenever their **alias**
+receives one.  This is useful if you want to control messages going to your socket.
+
+```javascript
+bus.unalias(socket, 'nathan');
+```
+
+An example is if you do not want to listen to messages from another user.
+
+```javascript
+bus.in('stop following', function (msg, sock, next) {
+  bus.unalias(sock, msg.target());
+  next();
+});
+```
+
 ### Server#in(fn#Function,...)
 
 The **in** method will use the passed function(s) when a message is received 
