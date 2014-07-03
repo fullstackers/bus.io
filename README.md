@@ -19,7 +19,7 @@ var bus = require('bus.io')(server);
 ### The Client
 
 ```html
-<script type="text/javascript" src="/bus.io/bus.io"></script>
+<script type="text/javascript" src="/bus.io/bus.io.js"></script>
 <script type="text/javascript">
   var client = io.connect();
   client.on('connect', function () {
