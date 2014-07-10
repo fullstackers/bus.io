@@ -24,7 +24,7 @@ if (cluster.isMaster) {
 
 var express = require('express');
 var expressSession = require('express-session');
-var session = require('bus.io-session')();
+var session = require('bus.io-session')({key:'bus.io.chat.demo'});
 
 var app = express();
 app.use(expressSession(session.config));
@@ -55,7 +55,7 @@ bus.use(session);
  * We want our socket to receive messages when sent to everyone
  */
 
-bus.socket(function (socket, bus) {
+bus.socket(function (socket) {
   bus.alias(socket, 'everyone');
 });
 
@@ -63,7 +63,7 @@ bus.socket(function (socket, bus) {
  * We want our socket to trigger a "left" message when disconnected
  */
 
-bus.socket(function (socket, bus) {
+bus.socket(function (socket) {
   socket.on('disconnect', function () {
     bus.message().i(socket.handshake.session.name).did('left').what('here').to('everyone');
   });
