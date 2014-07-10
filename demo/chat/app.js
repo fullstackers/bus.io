@@ -24,7 +24,7 @@ if (cluster.isMaster) {
 
 var express = require('express');
 var expressSession = require('express-session');
-var session = require('bus.io-session')();
+var session = require('bus.io-session')({key:'bus.io.chat.demo'});
 
 var app = express();
 app.use(expressSession(session.config));
