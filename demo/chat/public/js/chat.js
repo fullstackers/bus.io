@@ -41,7 +41,13 @@ $(function () {
   });
 
   socket.on('disconnect', function () {
-    $('#connection').removeClass('connected').addClass('disconnected').html('disconnected').show();
+    if (!me) {
+      $('#connection').removeClass('connected').addClass('disconnected').html('disconnected').show();
+    }
+    else {
+      $('#name').val(me);
+      setName();
+    }
   });
 
   socket.on('set name', function (who, what, to, when) {
