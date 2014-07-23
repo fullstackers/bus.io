@@ -448,6 +448,18 @@ bus.listen(require('http').createServer(function (req, res) { }));
 bus.listen(require('socket.io')());
 ```
 
+### Server#deliver(data:Mixed)
+
+This method is a convenient way to deliver a message.
+
+```javascript
+bus.send({actor:'I', action:'say', content:'hello', 'you'});
+```
+
+### Server#msg(data:Mixed)
+
+This is an alias to `message()`.
+
 ### Server#message(data:Mixed)
 
 This will create you an object for building a message that you can deliver.  The
