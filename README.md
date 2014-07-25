@@ -23,7 +23,7 @@ var bus = require('bus.io')(server);
 <script type="text/javascript">
   var client = io.connect();
   client.on('connect', function () {
-    client.message().action('echo').content('Hello, World!').deliver();
+    client.emit('echo', 'Hello, World!');
   });
   client.on('echo', function (msg) {
     console.log(msg.content());
