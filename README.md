@@ -453,7 +453,7 @@ bus.listen(require('socket.io')());
 This method is a convenient way to deliver a message.
 
 ```javascript
-bus.send({actor:'I', action:'say', content:'hello', 'you'});
+bus.deliver({actor:'I', action:'say', content:'hello', 'you'});
 ```
 
 ### Server#msg(data:Mixed)
