@@ -23,7 +23,7 @@ var bus = require('bus.io')(server);
 <script type="text/javascript">
   var client = io.connect();
   client.on('connect', function () {
-    client.message().action('echo').content('Hello, World!').deliver();
+    client.emit('echo', 'Hello, World!');
   });
   client.on('echo', function (msg) {
     console.log(msg.content());
@@ -447,6 +447,18 @@ bus.listen(require('http').createServer(function (req, res) { }));
 
 bus.listen(require('socket.io')());
 ```
+
+### Server#deliver(data:Mixed)
+
+This method is a convenient way to deliver a message.
+
+```javascript
+bus.deliver({actor:'I', action:'say', content:'hello', 'you'});
+```
+
+### Server#msg(data:Mixed)
+
+This is an alias to `message()`.
 
 ### Server#message(data:Mixed)
 

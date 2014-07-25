@@ -77,6 +77,10 @@ describe 'Server', ->
       When -> @bus.listen @server, @opts
       Then -> expect(@server.on).toHaveBeenCalled()
 
+    describe '#msg', ->
+
+      Then -> expect(@bus.msg).toEqual @bus.message
+
     describe '#message', ->
 
       Given ->
@@ -400,3 +404,13 @@ describe 'Server', ->
       Given -> @fn = jasmine.createSpy 'fn'
       When -> @bus.use @fn
       Then -> expect(@fn).toHaveBeenCalledWith @bus
+
+    describe '#deliver (data:mixed)', ->
+
+      Given -> @data = actor:'I', action:'said', content:'hello', to:'You'
+      Given -> @msg = Builder @data
+      Given -> spyOn(@bus, 'msg').andReturn @msg
+      Given -> spyOn(@msg, 'deliver')
+      When -> @bus.deliver @data
+      Then -> expect(@bus.msg).toHaveBeenCalledWith @data
+      And -> expect(@msg.deliver).toHaveBeenCalled()
