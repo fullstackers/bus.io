@@ -34,7 +34,7 @@ var bus = require('bus.io')(server);
 # Features
 
 * An event-driven architecture provides scalability.
-* Socket events are encapsulate as `Message` objects.
+* Socket events are encapsulated as `Message` objects.
 * `Message` objects are evenly distributed over all running bus.io app processes.
 * Standard interface for creating, handling, propagating, and consuming messages.
 * Sockets are associated to *actors* because messages are delivered to actors.
