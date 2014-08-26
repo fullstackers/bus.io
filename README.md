@@ -322,10 +322,15 @@ bus.in('chat', function (msg, sock, next) {
   next();
 });
 
+bus.in(function (err, msg, sock, next) {
+  console.error(err);
+  msg.errored(err);
+});
+
 // The output of msg.content() will be 'ABC';
 ```
 
-You can control propagation with `consume()`, `deliver()`, `respond()` as well.
+You can control propagation with `consume()`, `deliver()`, `respond()`, `errored()` as well.
 
 ```javascript
 bus.in(function (msg, sock, next) {
@@ -359,7 +364,7 @@ invoke the next handler.  Or you may call `msg.deliver()`, `msg.respond()`,
 or `msg.consumed()` to control the message's propagation.
 
 ```javascript
-bus.on('some event', function (msg, next) {
+bus.on('some*', function (msg, next) {
   // do something!
   next();
 });
@@ -417,10 +422,15 @@ bus.out('chat', function (msg, sock, next) {
   next();
 });
 
+bus.out(function (err, msg, sock, next) {
+  console.error(err);
+  msg.errored(err);
+});
+
 assert.equal(msg.content(), 'ABC');
 ```
 
-You can control propagation with `consume()`, `deliver()`, `respond()` as well.
+You can control propagation with `consume()`, `deliver()`, `respond()`, `errored()` as well.
 
 ```javascript
 bus.out(function (msg, sock, next) {
@@ -562,7 +572,7 @@ bus.pubsub(pubsub);
 Instead of having to write a function to deliver a message like this.
 
 ```javascript
-bus.on('some message', function (msg) {
+bus.on(/some message/, function (msg) {
   msg.deliver();
 });
 ```
