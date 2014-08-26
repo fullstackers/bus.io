@@ -18,6 +18,8 @@ if (cluster.isMaster) {
  * We are a child process now
  */
 
+var debug = require('debug')('chat');
+
 /*
  * Get Express up and running
  */
@@ -55,17 +57,21 @@ bus.use(session);
  * We want our socket to receive messages when sent to everyone
  */
 
-bus.socket(function (socket) {
-  bus.alias(socket, 'everyone');
+bus.socket(function (sock) {
+  bus.alias(sock, 'everyone');
 });
 
 /*
  * We want our socket to trigger a "left" message when disconnected
  */
 
-bus.socket(function (socket) {
-  socket.on('disconnect', function () {
-    bus.message().i(socket.handshake.session.name).did('left').what('here').to('everyone');
+bus.socket(function (sock) {
+  sock.on('disconnect', function () {
+    bus.deliver({
+      actor:sock.handshake.session.name,
+      action:'left',
+      target:'everyone'
+    })
   });
 });
 
@@ -74,8 +80,8 @@ bus.socket(function (socket) {
  * socket.id. We are handling this message before it gets on the Bus.
  */
 
-bus.in(function (message, socket, next) {
-  message.actor(socket.handshake.session.name || socket.id);
+bus.in(function (msg, sock, next) {
+  msg.actor(sock.handshake.session.name || sock.id);
   next();
 });
 
@@ -85,35 +91,46 @@ bus.in(function (message, socket, next) {
  * before it gets on the Bus.
  */
 
-bus.in('set name', function (message, socket) {
-  if (message.content().length && message.content().length > 32) {
-    message.content(message.content().slice(0,32));
+bus.in('set name', function (msg, sock, next) {
+  if (msg.content().length && msg.content().length > 32) {
+    msg.content(msg.content().slice(0,32));
   }
-  socket.handshake.session.name = message.content();
-  socket.handshake.session.save();
-  message.deliver();
+  sock.handshake.session.name = msg.content();
+  sock.handshake.session.save(function (err) {
+    debug('set name session save %s', err);
+    if (err) return next(err);
+    next();
+  });
 });
-
-/*
- * Consume the message and send to everyone that you joined
- */
-
-bus.on('set name', function (message) {
-  message.consume().deliver('everyone');
-});
-
 
 /*
  * When we receive a "post" event from the socket, cap the content length to
  * 128 characters.  We are handling this message before it gets on the Bus.
  */
 
-bus.in('post', function (message, socket) {
-  message.target(message.content().pop());
-  if (message.content().length && message.content().length > 128) {
-    message.content(message.content().slice(0,125)+'...');
+bus.in('post', function (msg, sock) {
+  msg.target(msg.content().pop());
+  if (msg.content().length && msg.content().length > 128) {
+    msg.content(msg.content().slice(0,125)+'...');
   }
-  message.deliver();
+  msg.deliver();
+});
+
+/*
+ * This will capture errors so we can handle them accordingly
+ */
+
+bus.in(function (err, msg, sock, next) {
+  console.error(err);
+  next();
+});
+
+/*
+ * Consume the message and send to everyone that you joined
+ */
+
+bus.on('set name', function (msg) {
+  msg.consume().deliver('everyone');
 });
 
 /*
@@ -122,9 +139,9 @@ bus.in('post', function (message, socket) {
  * the bus and on its way to the socket.
  */
 
-bus.out('set name', function (message, socket, next) {
-  if (socket.handshake.session.name === message.actor()) {
-    bus.alias(socket, message.content());
+bus.out('set name', function (msg, sock, next) {
+  if (sock.handshake.session.name === msg.actor()) {
+    bus.alias(sock, msg.content());
   }
   next();
 });
