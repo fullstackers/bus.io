@@ -34,6 +34,12 @@ describe 'Server', ->
     
     Then -> expect(@Server() instanceof @Server).toBe true
 
+    context 'calls should return default instance', ->
+
+      Given -> @a = @Server()
+      Given -> @b = @Server()
+      Then -> expect(@a).toBe @b
+
     context '(a:mixed)', ->
 
       Given -> @mixed = 3000
