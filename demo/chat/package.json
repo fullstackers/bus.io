@@ -12,6 +12,7 @@
     "express": "^4.4.1",
     "express-session": "^1.2.1",
     "bus.io": "*",
-    "bus.io-session": "*"
+    "bus.io-session": "*",
+    "debug": "^1.0.4"
   }
 }

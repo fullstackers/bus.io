@@ -38,6 +38,7 @@ var bus = require('bus.io')(server);
 * `Message` objects are evenly distributed over all running bus.io app processes.
 * Standard interface for creating, handling, propagating, and consuming messages.
 * Sockets are associated to *actors* because messages are delivered to actors.
+* Express like routing and error handling.
 
 # How this works
 
@@ -147,12 +148,12 @@ var bus = require('bus.io')(server)
 ### Server#actor(fn:Function)
 
 Sets the function that will grab the actor.  The default implementation 
-will use the `socket.id`.  This method is called when the socket connection is 
+will use the `sock.id`.  This method is called when the socket connection is 
 established.
 
 ```javascript 
-bus.actor(function (socket, cb) {
-  cb(null, socket.id);
+bus.actor(function (sock, cb) {
+  cb(null, sock.id);
 });
 ```
 The callback `cb` takes two parameters `err` and `actor`.
@@ -161,8 +162,8 @@ You may pass an `Error` object for the first argument if you encounter an error
 or would like to trigger one.
 
 ```javascript
-bus.actor(function (socket, cb) {
-  socket.get('user', function (err, user) {
+bus.actor(function (sock, cb) {
+  sock.get('user', function (err, user) {
     if (err) return cb(err);
     if (!user) return cb(new Error('Need to login'));
     return cb(null, user.name);
@@ -181,19 +182,19 @@ var actorFn = bus.actor();
 ### Server#target(fn:Function)
 
 Sets the function that will grab the target from the request.  The 
-default implementation will use the `socket.id`.  This method is called for each
-request from the `socket`.
+default implementation will use the `sock.id`.  This method is called for each
+request from the `sock`.
 
 The client would emit this.
 
 ```javascript
-socket.emit('shout', 'hello', 'You');
+sock.emit('shout', 'hello', 'You');
 ```
 
 We would like `"You"` to be the *actor*.
 
 ```javascript
-bus.target(function (socket, params, cb) {
+bus.target(function (sock, params, cb) {
   cb(null, params.pop());
 });
 ```
@@ -201,7 +202,7 @@ bus.target(function (socket, params, cb) {
 If you encounter an error you can also pass one along.
 
 ```javascript
-bus.target(function (socket, params, cb) {
+bus.target(function (sock, params, cb) {
   if (params.length === 0) {
     cb(new Error('You are you talking to?!'));
   }
@@ -221,7 +222,7 @@ Gets the method that will grab the target from the request.
 var targetFn = bus.target();
 ```
 
-### Server#socket(socket:Object)
+### Server#socket(sock:Object)
 
 This method will allow you to bind a function to the `connection` event that 
 socket.io supports.
@@ -231,40 +232,40 @@ e.g.
 We would like to tell the client `"Hello"` when they connect.
 
 ```javascript
-bus.socket(function (socket, bus) {
-  socket.emit('greet', 'Hello');
+bus.socket(function (sock, bus) {
+  sock.emit('greet', 'Hello');
 });
 ```
 
-### Server#alias(socket:Object, name:String)
+### Server#alias(sock:Object, name:String)
 
 With **alias** your **actor** will receive messages whenever their **alias**
 receives one.  This is useful if you want to associate a socket to a logged in 
 user.
 
 ```javascript
-bus.alias(socket, 'nathan');
+bus.alias(sock, 'nathan');
 ```
 
 A good place to do this is when the client is connected to the server.
 
 ```javascript
-bus.socket(function (socket, bus) {
-  socket.get('user', function (err, user) {
-    if (err) return socket.emit('error', err);
-    if (!user) return socket.emit('login', 'You must login');
-    bus.alias(socket, user.name);
+bus.socket(function (sock, bus) {
+  sock.get('user', function (err, user) {
+    if (err) return sock.emit('error', err);
+    if (!user) return sock.emit('login', 'You must login');
+    bus.alias(sock, user.name);
   });
 });
 ```
 
-### Server#unalias(socket:Object, name:String)
+### Server#unalias(sock:Object, name:String)
 
 With **unalias** your **actor** will no longer receive messages whenever their **alias**
 receives one.  This is useful if you want to control messages going to your socket.
 
 ```javascript
-bus.unalias(socket, 'nathan');
+bus.unalias(sock, 'nathan');
 ```
 
 An example is if you do not want to listen to messages from another user.
@@ -279,12 +280,12 @@ bus.in('stop following', function (msg, sock, next) {
 ### Server#in(fn#Function,...)
 
 The **in** method will use the passed function(s) when a message is received 
-from the `socket`.  This allows you to modify the message before it
+from the `sock`.  This allows you to modify the message before it
 is sent to the `exchange`.
 
 ```javascript
-bus.in(function (message, socket, next) {
-  message.content([message.content()[0].toLowerCase()]);
+bus.in(function (msg, sock, next) {
+  msg.content([msg.content()[0].toLowerCase()]);
   next();
 });
 ```
@@ -298,7 +299,7 @@ bus.in(function (a,b,c) {...}, function (a,b,c) {...}, [function (a,b,c) {...}, 
 You can set up handlers for specific messages.
 
 ```javascript
-bus.in('chat', function (message, socket, next) {
+bus.in('chat', function (msg, sock, next) {
   // do something
   next();
 });
@@ -307,36 +308,41 @@ bus.in('chat', function (message, socket, next) {
 If you bind multiple handlers they will be called in this order
 
 ```javascript
-bus.in('chat', function (message, socket, next) {
-  message.content('A');
+bus.in('chat', function (msg, sock, next) {
+  msg.content('A');
   next();
 });
 
-bus.in(function (message, socket, next) {
-  message.content(message.content()+'B');
+bus.in(function (msg, sock, next) {
+  msg.content(msg.content()+'B');
 });
 
-bus.in('chat', function (message, socket, next) {
-  message.content(message.content()+'C');
+bus.in('chat', function (msg, sock, next) {
+  msg.content(msg.content()+'C');
   next();
 });
 
-// The output of message.content() will be 'ABC';
+bus.in(function (err, msg, sock, next) {
+  console.error(err);
+  msg.errored(err);
+});
+
+// The output of msg.content() will be 'ABC';
 ```
 
-You can control propagation with `consume()`, `deliver()`, `respond()` as well.
+You can control propagation with `consume()`, `deliver()`, `respond()`, `errored()` as well.
 
 ```javascript
-bus.in(function (message, socket, next) {
-  message.deliver();
+bus.in(function (msg, sock, next) {
+  msg.deliver();
 });
 
-bus.in(function (message, socket, next) {
+bus.in(function (msg, sock, next) {
   // will not be called because the message will delivered to the target as a result of calling deliver!!
 });
 
-bus.in(function (message, socket, next) {
-  message.consume();
+bus.in(function (msg, sock, next) {
+  msg.consume();
   // the message will just die here
 });
 ```
@@ -348,17 +354,17 @@ message and give you the ability to either deliver the message or discard it.
 That is up to your application requirements.
 
 ```javascript
-bus.on('some event', function (message) {
-  message.deliver();
+bus.on('some event', function (msg) {
+  msg.deliver();
 });
 ```
 
 Or you can use the optional `next` parameter.  You may eiter call `next()` to
-invoke the next handler.  Or you may call `message.deliver()`, `message.respond()`,
-or `message.consumed()` to control the message's propagation.
+invoke the next handler.  Or you may call `msg.deliver()`, `msg.respond()`,
+or `msg.consumed()` to control the message's propagation.
 
 ```javascript
-bus.on('some event', function (message, next) {
+bus.on('some*', function (msg, next) {
   // do something!
   next();
 });
@@ -368,7 +374,7 @@ bus.on('some event', function (message, next) {
 
 The **out** method will use the passed function(s) when a message is received
 from the `exchange`. This allows you to modify the message before it
-is sent to the `socket`. 
+is sent to the `sock`. 
 
 Here you could save the message to a mongo store using mongoose.
 
@@ -376,8 +382,8 @@ Here you could save the message to a mongo store using mongoose.
 //assuming you have mongoose and a message model
 var Message = monngose.model('Message');
 
-bus.out(function (message, socket, next) {
-  new Message(message.data).save(function (err) {
+bus.out(function (msg, sock, next) {
+  new Message(msg.data).save(function (err) {
     if (err) return next(err);
     next();
   });
@@ -393,7 +399,7 @@ bus.out(function (a,b,c) {...}, function (a,b,c) {...}, [function (a,b,c) {...},
 You can set up handlers for specific messages.
 
 ```javascript
-bus.out('chat', function (message, socket, next) {
+bus.out('chat', function (msg, sock, next) {
   // do something
   next();
 });
@@ -402,36 +408,41 @@ bus.out('chat', function (message, socket, next) {
 If you bind multiple handlers they will be called in this order
 
 ```javascript
-bus.out('chat', function (message, socket, next) {
-  message.content('A');
+bus.out('chat', function (msg, sock, next) {
+  msg.content('A');
   next();
 });
 
-bus.out(function (message, socket, next) {
-  message.content(message.content()+'B');
+bus.out(function (msg, sock, next) {
+  msg.content(msg.content()+'B');
 });
 
-bus.out('chat', function (message, socket, next) {
-  message.content(message.content()+'C');
+bus.out('chat', function (msg, sock, next) {
+  msg.content(msg.content()+'C');
   next();
 });
 
-assert.equal(message.content(), 'ABC');
+bus.out(function (err, msg, sock, next) {
+  console.error(err);
+  msg.errored(err);
+});
+
+assert.equal(msg.content(), 'ABC');
 ```
 
-You can control propagation with `consume()`, `deliver()`, `respond()` as well.
+You can control propagation with `consume()`, `deliver()`, `respond()`, `errored()` as well.
 
 ```javascript
-bus.out(function (message, socket, next) {
-  message.deliver();
+bus.out(function (msg, sock, next) {
+  msg.deliver();
 });
 
-bus.out(function (message, socket, next) {
+bus.out(function (msg, sock, next) {
   // will not be called because the message will delivered to the target as a result of calling deliver!!
 });
 
-bus.out(function (message, socket, next) {
-  message.consume();
+bus.out(function (msg, sock, next) {
+  msg.consume();
   // the message will just die here
 });
 ```
@@ -466,7 +477,7 @@ This will create you an object for building a message that you can deliver.  The
 `data` can either be an object or an instanceof of `Message`.
 
 ```javascript
-bus.message({
+bus.msg({
   actor:'I',
   action:'say',
   content:'hello'
@@ -477,7 +488,7 @@ bus.message({
 A chain-able approach.
 
 ```javascript
-bus.message()
+bus.msg()
   .actor('me')
   .action('say')
   .content('hello')
@@ -488,7 +499,7 @@ bus.message()
 Simply put.
 
 ```javascript
-bus.message()
+bus.msg()
   .i('me')
   .did('say')
   .what('hello')
@@ -561,8 +572,8 @@ bus.pubsub(pubsub);
 Instead of having to write a function to deliver a message like this.
 
 ```javascript
-bus.on('some message', function (message) {
-  message.deliver();
+bus.on(/some message/, function (msg) {
+  msg.deliver();
 });
 ```
 
@@ -589,8 +600,8 @@ the bus.
 function tracker (emitter) {
   return function (bus) {
     function handler (event) {
-      return function (message, next) {
-        emitter.emit('track', event, message);
+      return function (msg, next) {
+        emitter.emit('track', event, msg);
         next();
       }
     }
@@ -602,11 +613,11 @@ function tracker (emitter) {
 
 var receiver = new require('events').EventEmitter();
 
-report.on('track', function (point, message) {
+report.on('track', function (point, msg) {
   this.data = this.data || {};
   this.data[point] = this.data[point] || {};
-  this.data[point][message.action()] = this.data[point][message.action()] || 0;
-  this.data[point][message.action()] += 1;
+  this.data[point][msg.action()] = this.data[point][msg.action()] || 0;
+  this.data[point][msg.action()] += 1;
 });
 
 report.on('report', function () {
