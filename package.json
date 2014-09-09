@@ -44,8 +44,8 @@
     "bus.io-common": "^0.2",
     "bus.io-exchange": "^0.3",
     "bus.io-messages": "^0.2",
-    "bus.io-receiver": "^0.1.3",
-    "debug": "~1.0.2",
+    "bus.io-receiver": "^0.1.4",
+    "debug": "~2",
     "socket.io": "^1.0.2"
   },
   "devDependencies": {
