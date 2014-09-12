@@ -1,20 +1,4 @@
 /*
- * Use Cluster to fork this process, each process is an app instance.
- */
-
-var cluster = require('cluster'), cpus = require('os').cpus().length;
-
-if (cluster.isMaster) {
-  for (var i=0; i<cpus; i++) {
-    cluster.fork();
-  }
-  cluster.on('exit', function () {
-    cluster.fork();
-  });
-  return;
-}
-
-/*
  * We are a child process now
  */
 
@@ -36,7 +20,7 @@ app.use(express.static(__dirname + '/public/'));
  * Create a Server to attach our Express app
  */
 
-var server = require('http').Server(app).listen(process.env.PORT || 3000);
+var server = require('http').Server(app);
 
 /*
  * Get a Bus and using our Server
@@ -145,3 +129,9 @@ bus.out('set name', function (msg, sock, next) {
   }
   next();
 });
+
+/*
+ * Use sticky-session which will help us out with our process clustering
+ */
+
+require('sticky-session')(server).listen(process.env.PORT || 3000);

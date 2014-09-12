@@ -13,6 +13,7 @@
     "express-session": "^1.2.1",
     "bus.io": "*",
     "bus.io-session": "*",
-    "debug": "^1.0.4"
+    "debug": "^1.0.4",
+    "sticky-session": "^0.1.0"
   }
 }
