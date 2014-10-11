@@ -1,6 +1,6 @@
 {
   "name": "bus.io",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "An express inspired, event-driven framework for building real time distributed applications over socket.io and redis.",
   "main": "index.js",
   "scripts": {
@@ -42,7 +42,7 @@
   "dependencies": {
     "bus.io-client": "^0.2",
     "bus.io-common": "^0.2",
-    "bus.io-exchange": "^0.4",
+    "bus.io-exchange": "^0.5",
     "bus.io-messages": "^0.2",
     "bus.io-receiver": "^0.1.5",
     "debug": "~2",
