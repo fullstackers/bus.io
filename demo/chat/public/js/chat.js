@@ -50,8 +50,8 @@ $(function () {
     }
   });
 
-  socket.on('set name', function (who, what, to, when) {
-    if (me === what) {
+  socket.on('set name', function (msg) {
+    if (me === msg.content()) {
       $('#error').hide();
       $('#login').hide();
       $('#update').show();
@@ -59,52 +59,52 @@ $(function () {
     }
     $('#messages').prepend(
       $('<li>')
-        .append($('<div>').addClass('user-box').addClass('you').append(what))
+      .append($('<div>').addClass('user-box').addClass('you').append(message.content()))
         .append($('<div>').addClass('message-container').append(
           $('<div>').addClass('bubble').append('just joined!'),
           $('<div>').addClass('message-summary').append(
             'To:',
-            $('<span>').addClass('italic').append(to),
+            $('<span>').addClass('italic').append(message.target()),
             'At:',
-            $('<span>').addClass('italic').append(when)
+            $('<span>').addClass('italic').append(message.created())
           )
         ))
     );
   });
 
-  socket.on('left', function (who, to, what, when) {
+  socket.on('left', function (msg) {
     $('#messages').prepend(
       $('<li>')
-        .append($('<div>').addClass('user-box').addClass('you').append(who))
+      .append($('<div>').addClass('user-box').addClass('you').append(msg.actor()))
         .append($('<div>').addClass('message-container').append(
           $('<div>').addClass('bubble').append('just left!'),
           $('<div>').addClass('message-summary').append(
             'To:',
-            $('<span>').addClass('italic').append(to),
+            $('<span>').addClass('italic').append(msg.target()),
             'At:',
-            $('<span>').addClass('italic').append(when)
+            $('<span>').addClass('italic').append(msg.created())
           )
         ))
     );
   });
 
-  socket.on('post', function (who, what, to, when) {
-    var userClass = who === me ? '' : 'you';
+  socket.on('post', function (msg) {
+    var userClass = msg.actor() === me ? '' : 'you', to = msg.target();
 
-    if (to === me) {
+    if (msg.target() === me) {
       to = 'you';
     }
 
     $('#messages').prepend(
       $('<li>')
-        .append($('<div>').addClass('user-box').addClass(userClass).append(who))
+      .append($('<div>').addClass('user-box').addClass(userClass).append(msg.actor()))
         .append($('<div>').addClass('message-container').append(
-          $('<div>').addClass('bubble').append(what),
+            $('<div>').addClass('bubble').append(msg.content()),
           $('<div>').addClass('message-summary').append(
             'To:',
-            $('<span>').addClass('italic').append(to),
+            $('<span>').addClass('italic').append(msg.target()),
             'At:',
-            $('<span>').addClass('italic').append(when)
+            $('<span>').addClass('italic').append(msg.created())
           )
         ))
     );
